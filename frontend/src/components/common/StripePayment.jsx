@@ -75,7 +75,7 @@ const StripePayment = ({ amount, type, metadata, onSuccess, onError }) => {
                 disabled={!stripe || processing}
                 className="payment-button"
             >
-                {processing ? 'Processing...' : `Pay $${amount}`}
+                {processing ? 'Processing...' : `Pay Rs. ${amount}`}
             </button>
         </form>
     );

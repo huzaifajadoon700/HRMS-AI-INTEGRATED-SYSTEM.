@@ -1,5 +1,6 @@
 const Order = require("../Models/Order");
 const User = require("../Models/User");
+const UserFoodInteraction = require("../Models/UserFoodInteraction");
 const http = require("http");
 const socketIo = require("socket.io");
 const mongoose = require("mongoose");
@@ -12,10 +13,34 @@ const io = socketIo(server);
 exports.createOrder = async (req, res) => {
   try {
     const { items, totalPrice, deliveryFee, deliveryAddress, deliveryLocation, payment, paymentMethodId } = req.body;
-    const userId = req.user._id;
-    
+
+    // Debug authentication
+    console.log("req.user object:", req.user);
+    console.log("req.headers.authorization:", req.headers.authorization);
+
+    if (!req.user) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
+
+    const userId = req.user._id || req.user.id;
+
     console.log("Creating order for user:", userId);
     console.log("Order data received:", { items, totalPrice, deliveryFee, deliveryAddress, deliveryLocation, payment, paymentMethodId });
+
+    // Log each item in detail to debug the menuItemId issue
+    console.log("🔍 Detailed items analysis:");
+    items.forEach((item, index) => {
+      console.log(`Item ${index}:`, {
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        itemId: item.itemId,
+        menuItemId: item.menuItemId,
+        id: item.id,
+        _id: item._id,
+        allKeys: Object.keys(item)
+      });
+    });
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ message: "Order items must be a non-empty array" });
@@ -26,6 +51,8 @@ exports.createOrder = async (req, res) => {
     }
 
     for (const item of items) {
+      console.log('Validating item:', item);
+
       if (!item.quantity || !item.price || !item.name) {
         return res.status(400).json({ message: "Each item must have name, quantity, and price" });
       }
@@ -44,7 +71,7 @@ exports.createOrder = async (req, res) => {
         // First create the payment intent
         paymentIntent = await stripe.paymentIntents.create({
           amount: (totalPrice + deliveryFee) * 100, // Convert to cents
-          currency: 'usd',
+          currency: 'pkr',
           payment_method_types: ['card'],
           metadata: {
             orderItems: JSON.stringify(items),
@@ -70,10 +97,27 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    // Create a new order with a unique ID
+    // Simple item mapping - just use items as they are, similar to booking/reservation controllers
+    console.log("🔄 Processing order items...");
+    const mappedItems = items.map((item) => {
+      console.log(`📦 Processing item:`, item);
+
+      return {
+        menuItemId: item.itemId || item.menuItemId || item.id || item._id || null,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        customizations: item.customizations || '',
+        addOns: item.addOns || []
+      };
+    });
+
+    console.log("✅ Items processed, creating order...");
+
+    // Create order directly like booking/reservation controllers
     const newOrder = new Order({
       user: userId,
-      items,
+      items: mappedItems,
       totalPrice,
       deliveryFee,
       deliveryAddress,
@@ -85,11 +129,42 @@ exports.createOrder = async (req, res) => {
       paymentStatus: paymentIntent?.status || 'pending'
     });
 
-    console.log("Order object created with ID:", newOrder._id);
-    console.log("Full order object:", newOrder);
-    
-    // Save the order
+    console.log("Creating order with data:", newOrder);
+
+    // Test validation before saving
+    console.log("🧪 Testing order validation...");
+    const validationError = newOrder.validateSync();
+    if (validationError) {
+      console.error("❌ Order validation failed:", validationError.message);
+      console.error("❌ Validation errors:", validationError.errors);
+      return res.status(400).json({
+        message: "Order validation failed",
+        error: validationError.message,
+        details: validationError.errors
+      });
+    }
+    console.log("✅ Order validation passed, saving...");
+
     const savedOrder = await newOrder.save();
+
+    // 🍽️ Record food interactions for recommendation system
+    try {
+      for (const item of mappedItems) {
+        if (item.menuItemId) {
+          const interaction = new UserFoodInteraction({
+            userId: userId,
+            menuItemId: item.menuItemId,
+            interactionType: 'order',
+            orderQuantity: item.quantity || 1
+          });
+          await interaction.save();
+        }
+      }
+      console.log(`📊 Recorded ${mappedItems.length} food interactions for recommendation system`);
+    } catch (interactionError) {
+      console.error('Error recording food interactions:', interactionError);
+      // Don't fail the order if interaction recording fails
+    }
 
     // Get socket.io instance
     const socketModule = require('../socket');
@@ -134,22 +209,59 @@ exports.getOrders = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
+    const userId = req.user._id;
+    console.log("🔍 Looking for orders for user ID:", userId);
+
     // Build query based on user role
     let query = {};
+    let orders = [];
+
     if (!req.user.isAdmin) {
       // Regular users can only see their own orders
-      query.user = req.user._id;
+      console.log("🔍 User is not admin, searching for user-specific orders");
+
+      // Try current user ID format first
+      query.user = userId;
+      orders = await Order.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+      console.log("Orders found with current userId:", orders.length);
+
+      // If no orders found, try string version of user ID
+      if (orders.length === 0) {
+        console.log("🔄 Trying to find orders with string userId...");
+        query.user = userId.toString();
+        orders = await Order.find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit);
+        console.log("Orders found with string userId:", orders.length);
+      }
+    } else {
+      // Admin can see all orders
+      console.log("🔍 Admin user, fetching all orders");
+      orders = await Order.find(query)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
     }
 
-    // Get total count for pagination
-    const totalOrders = await Order.countDocuments(query);
-    const totalPages = Math.ceil(totalOrders / limit);
+    // Get total count for pagination (use the same query logic)
+    let totalOrders;
+    if (!req.user.isAdmin) {
+      // Try to count with current user ID first
+      totalOrders = await Order.countDocuments({ user: userId });
+      if (totalOrders === 0) {
+        totalOrders = await Order.countDocuments({ user: userId.toString() });
+      }
+    } else {
+      totalOrders = await Order.countDocuments({});
+    }
 
-    // Fetch orders with pagination
-    const orders = await Order.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+    const totalPages = Math.ceil(totalOrders / limit);
+    console.log("Final orders found:", orders.length);
 
     // Ensure all price fields are valid numbers
     const validatedOrders = orders.map(order => ({

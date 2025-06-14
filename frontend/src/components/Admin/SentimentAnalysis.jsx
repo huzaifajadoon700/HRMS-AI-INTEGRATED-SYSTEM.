@@ -11,7 +11,7 @@ import {
   Legend,
   ArcElement
 } from 'chart.js';
-import { Bar, Pie } from 'react-chartjs-2';
+import {  Pie } from 'react-chartjs-2';
 
 ChartJS.register(
   CategoryScale,
@@ -124,6 +124,7 @@ const SentimentAnalysis = () => {
   };
 
   return (
+    <div className="enhanced-sentiment-analysis-module-container">
     <div className="container-fluid mt-4">
       <h2 className="mb-4">Feedback Analytics</h2>
       
@@ -194,7 +195,8 @@ const SentimentAnalysis = () => {
         </Card.Body>
       </Card>
     </div>
+    </div>
   );
 };
 
-export default SentimentAnalysis; 
+export default SentimentAnalysis;

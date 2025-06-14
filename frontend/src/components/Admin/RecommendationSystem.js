@@ -1,140 +1,251 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Card, Button, Alert, Spinner, Badge, Table } from "react-bootstrap";
+import { FiTrendingUp, FiUsers, FiStar, FiBarChart2, FiRefreshCw, FiSettings } from "react-icons/fi";
+import { recommendationAPI } from "../../api/recommendations";
 import "./RecommendationSystem.css";
 
-const customerHistory = {
-  rooms: [
-    { id: 1, name: "Ocean View Suite", date: "2024-12-10", rating: 4.5 },
-    { id: 2, name: "Mountain Cabin", date: "2024-11-25", rating: 4.0 },
-  ],
-  menuItems: [
-    { id: 1, name: "Grilled Salmon", rating: 4.8 },
-    { id: 2, name: "Vegetarian Pasta", rating: 4.2 },
-  ],
-};
-
 const RecommendationSystem = () => {
-  const [recommendedRooms, setRecommendedRooms] = useState([]);
-  const [recommendedMenu, setRecommendedMenu] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [analytics, setAnalytics] = useState(null);
+  const [mlInfo, setMLInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const suggestRooms = () => {
-    setLoading(true);
+  useEffect(() => {
+    loadData();
+  }, []);
 
-    const rooms = [
-      { id: 1, name: "Ocean View Suite", description: "A luxurious oceanfront suite", rating: 4.8 },
-      { id: 2, name: "Mountain Cabin", description: "A cozy cabin in the mountains", rating: 4.7 },
-      { id: 3, name: "City Loft", description: "A modern loft in the heart of the city", rating: 4.5 },
-    ];
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-    // Suggest rooms based on customer history ratings
-    const recommendations = rooms.filter((room) =>
-      customerHistory.rooms.some((history) => room.rating >= history.rating)
-    );
+      // Load analytics and ML info in parallel
+      const [analyticsResponse, mlInfoResponse] = await Promise.all([
+        recommendationAPI.getAnalytics().catch(() => ({ success: false })),
+        recommendationAPI.getMLInfo().catch(() => ({ success: false }))
+      ]);
 
-    setTimeout(() => {
-      setRecommendedRooms(recommendations);
+      if (analyticsResponse.success) {
+        setAnalytics(analyticsResponse.analytics);
+      }
+
+      if (mlInfoResponse.success) {
+        setMLInfo(mlInfoResponse);
+      }
+
+    } catch (err) {
+      console.error('Error loading recommendation data:', err);
+      setError('Failed to load recommendation system data');
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
-  const suggestMenuItems = () => {
-    setLoading(true);
-
-    const menuItems = [
-      { id: 1, name: "Grilled Salmon", description: "Fresh salmon grilled to perfection", rating: 4.9 },
-      { id: 2, name: "Vegetarian Pasta", description: "A healthy vegetarian pasta", rating: 4.6 },
-      { id: 3, name: "Steak Frites", description: "A classic steak with fries", rating: 4.8 },
-    ];
-
-    // Suggest menu items based on customer history ratings
-    const recommendations = menuItems.filter((item) =>
-      customerHistory.menuItems.some((history) => item.rating >= history.rating)
-    );
-
-    setTimeout(() => {
-      setRecommendedMenu(recommendations);
-      setLoading(false);
-    }, 1000);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadData();
+    setRefreshing(false);
   };
+
+  if (loading) {
+    return (
+      <div className="enhanced-recommendation-system-module-container">
+      <Container className="recommendation-admin-container">
+        <div className="text-center py-5">
+          <Spinner animation="border" variant="primary" />
+          <p className="mt-3">Loading recommendation system data...</p>
+        </div>
+      </Container>
+      </div>
+    );
+  }
 
   return (
-    <div className="cosmic-container">
-      <h2 className="cosmic-title text-center">Personalized Recommendations</h2>
-      <p className="cosmic-subtitle text-center">
-        Based on your history, we suggest the following rooms and menu items for your next visit:
-      </p>
-
-      <div className="row cosmic-row mb-5">
-        {/* Recommended Rooms */}
-        <div className="col-md-6">
-          <div className="card cosmic-card shadow-sm">
-            <div className="card-header cosmic-card-header">
-              Recommended Rooms
-            </div>
-            <div className="card-body cosmic-card-body">
-              <button
-                className="btn cosmic-button"
-                onClick={suggestRooms}
-                disabled={loading}
-              >
-                {loading ? "Loading..." : "Get Room Suggestions"}
-              </button>
-              <ul className="list-group cosmic-list mt-3">
-                {recommendedRooms.length > 0 ? (
-                  recommendedRooms.map((room) => (
-                    <li key={room.id} className="list-group-item cosmic-list-item">
-                      <h5>{room.name}</h5>
-                      <p>{room.description}</p>
-                      <span className="badge cosmic-badge-success">
-                        {room.rating} / 5
-                      </span>
-                    </li>
-                  ))
-                ) : (
-                  <p className="cosmic-info-text">
-                    No room suggestions yet. Click the button to get recommendations.
-                  </p>
-                )}
-              </ul>
-            </div>
+    <div className="enhanced-recommendation-system-module-container">
+    <Container className="recommendation-admin-container">
+      {/* Header */}
+      <div className="admin-header mb-4">
+        <div className="d-flex justify-content-between align-items-center">
+          <div>
+            <h2 className="admin-title">
+              <FiBarChart2 className="me-2" />
+              AI Recommendation System
+            </h2>
+            <p className="admin-subtitle">
+              Monitor and manage the intelligent food recommendation system
+            </p>
           </div>
-        </div>
-
-        {/* Recommended Menu Items */}
-        <div className="col-md-6">
-          <div className="card cosmic-card shadow-sm">
-            <div className="card-header cosmic-card-header cosmic-card-header-menu">
-              Recommended Menu Items
-            </div>
-            <div className="card-body cosmic-card-body">
-              <button
-                className="btn cosmic-button"
-                onClick={suggestMenuItems}
-                disabled={loading}
-              >
-                {loading ? "Loading..." : "Get Menu Suggestions"}
-              </button>
-              <ul className="list-group cosmic-list mt-3">
-                {recommendedMenu.length > 0 ? (
-                  recommendedMenu.map((item) => (
-                    <li key={item.id} className="list-group-item cosmic-list-item">
-                      <h5>{item.name}</h5>
-                      <p>{item.description}</p>
-                      <span className="badge cosmic-badge-warning">
-                        {item.rating} / 5
-                      </span>
-                    </li>
-                  ))
-                ) : (
-                  <p className="cosmic-info-text">
-                    No menu suggestions yet. Click the button to get recommendations.
-                  </p>
-                )}
-              </ul>
-            </div>
-          </div>
+          <Button
+            variant="outline-primary"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="refresh-btn"
+          >
+            <FiRefreshCw className={refreshing ? 'spinning' : ''} />
+            Refresh
+          </Button>
         </div>
       </div>
+
+      {error && (
+        <Alert variant="danger" className="mb-4">
+          <FiStar className="me-2" />
+          {error}
+        </Alert>
+      )}
+
+      {/* ML System Status */}
+      {mlInfo && (
+        <Row className="mb-4">
+          <Col md={12}>
+            <Card className="ml-status-card">
+              <Card.Header className="bg-primary text-white">
+                <FiSettings className="me-2" />
+                Machine Learning System Status
+              </Card.Header>
+              <Card.Body>
+                <Row>
+                  <Col md={3}>
+                    <div className="status-metric">
+                      <h4 className="text-success">
+                        {mlInfo.modelInfo?.performance?.rmse?.toFixed(4) || 'N/A'}
+                      </h4>
+                      <small className="text-muted">RMSE Score</small>
+                    </div>
+                  </Col>
+                  <Col md={3}>
+                    <div className="status-metric">
+                      <h4 className="text-info">
+                        {mlInfo.modelInfo?.performance?.mae?.toFixed(4) || 'N/A'}
+                      </h4>
+                      <small className="text-muted">MAE Score</small>
+                    </div>
+                  </Col>
+                  <Col md={3}>
+                    <div className="status-metric">
+                      <h4 className="text-warning">
+                        {Object.keys(mlInfo.pakistaniCuisine || {}).length}
+                      </h4>
+                      <small className="text-muted">Pakistani Adaptations</small>
+                    </div>
+                  </Col>
+                  <Col md={3}>
+                    <div className="status-metric">
+                      <h4 className="text-primary">
+                        {mlInfo.userHistory?.length || 0}
+                      </h4>
+                      <small className="text-muted">User Profiles</small>
+                    </div>
+                  </Col>
+                </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      )}
+
+      {/* Analytics Dashboard */}
+      {analytics && (
+        <Row>
+          <Col md={6}>
+            <Card className="analytics-card mb-4">
+              <Card.Header>
+                <FiUsers className="me-2" />
+                User Engagement
+              </Card.Header>
+              <Card.Body>
+                <div className="metric-row">
+                  <span>Total Users:</span>
+                  <Badge bg="primary">{analytics.totalUsers || 0}</Badge>
+                </div>
+                <div className="metric-row">
+                  <span>Active Users (30 days):</span>
+                  <Badge bg="success">{analytics.activeUsers || 0}</Badge>
+                </div>
+                <div className="metric-row">
+                  <span>Total Interactions:</span>
+                  <Badge bg="info">{analytics.totalInteractions || 0}</Badge>
+                </div>
+                <div className="metric-row">
+                  <span>Average Rating:</span>
+                  <Badge bg="warning">{analytics.averageRating?.toFixed(2) || 'N/A'}</Badge>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+
+          <Col md={6}>
+            <Card className="analytics-card mb-4">
+              <Card.Header>
+                <FiTrendingUp className="me-2" />
+                Popular Items
+              </Card.Header>
+              <Card.Body>
+                {analytics.popularItems?.length > 0 ? (
+                  <Table striped bordered hover size="sm">
+                    <thead>
+                      <tr>
+                        <th>Item</th>
+                        <th>Rating</th>
+                        <th>Orders</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {analytics.popularItems.slice(0, 5).map((item, index) => (
+                        <tr key={index}>
+                          <td>{item.name}</td>
+                          <td>
+                            <Badge bg="warning">
+                              {item.averageRating?.toFixed(1) || 'N/A'}
+                            </Badge>
+                          </td>
+                          <td>
+                            <Badge bg="info">
+                              {item.totalOrders || 0}
+                            </Badge>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                ) : (
+                  <p className="text-muted">No popular items data available</p>
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      )}
+
+      {/* Pakistani Cuisine Insights */}
+      {mlInfo?.pakistaniCuisine && (
+        <Row>
+          <Col md={12}>
+            <Card className="pakistani-insights-card">
+              <Card.Header className="bg-success text-white">
+                <FiStar className="me-2" />
+                Pakistani Cuisine Insights
+              </Card.Header>
+              <Card.Body>
+                <Row>
+                  {Object.entries(mlInfo.pakistaniCuisine).map(([key, value], index) => (
+                    <Col md={3} key={index} className="mb-3">
+                      <div className="insight-metric">
+                        <h5 className="text-success">{key.replace(/([A-Z])/g, ' $1').trim()}</h5>
+                        <p className="text-muted">
+                          {typeof value === 'object' ? JSON.stringify(value) : value}
+                        </p>
+                      </div>
+                    </Col>
+                  ))}
+                </Row>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      )}
+    </Container>
     </div>
   );
 };

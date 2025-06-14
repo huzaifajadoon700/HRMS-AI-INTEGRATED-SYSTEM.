@@ -62,7 +62,7 @@ const MenuList = ({ addToCart }) => {
               <h3 className="item-title">{item.name}</h3>
               <p className="item-description">{item.description}</p>
               <div className="item-footer">
-                <span className="item-price">${item.price}</span>
+                <span className="item-price">Rs. {item.price.toFixed(0)}</span>
                 <button 
                   className="add-to-cart-btn"
                   onClick={(e) => {

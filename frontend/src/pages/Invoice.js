@@ -64,10 +64,10 @@ const Invoice = () => {
         <div className="invoice-container" ref={invoiceRef}>
           <div className="invoice-header">
             <div className="hotel-info">
-              <h1>Night Elegance</h1>
-              <p>123 Luxury Avenue</p>
-              <p>City, State 12345</p>
-              <p>Tel: (555) 123-4567</p>
+              <h1>Hotel & Restaurant Management System</h1>
+              <p>123 Main Street, Karachi</p>
+              <p>Karachi, Pakistan 75000</p>
+              <p>Tel: +92 21 123 456 7890</p>
             </div>
             <div className="invoice-details">
               <h2>INVOICE</h2>
@@ -103,8 +103,8 @@ const Invoice = () => {
                     <small>Check-out: {formatDate(booking.checkOutDate)}</small>
                   </td>
                   <td>{booking.numberOfNights}</td>
-                  <td>${(booking.basePrice / booking.numberOfNights).toFixed(2)}</td>
-                  <td>${booking.basePrice}</td>
+                  <td>Rs. {parseInt(booking.basePrice / booking.numberOfNights).toLocaleString('en-PK')}</td>
+                  <td>Rs. {parseInt(booking.basePrice).toLocaleString('en-PK')}</td>
                 </tr>
                 {booking.specialRequests && (
                   <tr>
@@ -121,15 +121,15 @@ const Invoice = () => {
           <div className="invoice-summary">
             <div className="summary-item">
               <span>Subtotal:</span>
-              <span>${booking.basePrice}</span>
+              <span>Rs. {parseInt(booking.basePrice || booking.totalPrice * 0.9).toLocaleString('en-PK')}</span>
             </div>
             <div className="summary-item">
               <span>Tax (10%):</span>
-              <span>${booking.taxAmount}</span>
+              <span>Rs. {parseInt(booking.taxAmount || booking.totalPrice * 0.1).toLocaleString('en-PK')}</span>
             </div>
             <div className="summary-item total">
               <span>Total:</span>
-              <span>${booking.totalPrice}</span>
+              <span>Rs. {parseInt(booking.totalPrice).toLocaleString('en-PK')}</span>
             </div>
             <div className="summary-item payment">
               <span>Payment Method:</span>
@@ -138,7 +138,7 @@ const Invoice = () => {
           </div>
 
           <div className="invoice-footer">
-            <p>Thank you for choosing Night Elegance</p>
+            <p>Thank you for choosing our Hotel & Restaurant Management System</p>
             <small>This is a computer-generated invoice and requires no signature</small>
           </div>
         </div>

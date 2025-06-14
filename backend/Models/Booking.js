@@ -15,7 +15,22 @@ const Booking = mongoose.models.Booking || mongoose.model("Booking", new mongoos
   fullName: { type: String },
   email: { type: String },
   phone: { type: String },
-  specialRequests: { type: String }
+  specialRequests: { type: String },
+  // Payment tracking fields
+  paymentIntentId: { type: String, default: null },
+  paymentStatus: {
+    type: String,
+    enum: ['pending', 'succeeded', 'failed', 'refunded'],
+    default: 'pending'
+  },
+  // Booking status
+  status: {
+    type: String,
+    enum: ['pending', 'confirmed', 'checked-in', 'checked-out', 'cancelled'],
+    default: 'confirmed'
+  }
+}, {
+  timestamps: true // This adds createdAt and updatedAt automatically
 }));
 
 module.exports = Booking;

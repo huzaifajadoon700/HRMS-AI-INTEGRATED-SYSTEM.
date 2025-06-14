@@ -155,6 +155,186 @@ body {
   border-top: 1px solid var(--accent);
 }
 
+/* Page Header with Analytics */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1.5rem;
+  border-radius: 15px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  color: var(--text-light);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* Table Analytics Styles */
+.table-info strong {
+  color: var(--text-light);
+  font-size: 1.1rem;
+}
+
+.table-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.capacity-info {
+  display: flex;
+  align-items: center;
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.status-badge {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+}
+
+.rating-display {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #f39c12;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.star-icon {
+  color: #f39c12;
+}
+
+.analytics-data {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metric {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+}
+
+.metric-icon {
+  color: #64ffda;
+  font-size: 0.9rem;
+}
+
+.metric span {
+  font-weight: 600;
+  color: #64ffda;
+}
+
+.metric small {
+  color: rgba(240, 244, 252, 0.7);
+  font-size: 0.75rem;
+}
+
+.performance-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.performance-score {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: #f39c12;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.performance-level {
+  font-size: 0.8rem;
+}
+
+/* Enhanced Table Styles */
+.cosmic-table {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.cosmic-table th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  padding: 1.2rem;
+  border: none;
+}
+
+.cosmic-table td {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.cosmic-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: scale(1.01);
+  transition: all 0.3s ease;
+}
+
+.cosmic-table-image {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.cosmic-table-image:hover {
+  transform: scale(1.1);
+  border-color: #64ffda;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  .analytics-data {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  .performance-metrics {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .cosmic-table {
+    font-size: 0.85rem;
+  }
+
+  .cosmic-table th,
+  .cosmic-table td {
+    padding: 0.75rem 0.5rem;
+  }
+}
+
 /* Utility Classes */
 .text-center {
   text-align: center;

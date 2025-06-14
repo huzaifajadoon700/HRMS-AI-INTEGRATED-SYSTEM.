@@ -81,7 +81,7 @@ const PaymentForm = ({ onPaymentSuccess, totalPrice, onCancel }) => {
                         className="btn btn-primary"
                         disabled={!stripe || processing}
                     >
-                        {processing ? 'Processing...' : `Pay $${totalPrice}`}
+                        {processing ? 'Processing...' : `Pay Rs. ${totalPrice}`}
                     </button>
                 </div>
             </form>
@@ -125,10 +125,10 @@ const MenuOrder = () => {
 
     const handleItemSelect = (item) => {
         setSelectedItems(prev => {
-            const existingItem = prev.find(i => i.id === item.id);
+            const existingItem = prev.find(i => i._id === item._id);
             if (existingItem) {
                 return prev.map(i =>
-                    i.id === item.id
+                    i._id === item._id
                         ? { ...i, quantity: i.quantity + 1 }
                         : i
                 );
@@ -140,7 +140,7 @@ const MenuOrder = () => {
     const handleQuantityChange = (itemId, change) => {
         setSelectedItems(prev =>
             prev.map(item => {
-                if (item.id === itemId) {
+                if (item._id === itemId) {
                     const newQuantity = item.quantity + change;
                     return newQuantity > 0
                         ? { ...item, quantity: newQuantity }
@@ -177,14 +177,14 @@ const MenuOrder = () => {
 
             const orderData = {
                 items: selectedItems.map(item => ({
-                    id: item.id,
+                    menuItemId: item._id,
                     name: item.name,
                     price: item.price,
                     quantity: item.quantity
                 })),
                 payment: 'card',
                 totalPrice: calculateTotal(),
-                deliveryFee: 4.00,
+                deliveryFee: 50,
                 deliveryAddress: deliveryDetails.address,
                 deliveryLocation: deliveryDetails.address,
                 paymentMethodId: paymentMethodId
@@ -270,19 +270,19 @@ const MenuOrder = () => {
                             </thead>
                             <tbody>
                                 {selectedItems.map(item => (
-                                    <tr key={item.id}>
+                                    <tr key={item._id}>
                                         <td>{item.name}</td>
-                                        <td>${item.price}</td>
+                                        <td>Rs. {item.price.toFixed(0)}</td>
                                         <td>
                                             <div className="quantity-controls">
-                                                <button onClick={() => handleQuantityChange(item.id, -1)}>-</button>
+                                                <button onClick={() => handleQuantityChange(item._id, -1)}>-</button>
                                                 <span>{item.quantity}</span>
-                                                <button onClick={() => handleQuantityChange(item.id, 1)}>+</button>
+                                                <button onClick={() => handleQuantityChange(item._id, 1)}>+</button>
                                             </div>
                                         </td>
-                                        <td>${(item.price * item.quantity).toFixed(2)}</td>
+                                        <td>Rs. {(item.price * item.quantity).toFixed(0)}</td>
                                         <td>
-                                            <button onClick={() => handleQuantityChange(item.id, -item.quantity)}>
+                                            <button onClick={() => handleQuantityChange(item._id, -item.quantity)}>
                                                 Remove
                                             </button>
                                         </td>
@@ -329,15 +329,15 @@ const MenuOrder = () => {
                         <div className="order-summary">
                             <div className="summary-item">
                                 <span>Subtotal:</span>
-                                <span>${calculateTotal().toFixed(2)}</span>
+                                <span>Rs. {calculateTotal().toFixed(0)}</span>
                             </div>
                             <div className="summary-item">
                                 <span>Delivery Fee:</span>
-                                <span>$4.00</span>
+                                <span>Rs. 50</span>
                             </div>
                             <div className="summary-item total">
                                 <span>Total Amount:</span>
-                                <span>${(calculateTotal() + 4.00).toFixed(2)}</span>
+                                <span>Rs. {(calculateTotal() + 50).toFixed(0)}</span>
                             </div>
                         </div>
 

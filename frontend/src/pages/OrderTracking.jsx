@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { FiPackage, FiMapPin, FiClock, FiCheckCircle, FiWifi, FiWifiOff } from 'react-icons/fi';
+import { FiMapPin, FiWifi, FiWifiOff } from 'react-icons/fi';
 import { MdRestaurant } from 'react-icons/md';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
@@ -242,7 +242,7 @@ const OrderTracking = () => {
     };
 
     fetchOrder();
-  }, [orderId, location.state, navigate]);
+  }, [orderId, location.state, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Socket connection and updates
   useEffect(() => {
@@ -347,7 +347,7 @@ const OrderTracking = () => {
       }
       disconnectSocket();
     };
-  }, [orderId, loading]);
+  }, [orderId, loading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Helper function to add socket event logs
   const addSocketEvent = (message) => {
@@ -361,9 +361,7 @@ const OrderTracking = () => {
     navigate(-1);
   };
 
-  const handleViewInvoice = () => {
-    navigate(`/invoice/${orderId}`);
-  };
+
 
   const handleRefreshOrder = () => {
     // Debounce protection - prevent multiple refreshes in quick succession

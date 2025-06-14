@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { FiCalendar, FiClock, FiUsers, FiCheckCircle, FiDownload, FiArrowLeft, FiDollarSign, FiCreditCard, FiHash, FiUser, FiMail, FiPhone, FiPrinter } from 'react-icons/fi';
+import { FiCalendar,  FiUsers, FiCheckCircle, FiDownload, FiArrowLeft, FiDollarSign, FiCreditCard, FiHash, FiUser,  FiPrinter, } from 'react-icons/fi';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
@@ -252,10 +252,10 @@ const TableConfirmationPage = () => {
           <div className="invoice-container" ref={invoiceRef}>
             <div className="invoice-header">
               <div className="hotel-info">
-                <h1>Night Elegance</h1>
-                <p>123 Luxury Avenue</p>
-                <p>City, State 12345</p>
-                <p>Tel: (555) 123-4567</p>
+                <h1>Night Elegance Restaurant</h1>
+                <p>123 Main Street, Karachi</p>
+                <p>Karachi, Pakistan 75000</p>
+                <p>Tel: +92 21 123 456 7890</p>
               </div>
               <div className="invoice-details">
                 <h2>INVOICE</h2>
@@ -310,15 +310,15 @@ const TableConfirmationPage = () => {
             <div className="invoice-summary">
               <div className="summary-item">
                 <span>Subtotal:</span>
-                <span>${reservation.totalPrice}</span>
+                <span>Rs. {parseInt(reservation.totalPrice).toLocaleString('en-PK')}</span>
               </div>
               <div className="summary-item">
                 <span>Tax (0%):</span>
-                <span>$0.00</span>
+                <span>Rs. 0</span>
               </div>
               <div className="summary-item total">
                 <span>Total:</span>
-                <span>${reservation.totalPrice}</span>
+                <span>Rs. {parseInt(reservation.totalPrice).toLocaleString('en-PK')}</span>
               </div>
               <div className="summary-item payment">
                 <span>Payment Method:</span>
@@ -337,118 +337,134 @@ const TableConfirmationPage = () => {
   }
 
   return (
-    <PageLayout>
-      <div className="confirmation-container">
-        <div className="confirmation-card">
-          <div className="confirmation-header">
+    <div className="table-confirmation-page">
+      {/* Hero Section */}
+      <div className="confirmation-hero">
+        <div className="hero-content">
+          <div className="success-animation">
             <FiCheckCircle className="success-icon" />
-            <h2>Reservation Confirmed!</h2>
-            <p>Your table has been successfully reserved</p>
+          </div>
+          <h1 className="hero-title">🍽️ Table Reserved!</h1>
+          <p className="hero-subtitle">Your dining experience is confirmed and ready</p>
+          <div className="reservation-id-badge">
+            <FiHash className="badge-icon" />
+            <span>Reservation ID: {reservation._id?.substring(0, 8).toUpperCase() || 'TEMP'}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="confirmation-content">
+        <div className="content-container">
+
+          {/* Quick Summary Cards */}
+          <div className="summary-cards">
+            <div className="summary-card primary">
+              <div className="card-icon">
+                <FiCalendar />
+              </div>
+              <div className="card-content">
+                <h3>Date & Time</h3>
+                <p>{new Date(reservation.reservationDate).toLocaleDateString()} at {reservation.time}</p>
+              </div>
+            </div>
+
+            <div className="summary-card accent">
+              <div className="card-icon">
+                <FiHash />
+              </div>
+              <div className="card-content">
+                <h3>Table {reservation.tableNumber}</h3>
+                <p>Reserved for you</p>
+              </div>
+            </div>
+
+            <div className="summary-card primary">
+              <div className="card-icon">
+                <FiUsers />
+              </div>
+              <div className="card-content">
+                <h3>Party Size</h3>
+                <p>{reservation.guests} guests</p>
+              </div>
+            </div>
+
+            <div className="summary-card success">
+              <div className="card-icon">
+                <FiDollarSign />
+              </div>
+              <div className="card-content">
+                <h3>Total Paid</h3>
+                <p>Rs. {reservation.totalPrice}</p>
+              </div>
+            </div>
           </div>
 
-          <div className="confirmation-details">
+          {/* Detailed Information Grid */}
+          <div className="details-section">
+            <h2 className="section-title">Reservation Details</h2>
             <div className="details-grid">
-              <div className="detail-item">
-                <FiCalendar className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Date</span>
-                  <span className="detail-value">{new Date(reservation.reservationDate).toLocaleDateString()}</span>
+              <div className="detail-card">
+                <div className="detail-header">
+                  <FiUser className="detail-icon" />
+                  <span>Guest Information</span>
+                </div>
+                <div className="detail-body">
+                  <div className="detail-row">
+                    <span className="label">Name:</span>
+                    <span className="value">{userData?.name || reservation.fullName || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="label">Email:</span>
+                    <span className="value">{userData?.email || reservation.email || 'N/A'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="label">Phone:</span>
+                    <span className="value">{reservation.phone || userData?.phone || 'N/A'}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="detail-item">
-                <FiClock className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Time</span>
-                  <span className="detail-value">{reservation.time}</span>
+              <div className="detail-card">
+                <div className="detail-header">
+                  <FiCreditCard className="detail-icon" />
+                  <span>Payment Information</span>
                 </div>
-              </div>
-
-              <div className="detail-item">
-                <FiUsers className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Guests</span>
-                  <span className="detail-value">{reservation.guests}</span>
-                </div>
-              </div>
-
-              <div className="detail-item">
-                <FiHash className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Table</span>
-                  <span className="detail-value">{reservation.tableNumber}</span>
-                </div>
-              </div>
-
-              <div className="detail-item">
-                <FiUser className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Name</span>
-                  <span className="detail-value">{userData?.name || reservation.fullName || 'N/A'}</span>
-                </div>
-              </div>
-
-              <div className="detail-item">
-                <FiMail className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Email</span>
-                  <span className="detail-value">{userData?.email || reservation.email || 'N/A'}</span>
-                </div>
-              </div>
-
-              <div className="detail-item">
-                <FiPhone className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Phone</span>
-                  <span className="detail-value">{reservation.phone || userData?.phone || 'N/A'}</span>
-                </div>
-              </div>
-
-              <div className="detail-item">
-                <FiDollarSign className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Total Amount</span>
-                  <span className="detail-value">${reservation.totalPrice}</span>
-                </div>
-              </div>
-
-              <div className="detail-item">
-                <FiCreditCard className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Payment Method</span>
-                  <span className="detail-value">{reservation.payment}</span>
-                </div>
-              </div>
-
-              <div className="detail-item">
-                <FiHash className="detail-icon" />
-                <div className="detail-content">
-                  <span className="detail-label">Reservation ID</span>
-                  <span className="detail-value">{reservation._id}</span>
+                <div className="detail-body">
+                  <div className="detail-row">
+                    <span className="label">Method:</span>
+                    <span className="value">{reservation.payment === 'card' ? 'Credit Card' : 'PayPal'}</span>
+                  </div>
+                  <div className="detail-row">
+                    <span className="label">Status:</span>
+                    <span className="value success">✓ Confirmed</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="confirmation-actions">
-            <button 
+          {/* Action Buttons */}
+          <div className="action-section">
+            <button
               onClick={handleViewInvoice}
-              className="btn btn-primary"
+              className="action-btn primary"
             >
-              <FiPrinter className="me-2" />
-              View & Print Invoice
+              <FiPrinter />
+              <span>View & Download Invoice</span>
             </button>
-            <button 
-              onClick={() => navigate('/reserve-table')} 
-              className="btn btn-secondary"
+            <button
+              onClick={() => navigate('/my-reservations')}
+              className="action-btn secondary"
             >
-              <FiArrowLeft className="me-2" />
-              Back to Reservation
+              <FiArrowLeft />
+              <span>View All Reservations</span>
             </button>
           </div>
+
         </div>
       </div>
-    </PageLayout>
+    </div>
   );
 };
 

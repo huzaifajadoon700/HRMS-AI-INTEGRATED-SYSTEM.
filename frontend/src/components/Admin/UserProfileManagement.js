@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { FiUser, FiMail, FiLock, FiEdit2, FiTrash2, FiSearch, FiFilter, FiToggleLeft, FiToggleRight, FiUserPlus, FiUserCheck, FiUserX } from "react-icons/fi";
+import { FiUser, FiUsers, FiMail, FiLock, FiEdit2, FiTrash2, FiSearch, FiFilter, FiToggleLeft, FiToggleRight, FiUserPlus, FiUserCheck, FiUserX } from "react-icons/fi";
 import { toast } from "react-toastify";
 import "./UserProfileTable.css";
 
@@ -148,65 +148,128 @@ const UserProfileManagement = () => {
   }
 
   return (
-    <div className="admin-container">
-      <div className="admin-header">
+    <div className="enhanced-user-module-container">
+      {/* Enhanced Header with Modern Design */}
+      <div className="enhanced-user-header">
         <div className="header-content">
-          <h1 className="admin-title">User Management</h1>
-          <p className="admin-subtitle">Manage and monitor user profiles</p>
-        </div>
-        <div className="admin-actions">
-          <div className="search-box">
-            <FiSearch className="search-icon" />
-            <input
-              type="text"
-              placeholder="Search users..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
+          <div className="title-section">
+            <div className="title-wrapper">
+              <div className="title-icon-wrapper">
+                <FiUser className="title-icon" />
+              </div>
+              <div className="title-text">
+                <h1 className="user-title-enhanced">User Management</h1>
+                <p className="user-subtitle-enhanced">Manage and monitor user profiles</p>
+              </div>
+            </div>
           </div>
-          <div className="filter-box">
-            <FiFilter className="filter-icon" />
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="filter-select"
-            >
-              <option value="All">All Roles</option>
-              <option value="admin">Admin</option>
-              <option value="user">User</option>
-            </select>
+
+          <div className="enhanced-filter-section">
+            <div className="filter-controls">
+              <div className="filter-group">
+                <div className="search-box">
+                  <FiSearch className="search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Search users..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="search-input"
+                  />
+                </div>
+              </div>
+              <div className="filter-group">
+                <div className="filter-box">
+                  <FiFilter className="filter-icon" />
+                  <select
+                    value={roleFilter}
+                    onChange={(e) => setRoleFilter(e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="All">All Roles</option>
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                  </select>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="users-stats">
-        <div className="stat-card">
-          <FiUserCheck className="stat-icon" />
-          <div className="stat-info">
-            <span className="stat-value">{users.filter(u => u.isActive).length}</span>
-            <span className="stat-label">Active Users</span>
+      <div className="user-metrics-grid animate-stagger">
+        {/* Active Users Card */}
+        <div className="user-metric-card active-users-card">
+          <div className="card-header">
+            <div className="card-icon active-icon">
+              <FiUserCheck />
+            </div>
+            <div className="card-info">
+              <h3 className="card-title">Active Users</h3>
+              <p className="card-subtitle">Currently Active</p>
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="main-metric">
+              <span className="metric-value">{users.filter(u => u.isActive).length}</span>
+              <span className="metric-period">Users</span>
+            </div>
           </div>
         </div>
-        <div className="stat-card">
-          <FiUserX className="stat-icon" />
-          <div className="stat-info">
-            <span className="stat-value">{users.filter(u => !u.isActive).length}</span>
-            <span className="stat-label">Inactive Users</span>
-          </div>
-        </div>
-        <div className="stat-card">
-          <FiUserPlus className="stat-icon" />
-          <div className="stat-info">
-            <span className="stat-value">{users.filter(u => u.role === 'admin').length}</span>
-            <span className="stat-label">Administrators</span>
-          </div>
-        </div>
-      </div>
 
-      <div className="users-grid">
-        {filteredUsers.map((user) => (
-          <div key={user._id} className="user-card">
+        {/* Inactive Users Card */}
+        <div className="user-metric-card inactive-users-card">
+          <div className="card-header">
+            <div className="card-icon inactive-icon">
+              <FiUserX />
+            </div>
+            <div className="card-info">
+              <h3 className="card-title">Inactive Users</h3>
+              <p className="card-subtitle">Deactivated</p>
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="main-metric">
+              <span className="metric-value">{users.filter(u => !u.isActive).length}</span>
+              <span className="metric-period">Users</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Admin Users Card */}
+        <div className="user-metric-card admin-users-card">
+          <div className="card-header">
+            <div className="card-icon admin-icon">
+              <FiUserPlus />
+            </div>
+            <div className="card-info">
+              <h3 className="card-title">Administrators</h3>
+              <p className="card-subtitle">Admin Access</p>
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="main-metric">
+              <span className="metric-value">{users.filter(u => u.role === 'admin').length}</span>
+              <span className="metric-period">Admins</span>
+            </div>
+          </div>
+        </div>
+
+        {/* User List Card */}
+        <div className="user-metric-card users-list-card full-width">
+          <div className="card-header">
+            <div className="card-icon users-icon">
+              <FiUsers />
+            </div>
+            <div className="card-info">
+              <h3 className="card-title">User Profiles</h3>
+              <p className="card-subtitle">{filteredUsers.length} Users Found</p>
+            </div>
+          </div>
+          <div className="card-body">
+            <div className="users-grid">
+              {filteredUsers.map((user) => (
+                <div key={user._id} className="user-card">
             <div className="user-header">
               <div className="user-avatar">
                 <FiUser className="avatar-icon" />
@@ -259,6 +322,9 @@ const UserProfileManagement = () => {
             </div>
           </div>
         ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {editMode && editUser && (

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiPackage, FiClock, FiMapPin, FiRefreshCw } from 'react-icons/fi';
+import { FiPackage, FiClock, FiMapPin, FiPrinter, FiArrowLeft, FiDollarSign, FiHash,  } from 'react-icons/fi';
 import { MdRestaurant } from 'react-icons/md';
 import axios from 'axios';
 import PageLayout from '../components/layout/PageLayout';
-import './OrderConfirmation.css';
+import './OrderConfirmationNew.css';
 
 // Create a configurable axios instance
 const apiClient = axios.create({
@@ -53,7 +53,7 @@ const OrderConfirmation = () => {
     logInfo('Component mounted', new Date().toISOString());
     testBackendConnection();
     fetchMostRecentOrder();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   
   // Simple test to check if backend is reachable
   const testBackendConnection = async () => {
@@ -373,109 +373,150 @@ const OrderConfirmation = () => {
   
   // Main render with order data
   return (
-    <PageLayout>
-      <div className="order-confirmation-container">
-        <div className="confirmation-card">
-          <div className="confirmation-left">
-            <div className="confirmation-header">
-              <div className="status-icon">
-                <MdRestaurant size={24} />
-              </div>
-              <h2>Order Confirmed!</h2>
-              <p className="order-id">Order ID: {order._id}</p>
-              <p className="order-date">Placed on: {new Date(order.createdAt).toLocaleString()}</p>
-            </div>
-
-            <div className="delivery-info">
-              <div className="info-row">
-                <FiClock className="info-icon" />
-                <div className="info-content">
-                  <p className="info-label">Estimated Delivery Time</p>
-                  <p className="info-value">{order.estimatedDelivery || '30-45 minutes'}</p>
-                </div>
-              </div>
-
-              <div className="info-row">
-                <FiMapPin className="info-icon" />
-                <div className="info-content">
-                  <p className="info-label">Delivery Address</p>
-                  <p className="info-value">{order.deliveryAddress || 'Address not available'}</p>
-                </div>
-              </div>
-
-              <div className="info-row">
-                <FiPackage className="info-icon" />
-                <div className="info-content">
-                  <p className="info-label">Order Status</p>
-                  <p className="info-value">{order.status || 'Processing'}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="action-buttons">
-              {isOrderTrackable() && (
-                <button className="order-action-btn track-order-btn" onClick={handleTrackOrder}>
-                  Track Order
-                </button>
-              )}
-              <button 
-                className="order-action-btn view-invoice-btn" 
-                onClick={handleViewInvoice}
-              >
-                View Invoice
-              </button>
-            </div>
+    <div className="order-confirmation-page">
+      {/* Hero Section */}
+      <div className="confirmation-hero">
+        <div className="hero-content">
+          <div className="success-animation">
+            <MdRestaurant className="success-icon" />
           </div>
-
-          <div className="confirmation-right">
-            <div className="order-summary">
-              <h3>Order Summary</h3>
-              <div className="order-items">
-                {order.items?.map((item, index) => {
-                  // Extract the required properties safely from any object structure
-                  const itemName = item.name || 
-                                  (item._doc && item._doc.name) || 
-                                  (item.__parentArray && item.__parentArray[0] && item.__parentArray[0].name) || 
-                                  'Unknown Item';
-                                  
-                  const itemPrice = typeof item.price === 'number' ? item.price : 
-                               (item._doc?.price || item.__parentArray?.[0]?.price || 0);
-                               
-                  const itemQuantity = typeof item.quantity === 'number' ? item.quantity : 
-                                  (item._doc?.quantity || item.__parentArray?.[0]?.quantity || 1);
-                
-                  return (
-                  <div key={index} className="order-item">
-                    <div className="item-details">
-                      <p className="item-name">{itemName}</p>
-                      <p className="item-quantity">Qty: {itemQuantity}</p>
-                    </div>
-                    <p className="item-price">${formatPrice(itemPrice)}</p>
-                  </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Totals section with blue background */}
-        <div className="total-section">
-          <div className="subtotal-section">
-            <span className="subtotal-label">Subtotal</span>
-            <span className="subtotal-value">${formatPrice(calculateSubtotal())}</span>
-          </div>
-          <div className="delivery-section">
-            <span className="delivery-label">Delivery Fee</span>
-            <span className="delivery-value">${formatPrice(order.deliveryFee || 0)}</span>
-          </div>
-          <div className="total-section-inner">
-            <span className="total-label">Total</span>
-            <span className="total-value">${formatPrice(order.totalPrice || 0)}</span>
+          <h1 className="hero-title">🍕 Order Confirmed!</h1>
+          <p className="hero-subtitle">Your delicious meal is being prepared with care</p>
+          <div className="order-id-badge">
+            <FiHash className="badge-icon" />
+            <span>Order ID: {order._id?.substring(0, 8).toUpperCase() || 'TEMP'}</span>
           </div>
         </div>
       </div>
-    </PageLayout>
+
+      {/* Main Content */}
+      <div className="confirmation-content">
+        <div className="content-container">
+
+          {/* Quick Summary Cards */}
+          <div className="summary-cards">
+            <div className="summary-card primary">
+              <div className="card-icon">
+                <FiClock />
+              </div>
+              <div className="card-content">
+                <h3>Delivery Time</h3>
+                <p>{order.estimatedDelivery || '30-45 minutes'}</p>
+              </div>
+            </div>
+
+            <div className="summary-card accent">
+              <div className="card-icon">
+                <FiMapPin />
+              </div>
+              <div className="card-content">
+                <h3>Delivery To</h3>
+                <p>{order.deliveryAddress || 'Address not available'}</p>
+              </div>
+            </div>
+
+            <div className="summary-card primary">
+              <div className="card-icon">
+                <FiPackage />
+              </div>
+              <div className="card-content">
+                <h3>Status</h3>
+                <p>{order.status || 'Processing'}</p>
+              </div>
+            </div>
+
+            <div className="summary-card success">
+              <div className="card-icon">
+                <FiDollarSign />
+              </div>
+              <div className="card-content">
+                <h3>Total Paid</h3>
+                <p>Rs. {formatPrice(order.totalPrice || 0)}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Order Items Section */}
+          <div className="order-items-section">
+            <h2 className="section-title">Your Order</h2>
+            <div className="order-items-grid">
+              {order.items?.map((item, index) => {
+                // Extract the required properties safely from any object structure
+                const itemName = item.name ||
+                                (item._doc && item._doc.name) ||
+                                (item.__parentArray && item.__parentArray[0] && item.__parentArray[0].name) ||
+                                'Unknown Item';
+
+                const itemPrice = typeof item.price === 'number' ? item.price :
+                             (item._doc?.price || item.__parentArray?.[0]?.price || 0);
+
+                const itemQuantity = typeof item.quantity === 'number' ? item.quantity :
+                                (item._doc?.quantity || item.__parentArray?.[0]?.quantity || 1);
+
+                return (
+                  <div key={index} className="order-item-card">
+                    <div className="item-details">
+                      <h4 className="item-name">{itemName}</h4>
+                      <div className="item-meta">
+                        <span className="item-quantity">Qty: {itemQuantity}</span>
+                        <span className="item-unit-price">Rs. {formatPrice(itemPrice)} each</span>
+                      </div>
+                    </div>
+                    <div className="item-total">
+                      <span className="total-price">Rs. {formatPrice(itemPrice * itemQuantity)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Order Total */}
+            <div className="order-total-section">
+              <div className="total-row">
+                <span className="total-label">Subtotal:</span>
+                <span className="total-value">Rs. {formatPrice(calculateSubtotal())}</span>
+              </div>
+              <div className="total-row">
+                <span className="total-label">Delivery Fee:</span>
+                <span className="total-value">Rs. {formatPrice(order.deliveryFee || 0)}</span>
+              </div>
+              <div className="total-row final-total">
+                <span className="total-label">Total:</span>
+                <span className="total-value">Rs. {formatPrice(order.totalPrice || 0)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="action-section">
+            {isOrderTrackable() && (
+              <button
+                onClick={handleTrackOrder}
+                className="action-btn secondary"
+              >
+                <FiPackage />
+                <span>Track Order</span>
+              </button>
+            )}
+            <button
+              onClick={handleViewInvoice}
+              className="action-btn primary"
+            >
+              <FiPrinter />
+              <span>View & Download Invoice</span>
+            </button>
+            <button
+              onClick={() => navigate('/my-orders')}
+              className="action-btn secondary"
+            >
+              <FiArrowLeft />
+              <span>View All Orders</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
   );
 };
 

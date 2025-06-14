@@ -55,7 +55,7 @@ const Dashboard = () => {
         <div className="card">
           <FiDollarSign className="card-icon" size={32} />
           <h3 className="card-title">Total Revenue</h3>
-          <p className="card-text">${stats.totalRevenue}</p>
+          <p className="card-text">Rs. {stats.totalRevenue}</p>
         </div>
       </div>
     </PageLayout>

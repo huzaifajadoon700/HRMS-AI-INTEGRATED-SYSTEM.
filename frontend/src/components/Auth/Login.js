@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
-import { Toast, ToastContainer, Button, Form, Card } from "react-bootstrap";
-import "../../styles/theme.css";
-import "../../styles/AuthPage.css";
-import axios from 'axios';
+import { FiMail, FiLock, FiUser, FiEye, FiEyeOff,  FiShield, FiCheckCircle } from "react-icons/fi";
+import "./Login.css";
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -12,6 +10,7 @@ const AuthPage = () => {
   const [toastMessage, setToastMessage] = useState({ message: "", type: "" });
   const [showToast, setShowToast] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleToggle = () => {
@@ -54,11 +53,16 @@ const AuthPage = () => {
     try {
       // Clear previous user data before logging in
       localStorage.clear();
-      
+
+      // Prepare request body based on operation
+      const requestBody = isLogin
+        ? { email: formData.email, password: formData.password }
+        : { name: formData.name, email: formData.email, password: formData.password };
+
       const response = await fetch(`http://localhost:8080/auth${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
@@ -70,6 +74,10 @@ const AuthPage = () => {
         localStorage.setItem("email", data.email);
         localStorage.setItem("phone", data.phone || "");
         localStorage.setItem("userId", data.userId);
+
+        // Dispatch custom event to update header
+        window.dispatchEvent(new Event('authStateChanged'));
+
         navigate(data.role === "admin" ? "/dashboard" : "/", { replace: true });
       } else {
         showToastMessage(data.message || "Error occurred", "danger");
@@ -103,6 +111,10 @@ const AuthPage = () => {
         localStorage.setItem("email", data.email);
         localStorage.setItem("phone", data.phone || "");
         localStorage.setItem("userId", data.userId);
+
+        // Dispatch custom event to update header
+        window.dispatchEvent(new Event('authStateChanged'));
+
         navigate(data.role === "admin" ? "/dashboard" : "/", { replace: true });
       } else {
         showToastMessage(data.message || "Error occurred", "danger");
@@ -121,98 +133,183 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="page-container">
-      <div className="auth-container">
-        <ToastContainer position="bottom-end" className="p-3">
-          <Toast bg={toastMessage.type} show={showToast} onClose={() => setShowToast(false)}>
-            <Toast.Body>{toastMessage.message}</Toast.Body>
-          </Toast>
-        </ToastContainer>
+    <div className="modern-login-page">
+      {/* Left Side - Branding */}
+      <div className="login-branding">
+        <div className="branding-content">
+         
 
-        <div className="auth-wrapper glass animate-fade-in">
-          <div className="auth-image"></div>
+          <div className="features-list">
+            <div className="feature-item">
+              <FiCheckCircle className="feature-icon" />
+              <span>Exquisite Cuisine</span>
+            </div>
+            <div className="feature-item">
+              <FiCheckCircle className="feature-icon" />
+              <span>Premium Service</span>
+            </div>
+            <div className="feature-item">
+              <FiCheckCircle className="feature-icon" />
+              <span>Elegant Ambiance</span>
+            </div>
+            <div className="feature-item">
+              <FiCheckCircle className="feature-icon" />
+              <span>Memorable Experiences</span>
+            </div>
+          </div>
 
-          <div className="auth-form">
-            <Card className="auth-card">
-              <Card.Body>
-                <h3 className="auth-title">{isLogin ? "Welcome Back" : "Create Account"}</h3>
-                <p className="auth-subtext">
-                  {isLogin ? "Sign in to continue your journey." : "Join us to explore the cosmos."}
-                </p>
-
-                <Form onSubmit={handleSubmit}>
-                  {!isLogin && (
-                    <Form.Group className="mb-4">
-                      <Form.Label>Name</Form.Label>
-                      <Form.Control 
-                        type="text" 
-                        name="name" 
-                        value={formData.name} 
-                        onChange={handleChange} 
-                        required 
-                        placeholder="Enter your full name"
-                        className="form-control"
-                      />
-                    </Form.Group>
-                  )}
-
-                  <Form.Group className="mb-4">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      placeholder="Enter your email"
-                      className="form-control"
-                    />
-                  </Form.Group>
-
-                  <Form.Group className="mb-4">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                      placeholder="Enter your password"
-                      className="form-control"
-                    />
-                  </Form.Group>
-
-                  <Button 
-                    type="submit" 
-                    className="btn btn-primary w-100 mb-3"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Processing..." : (isLogin ? "Sign In" : "Create Account")}
-                  </Button>
-                </Form>
-
-                <div className="google-login">
-                  <GoogleLogin
-                    onSuccess={handleGoogleLogin}
-                    onError={() => showToastMessage("Google login failed", "danger")}
-                    theme="filled_blue"
-                    shape="pill"
-                    size="large"
-                    text={isLogin ? "continue_with" : "signup_with"}
-                    logo_alignment="left"
-                    disabled={isLoading}
-                  />
-                </div>
-
-                <p className="auth-toggle mt-3">
-                  {isLogin ? "New to the cosmos?" : "Already among the stars?"}{" "}
-                  <span onClick={handleToggle}>{isLogin ? "Create Account" : "Sign In"}</span>
-                </p>
-              </Card.Body>
-            </Card>
+          <div className="testimonial">
+            <p>"An unforgettable dining experience that exceeds all expectations."</p>
+            <span>- Satisfied Customer</span>
           </div>
         </div>
       </div>
+
+      {/* Right Side - Login Form */}
+      <div className="login-form-section">
+        <div className="form-container">
+          <div className="form-header">
+            <h2 className="form-title">
+              {isLogin ? "Welcome Back" : "Join Us Today"}
+            </h2>
+            <p className="form-subtitle">
+              {isLogin
+                ? "Sign in to access your account and continue your culinary journey"
+                : "Create your account and discover amazing dining experiences"
+              }
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            {!isLogin && (
+              <div className="form-group">
+                <label className="form-label">
+                  <FiUser className="label-icon" />
+                  Full Name
+                </label>
+                <div className="input-wrapper">
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter your full name"
+                    className="form-input"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="form-group">
+              <label className="form-label">
+                <FiMail className="label-icon" />
+                Email Address
+              </label>
+              <div className="input-wrapper">
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter your email address"
+                  className="form-input"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                <FiLock className="label-icon" />
+                Password
+              </label>
+              <div className="input-wrapper password-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  placeholder="Enter your password"
+                  className="form-input"
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="submit-btn"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="loading-spinner"></div>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <FiShield className="btn-icon" />
+                  {isLogin ? "Sign In" : "Create Account"}
+                </>
+              )}
+            </button>
+          </form>
+
+          <div className="divider">
+            <span>or continue with</span>
+          </div>
+
+          <div className="google-login-wrapper">
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => showToastMessage("Google login failed", "danger")}
+              theme="filled_blue"
+              shape="pill"
+              size="large"
+              text={isLogin ? "continue_with" : "signup_with"}
+              logo_alignment="left"
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="auth-toggle">
+            <p>
+              {isLogin ? "New to Night Elegance?" : "Already have an account?"}{" "}
+              <button
+                type="button"
+                className="toggle-btn"
+                onClick={handleToggle}
+              >
+                {isLogin ? "Create Account" : "Sign In"}
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Toast Notifications */}
+      {showToast && (
+        <div className={`toast-notification ${toastMessage.type}`}>
+          <div className="toast-content">
+            <FiCheckCircle className="toast-icon" />
+            <span>{toastMessage.message}</span>
+          </div>
+          <button
+            className="toast-close"
+            onClick={() => setShowToast(false)}
+          >
+            ×
+          </button>
+        </div>
+      )}
     </div>
   );
 };

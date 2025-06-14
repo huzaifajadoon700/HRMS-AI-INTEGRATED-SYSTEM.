@@ -88,6 +88,7 @@ const AdminDeleteRoom = () => {
   };
 
   return (
+    <div className="enhanced-delete-room-module-container">
     <div className="admin-manage-rooms">
       <Container fluid>
         <div className="admin-header">
@@ -122,7 +123,7 @@ const AdminDeleteRoom = () => {
                     <div className="room-card-content">
                       <div className="room-card-header">
                         <h3 className="room-number">Room {room.roomNumber}</h3>
-                        <div className="room-price">${room.price}</div>
+                        <div className="room-price">Rs. {parseInt(room.price).toLocaleString('en-PK')}</div>
                       </div>
                       <div className="room-type">{room.roomType}</div>
                       <p className="room-description">{room.description}</p>
@@ -162,7 +163,8 @@ const AdminDeleteRoom = () => {
         </div>
       </Container>
     </div>
+    </div>
   );
 };
 
-export default AdminDeleteRoom; 
+export default AdminDeleteRoom;

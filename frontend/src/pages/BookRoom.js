@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { FiCalendar, FiUsers, FiCreditCard, FiInfo } from 'react-icons/fi';
 import PageLayout from '../components/layout/PageLayout';
 import EditBooking from '../components/User/EditBooking';
-import '../styles/theme.css';
+import '../styles/simple-theme.css';
 
 const BookRoom = () => {
   const { roomId } = useParams();

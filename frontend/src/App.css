@@ -23,10 +23,26 @@ body {
   min-height: calc(100vh - 160px); /* Account for header and footer */
 }
 
+/* Full width override for specific pages */
+.main-content.full-width {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
 /* Page Container */
 .page-container {
   padding: 2rem 0;
   min-height: calc(100vh - 160px);
+}
+
+/* Full width page container */
+.page-container.full-width {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
 }
 
 /* Form Container */
@@ -41,6 +57,9 @@ body {
 
 .navbar-dark .navbar-nav .nav-link:hover, .navbar-dark .navbar-nav .nav-link.active {
   color : #fea116;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
 }
 
 .navbar-dark .navbar-nav .nav-link {
@@ -50,6 +69,9 @@ body {
   font-size: 15px;
   text-transform: uppercase;
   outline: none;
+  border-radius: 0 !important;
+  border: none !important;
+  background: transparent !important;
 }
 
 .carousel-caption {
@@ -145,4 +167,29 @@ body {
 
 .social a:hover {
   text-decoration: underline;
+}
+
+/* Global override to remove all rounded borders from navigation */
+.navbar *,
+.navbar .nav-link,
+.navbar .navbar-nav .nav-link,
+.navbar .nav-item,
+.navbar .dropdown,
+.navbar .btn,
+.navbar-nav .nav-link,
+.nav-link {
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.navbar *:hover,
+.navbar .nav-link:hover,
+.navbar .navbar-nav .nav-link:hover,
+.navbar .nav-item:hover,
+.navbar .dropdown:hover,
+.navbar .btn:hover,
+.navbar-nav .nav-link:hover,
+.nav-link:hover {
+  border-radius: 0 !important;
+  border: none !important;
 }

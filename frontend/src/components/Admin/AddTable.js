@@ -16,6 +16,7 @@ const AdminManageTables = () => {
     tableType: "",
     capacity: "",
     status: "Available",
+    description: "",
   });
 
   const fetchTables = async () => {
@@ -49,6 +50,7 @@ const AdminManageTables = () => {
     data.append("tableType", formData.tableType);
     data.append("capacity", formData.capacity);
     data.append("status", formData.status);
+    data.append("description", formData.description);
     if (image) {
       data.append("image", image);
     }
@@ -199,6 +201,19 @@ const AdminManageTables = () => {
                 </select>
               </div>
               <div className="form-group">
+                <label htmlFor="table-description">Description</label>
+                <textarea
+                  className="form-control cosmic-input"
+                  id="table-description"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  placeholder="Enter table description"
+                  rows="3"
+                />
+              </div>
+              <div className="form-group">
                 <label htmlFor="table-image">Upload Table Image</label>
                 <input
                   type="file"
@@ -206,7 +221,6 @@ const AdminManageTables = () => {
                   id="table-image"
                   accept="image/jpeg, image/png"
                   onChange={handleImageChange}
-                  required
                 />
               </div>
               <div className="text-center mt-3">

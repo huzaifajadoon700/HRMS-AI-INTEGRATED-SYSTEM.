@@ -11,7 +11,7 @@ const DeliveryMap = ({ deliveryLocation, initialCenter, onLoad }) => {
   const mapRef = useRef(null);
   const driverMarkerRef = useRef(null);
   const routeCoordinates = useRef([]); // To record the traveled path
-  const [styleLoaded, setStyleLoaded] = useState(false);
+  const [, setStyleLoaded] = useState(false);
 
   // Initialize the Mapbox map
   useEffect(() => {

@@ -77,16 +77,34 @@
 /* Menu Item Card */
 .menu-item-card {
   background: var(--cosmic-card-bg);
-  border: 1px solid var(--cosmic-border);
-  border-radius: 12px;
+  border: 2px solid var(--cosmic-border);
+  border-radius: 16px;
   overflow: hidden;
   transition: all var(--transition-speed);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.menu-item-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #dc3545, #ff4757, #dc3545);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.menu-item-card:hover::before {
+  opacity: 1;
 }
 
 .menu-item-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px var(--cosmic-shadow);
-  border-color: var(--cosmic-primary);
+  transform: translateY(-8px);
+  box-shadow: 0 12px 35px rgba(220, 53, 69, 0.3);
+  border-color: #dc3545;
 }
 
 .menu-item-image {
@@ -121,33 +139,93 @@
 
 .menu-item-info p {
   color: var(--cosmic-secondary);
-  margin: 0;
+  margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
   text-transform: capitalize;
   opacity: 0.8;
+}
+
+.menu-item-info .item-category {
+  background: var(--cosmic-primary);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.menu-item-info .item-price {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--cosmic-text);
+  margin-bottom: 0.5rem;
+}
+
+.menu-item-info .item-availability {
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.menu-item-info .available {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.menu-item-info .unavailable {
+  color: #dc3545;
+  font-weight: 600;
 }
 
 /* Delete Button */
 .delete-button {
   margin-top: 1rem;
   width: 100%;
-  background: linear-gradient(135deg, #ff4d4d 0%, #ff6b6b 100%);
-  border: none;
-  padding: 0.8rem;
-  border-radius: 8px;
-  color: white;
-  font-weight: 500;
-  transition: all var(--transition-speed);
+  background: linear-gradient(135deg, #dc3545 0%, #ff4757 100%) !important;
+  border: 2px solid #dc3545 !important;
+  padding: 1rem !important;
+  border-radius: 12px !important;
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  transition: all var(--transition-speed) !important;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.delete-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.delete-button:hover::before {
+  left: 100%;
 }
 
 .delete-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255, 77, 77, 0.3);
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 25px rgba(220, 53, 69, 0.5) !important;
+  background: linear-gradient(135deg, #c82333 0%, #e74c3c 100%) !important;
+  border-color: #c82333 !important;
+}
+
+.delete-button:active {
+  transform: translateY(-1px) !important;
 }
 
 .delete-button:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
+  opacity: 0.7 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
 }
 
 /* Delete Modal */

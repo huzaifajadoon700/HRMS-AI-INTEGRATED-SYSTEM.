@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FiCalendar, FiUser, FiMail, FiPhone, FiCreditCard, FiStar } from 'react-icons/fi';
-import { toast } from 'react-toastify';
-import PageLayout from '../components/layout/PageLayout';
+import { FiCalendar, FiUser, FiMail, FiPhone, FiCreditCard, FiStar, FiMapPin, FiWifi, FiTv, FiCoffee, FiCheck, FiArrowLeft } from 'react-icons/fi';
+import { toast } from 'react-hot-toast';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import './BookingPage.css';
 
 // Initialize Stripe
 const stripePromise = loadStripe('pk_test_51RQDO0QHBrXA72xgYssbECOe9bubZ2bWHA4m0T6EY6AvvmAfCzIDmKUCkRjpwVVIJ4IMaOiQBUawECn5GD8ADHbn00GRVmjExI');
@@ -83,7 +81,7 @@ const PaymentForm = ({ onPaymentSuccess, totalPrice, onCancel }) => {
             className="btn btn-primary"
             disabled={!stripe || processing}
           >
-            {processing ? 'Processing...' : `Pay $${totalPrice}`}
+            {processing ? 'Processing...' : `Pay Rs. ${totalPrice}`}
           </button>
         </div>
       </form>
@@ -132,15 +130,26 @@ const BookingPage = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      navigate("/login", { state: { from: `/rooms/${id}` } });
+      navigate("/login", { state: { from: `/booking-page/${id}` } });
       return;
+    }
+
+    // Get booking data from localStorage (set from RoomPage)
+    const bookingData = localStorage.getItem('roomBookingData');
+    let prefilledData = {};
+    if (bookingData) {
+      try {
+        prefilledData = JSON.parse(bookingData);
+      } catch (error) {
+        console.warn('Error parsing booking data:', error);
+      }
     }
 
     const fetchUserAndRoomDetails = async () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Fetch room details
         const roomResponse = await axios.get('http://localhost:8080/api/rooms', {
           headers: {
@@ -158,21 +167,28 @@ const BookingPage = () => {
           return { data: {} }; // Return empty data if profile fetch fails
         });
 
-        // Update form with user data if available
-        if (userResponse.data) {
-          setFormData(prev => ({
-            ...prev,
-            fullName: userResponse.data.name || '',
-            email: userResponse.data.email || '',
-            phone: userResponse.data.phone || ''
-          }));
-        }
+        // Update form with user data and booking data if available
+        const userData = userResponse.data || {};
+        setFormData(prev => ({
+          ...prev,
+          fullName: userData.name || '',
+          email: userData.email || '',
+          phone: userData.phone || '',
+          checkInDate: prefilledData.checkInDate || '',
+          checkOutDate: prefilledData.checkOutDate || '',
+          guests: prefilledData.guests || 1
+        }));
 
         if (roomResponse.data) {
           const roomData = roomResponse.data.find(room => room._id === id);
           if (roomData) {
             setRoom(roomData);
-            updateBookingSummary(roomData.price, formData.checkInDate, formData.checkOutDate);
+            // Update booking summary with prefilled dates if available
+            updateBookingSummary(
+              roomData.price,
+              prefilledData.checkInDate || '',
+              prefilledData.checkOutDate || ''
+            );
           } else {
             throw new Error('Room not found');
           }
@@ -181,7 +197,7 @@ const BookingPage = () => {
         console.error('Error fetching data:', err);
         if (err.response?.status === 401) {
           localStorage.clear();
-          navigate("/login", { state: { from: `/rooms/${id}` } });
+          navigate("/login", { state: { from: `/booking-page/${id}` } });
           return;
         }
         setError(err.response?.data?.message || err.message || 'Failed to load room details');
@@ -191,7 +207,7 @@ const BookingPage = () => {
     };
 
     fetchUserAndRoomDetails();
-  }, [id, navigate]);
+  }, [id, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateBookingSummary = (roomPrice, checkIn, checkOut) => {
     if (!roomPrice || !checkIn || !checkOut) {
@@ -383,7 +399,7 @@ const BookingPage = () => {
 
   if (loading) {
     return (
-      <PageLayout>
+      
         <div className="booking-page">
           <div className="container">
             <div className="loading-spinner">
@@ -392,233 +408,819 @@ const BookingPage = () => {
             </div>
           </div>
         </div>
-      </PageLayout>
+      
     );
   }
 
   if (error) {
     return (
-      <PageLayout>
+      
         <div className="booking-page">
           <div className="container">
             <div className="error-message">{error}</div>
           </div>
         </div>
-      </PageLayout>
+      
     );
   }
 
   if (showPayment) {
     return (
-      <PageLayout>
-        <div className="booking-page">
-          <div className="container">
-            <Elements stripe={stripePromise}>
-              <PaymentForm 
-                onPaymentSuccess={handlePaymentSuccess}
-                totalPrice={bookingSummary.totalPrice.toFixed(2)}
-                onCancel={() => setShowPayment(false)}
-              />
-            </Elements>
-          </div>
+      <div style={{
+        background: '#0A192F',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        paddingTop: '100px',
+        paddingBottom: '50px'
+      }}>
+        <div style={{
+          background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(100, 255, 218, 0.1)',
+          borderRadius: '1rem',
+          padding: '2rem',
+          maxWidth: '500px',
+          width: '100%'
+        }}>
+          <Elements stripe={stripePromise}>
+            <PaymentForm
+              onPaymentSuccess={handlePaymentSuccess}
+              totalPrice={bookingSummary.totalPrice.toFixed(2)}
+              onCancel={() => setShowPayment(false)}
+            />
+          </Elements>
         </div>
-      </PageLayout>
+      </div>
+    );
+  }
+
+  // Format price in Pakistani Rupees
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-PK', {
+      style: 'currency',
+      currency: 'PKR',
+      minimumFractionDigits: 0
+    }).format(price);
+  };
+
+  if (loading) {
+    return (
+      <div style={{
+        background: '#0A192F',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: '80px'
+      }}>
+        <div style={{
+          background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(100, 255, 218, 0.1)',
+          borderRadius: '1rem',
+          padding: '3rem',
+          textAlign: 'center',
+          maxWidth: '400px'
+        }}>
+          <div style={{
+            width: '60px',
+            height: '60px',
+            border: '4px solid rgba(100, 255, 218, 0.1)',
+            borderTop: '4px solid #64ffda',
+            borderRadius: '50%',
+            margin: '0 auto 1.5rem',
+            animation: 'spin 1s linear infinite'
+          }} />
+          <h3 style={{
+            color: '#fff',
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            marginBottom: '0.5rem'
+          }}>
+            Loading Room Details
+          </h3>
+          <p style={{
+            color: 'rgba(255, 255, 255, 0.7)',
+            fontSize: '0.9rem',
+            margin: 0
+          }}>
+            Please wait while we prepare your booking page...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={{
+        background: '#0A192F',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingTop: '80px'
+      }}>
+        <div style={{
+          background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 107, 157, 0.3)',
+          borderRadius: '1rem',
+          padding: '3rem',
+          textAlign: 'center',
+          maxWidth: '400px'
+        }}>
+          <h3 style={{
+            color: '#ff6b9d',
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            marginBottom: '1rem'
+          }}>
+            Error Loading Room
+          </h3>
+          <p style={{
+            color: 'rgba(255, 255, 255, 0.7)',
+            fontSize: '0.9rem',
+            marginBottom: '1.5rem'
+          }}>
+            {error}
+          </p>
+          <button
+            onClick={() => navigate('/rooms')}
+            style={{
+              background: 'linear-gradient(135deg, #64ffda 0%, #bb86fc 100%)',
+              border: 'none',
+              borderRadius: '0.5rem',
+              padding: '0.75rem 1.5rem',
+              color: '#0a0a0a',
+              fontSize: '0.9rem',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            Back to Rooms
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (showPayment) {
+    return (
+      <div style={{
+        background: '#0A192F',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        paddingTop: '500px',
+        paddingBottom: '50px'
+      }}>
+        <div style={{
+          background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(100, 255, 218, 0.1)',
+          borderRadius: '1rem',
+          padding: '2rem',
+          maxWidth: '500px',
+          width: '100%'
+        }}>
+          <Elements stripe={stripePromise}>
+            <PaymentForm
+              onPaymentSuccess={handlePaymentSuccess}
+              totalPrice={bookingSummary.totalPrice.toFixed(2)}
+              onCancel={() => setShowPayment(false)}
+            />
+          </Elements>
+        </div>
+      </div>
     );
   }
 
   return (
-    <PageLayout>
-      <div className="booking-page">
-        <div className="container">
-          <div className="booking-container">
-            {/* Room Details Card - Made more compact */}
-            <div className="room-details-card">
-              <div className="room-image-container" style={{ maxHeight: '300px' }}>
-                <img
-                  src={getImageUrl(room?.image)}
-                  alt={room?.roomType}
-                  className="room-image"
-                  onError={(e) => {
-                    e.target.src = '/images/placeholder-room.jpg';
-                    e.target.onerror = null;
-                  }}
-                />
-                <div className="price-badge">
-                  ${room?.price}<small>/night</small>
-                </div>
-              </div>
-              
-              <div className="room-info">
-                <h1 className="room-title">{room?.roomType}</h1>
-                <div className="room-rating">
-                  {[...Array(5)].map((_, i) => (
-                    <FiStar key={i} className="star-icon" />
-                  ))}
-                </div>
-                <p className="room-description">{room?.description}</p>
-              </div>
-            </div>
-
-            {/* Booking Form Card - Made more compact */}
-            <div className="booking-form-card">
-              <h2>Book Your Stay</h2>
-              <form>
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label><FiCalendar /> Check-in Date *</label>
-                    <input
-                      type="date"
-                      name="checkInDate"
-                      value={formData.checkInDate}
-                      onChange={handleChange}
-                      min={new Date().toISOString().split('T')[0]}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label><FiCalendar /> Check-out Date *</label>
-                    <input
-                      type="date"
-                      name="checkOutDate"
-                      value={formData.checkOutDate}
-                      onChange={handleChange}
-                      min={formData.checkInDate || new Date().toISOString().split('T')[0]}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label><FiUser /> Number of Guests *</label>
-                    <input
-                      type="number"
-                      name="guests"
-                      value={formData.guests}
-                      onChange={handleChange}
-                      min="1"
-                      max={room?.maxGuests || 4}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label><FiUser /> Full Name *</label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      placeholder="Enter your full name"
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label><FiMail /> Email *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="Enter your email"
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label><FiPhone /> Phone Number *</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="Enter your phone number"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Payment Method *</label>
-                  <select
-                    name="payment"
-                    value={formData.payment}
-                    onChange={handleChange}
-                    required
-                  >
-                    <option value="card">Credit Card</option>
-                    <option value="paypal">PayPal</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Special Requests</label>
-                  <textarea
-                    name="specialRequests"
-                    value={formData.specialRequests}
-                    onChange={handleChange}
-                    placeholder="Any special requests or requirements?"
-                    rows="2"
-                  />
-                </div>
-
-                <div className="booking-summary">
-                  <h3>Booking Summary</h3>
-                  <div className="summary-grid">
-                    <div className="summary-item">
-                      <span>Room Type:</span>
-                      <span>{room?.roomType}</span>
-                    </div>
-                    <div className="summary-item">
-                      <span>Price per Night:</span>
-                      <span>${room?.price}</span>
-                    </div>
-                    <div className="summary-item">
-                      <span>Number of Nights:</span>
-                      <span>{bookingSummary.nights}</span>
-                    </div>
-                    <div className="summary-item">
-                      <span>Base Price:</span>
-                      <span>${bookingSummary.basePrice.toFixed(2)}</span>
-                    </div>
-                    <div className="summary-item">
-                      <span>Tax (10%):</span>
-                      <span>${bookingSummary.taxAmount.toFixed(2)}</span>
-                    </div>
-                    <div className="summary-item total">
-                      <span>Total Price:</span>
-                      <span>${bookingSummary.totalPrice.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button 
-                  type="button" 
-                  className="book-button"
-                  onClick={() => {
-                    if (validateBooking()) {
-                      setShowPayment(true);
-                    }
-                  }}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <div className="spinner-small"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <FiCreditCard /> Proceed to Payment
-                    </>
-                  )}
-                </button>
-              </form>
-            </div>
-          </div>
+    <div style={{
+      background: '#0A192F',
+      minHeight: '100vh',
+      width: '100%',
+      margin: 0,
+      padding: 0,
+      paddingTop: '80px'
+    }}>
+      {/* Header with Back Button */}
+      <div style={{
+        position: 'sticky',
+        top: '80px',
+        zIndex: 10,
+        background: 'rgba(10, 25, 47, 0.95)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(100, 255, 218, 0.1)',
+        padding: '1rem 2rem'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1rem',
+          maxWidth: '1600px',
+          margin: '0 auto'
+        }}>
+          <button
+            onClick={() => navigate('/rooms')}
+            style={{
+              background: 'rgba(100, 255, 218, 0.1)',
+              border: '1px solid rgba(100, 255, 218, 0.3)',
+              borderRadius: '0.5rem',
+              padding: '0.5rem',
+              color: '#64ffda',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              fontSize: '0.9rem',
+              transition: 'all 0.3s ease'
+            }}
+          >
+            <FiArrowLeft size={16} />
+            Back to Rooms
+          </button>
+          <h1 style={{
+            fontSize: '1.5rem',
+            fontWeight: '600',
+            color: '#fff',
+            margin: 0
+          }}>
+            Complete Your Booking
+          </h1>
         </div>
       </div>
-    </PageLayout>
+
+      {/* Main Content */}
+      <div style={{
+        maxWidth: '1600px',
+        margin: '0 auto',
+        padding: '2rem',
+        display: 'grid',
+        gridTemplateColumns: '1fr 400px',
+        gap: '2rem',
+        alignItems: 'start'
+      }}>
+        {/* Left Side - Booking Form */}
+        <div style={{
+          background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(100, 255, 218, 0.1)',
+          borderRadius: '1rem',
+          padding: '2rem'
+        }}>
+          {/* Room Header */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '150px 1fr',
+            gap: '1rem',
+            marginBottom: '1.5rem',
+            padding: '0.75rem',
+            background: 'rgba(10, 25, 47, 0.5)',
+            borderRadius: '0.75rem',
+            border: '1px solid rgba(100, 255, 218, 0.1)'
+          }}>
+            <div style={{ position: 'relative' }}>
+              <img
+                src={getImageUrl(room?.image)}
+                alt={room?.roomType}
+                style={{
+                  width: '100%',
+                  height: '80px',
+                  objectFit: 'cover',
+                  borderRadius: '0.5rem'
+                }}
+                onError={(e) => {
+                  e.target.src = '/images/placeholder-room.jpg';
+                  e.target.onerror = null;
+                }}
+              />
+            </div>
+            <div>
+              <h2 style={{
+                fontSize: '1.25rem',
+                fontWeight: '600',
+                color: '#fff',
+                marginBottom: '0.25rem'
+              }}>
+                {room?.roomType}
+              </h2>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.25rem',
+                marginBottom: '0.25rem'
+              }}>
+                {[...Array(5)].map((_, i) => (
+                  <FiStar key={i} style={{ color: '#64ffda', fontSize: '0.8rem' }} />
+                ))}
+              </div>
+              <div style={{
+                fontSize: '1.1rem',
+                fontWeight: '600',
+                color: '#64ffda'
+              }}>
+                {formatPrice(room?.price)}<span style={{ fontSize: '0.7rem', opacity: 0.8 }}>/night</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Booking Form */}
+          <form style={{ display: 'grid', gap: '1.5rem' }}>
+            {/* Date and Guest Selection */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '1rem'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <FiCalendar style={{ color: '#64ffda' }} />
+                  Check-in Date *
+                </label>
+                <input
+                  type="date"
+                  name="checkInDate"
+                  value={formData.checkInDate}
+                  onChange={handleChange}
+                  min={new Date().toISOString().split('T')[0]}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <FiCalendar style={{ color: '#64ffda' }} />
+                  Check-out Date *
+                </label>
+                <input
+                  type="date"
+                  name="checkOutDate"
+                  value={formData.checkOutDate}
+                  onChange={handleChange}
+                  min={formData.checkInDate || new Date().toISOString().split('T')[0]}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <FiUser style={{ color: '#64ffda' }} />
+                  Guests *
+                </label>
+                <input
+                  type="number"
+                  name="guests"
+                  value={formData.guests}
+                  onChange={handleChange}
+                  min="1"
+                  max={room?.capacity || 4}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Personal Information */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: '1rem'
+            }}>
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <FiUser style={{ color: '#64ffda' }} />
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  placeholder="Enter your full name"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <FiMail style={{ color: '#64ffda' }} />
+                  Email *
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter your email"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}>
+                  <FiPhone style={{ color: '#64ffda' }} />
+                  Phone Number *
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Enter your phone number"
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{
+                  display: 'block',
+                  marginBottom: '0.5rem',
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '0.9rem',
+                  fontWeight: '500'
+                }}>
+                  Payment Method *
+                </label>
+                <select
+                  name="payment"
+                  value={formData.payment}
+                  onChange={handleChange}
+                  required
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: '0.5rem',
+                    color: '#fff',
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  <option value="card">Credit Card</option>
+                  <option value="paypal">PayPal</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Special Requests */}
+            <div>
+              <label style={{
+                display: 'block',
+                marginBottom: '0.5rem',
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: '0.9rem',
+                fontWeight: '500'
+              }}>
+                Special Requests
+              </label>
+              <textarea
+                name="specialRequests"
+                value={formData.specialRequests}
+                onChange={handleChange}
+                placeholder="Any special requests or requirements?"
+                rows="3"
+                style={{
+                  width: '100%',
+                  padding: '0.75rem',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '0.5rem',
+                  color: '#fff',
+                  fontSize: '0.9rem',
+                  resize: 'vertical'
+                }}
+              />
+            </div>
+          </form>
+        </div>
+
+        {/* Right Side - Booking Summary */}
+        <div style={{
+          background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(100, 255, 218, 0.1)',
+          borderRadius: '1rem',
+          padding: '1.5rem',
+          height: 'fit-content',
+          position: 'sticky',
+          top: '180px'
+        }}>
+          <h3 style={{
+            fontSize: '1.25rem',
+            fontWeight: '600',
+            color: '#fff',
+            marginBottom: '1.5rem',
+            textAlign: 'center'
+          }}>
+            Booking Summary
+          </h3>
+
+          {/* Stay Duration */}
+          {bookingSummary.nights > 0 && (
+            <div style={{
+              background: 'rgba(100, 255, 218, 0.1)',
+              border: '1px solid rgba(100, 255, 218, 0.3)',
+              borderRadius: '0.75rem',
+              padding: '1rem',
+              marginBottom: '1.5rem',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                fontSize: '2rem',
+                fontWeight: '700',
+                color: '#64ffda',
+                marginBottom: '0.25rem'
+              }}>
+                {bookingSummary.nights}
+              </div>
+              <div style={{
+                fontSize: '0.9rem',
+                color: 'rgba(255, 255, 255, 0.8)'
+              }}>
+                {bookingSummary.nights === 1 ? 'Night' : 'Nights'}
+              </div>
+            </div>
+          )}
+
+          {/* Price Breakdown */}
+          <div style={{ marginBottom: '1.5rem' }}>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0.75rem 0',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              color: 'rgba(255, 255, 255, 0.8)',
+              fontSize: '0.9rem'
+            }}>
+              <span>Room Type:</span>
+              <span style={{ color: '#fff', fontWeight: '500' }}>{room?.roomType}</span>
+            </div>
+
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '0.75rem 0',
+              borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+              color: 'rgba(255, 255, 255, 0.8)',
+              fontSize: '0.9rem'
+            }}>
+              <span>Price per Night:</span>
+              <span style={{ color: '#fff', fontWeight: '500' }}>{formatPrice(room?.price || 0)}</span>
+            </div>
+
+            {bookingSummary.nights > 0 && (
+              <>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '0.75rem 0',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontSize: '0.9rem'
+                }}>
+                  <span>Number of Nights:</span>
+                  <span style={{ color: '#fff', fontWeight: '500' }}>{bookingSummary.nights}</span>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '0.75rem 0',
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontSize: '0.9rem'
+                }}>
+                  <span>Subtotal:</span>
+                  <span style={{ color: '#fff', fontWeight: '500' }}>{formatPrice(bookingSummary.basePrice)}</span>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '0.75rem 0',
+                  borderBottom: '2px solid rgba(100, 255, 218, 0.2)',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontSize: '0.9rem'
+                }}>
+                  <span>Tax (10%):</span>
+                  <span style={{ color: '#fff', fontWeight: '500' }}>{formatPrice(bookingSummary.taxAmount)}</span>
+                </div>
+
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '1rem 0 0.5rem',
+                  fontSize: '1.1rem',
+                  fontWeight: '600',
+                  color: '#64ffda'
+                }}>
+                  <span>Total Amount:</span>
+                  <span>{formatPrice(bookingSummary.totalPrice)}</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Amenities */}
+          {room?.amenities && room.amenities.length > 0 && (
+            <div style={{ marginBottom: '1.5rem' }}>
+              <h4 style={{
+                fontSize: '1rem',
+                fontWeight: '600',
+                color: '#fff',
+                marginBottom: '0.75rem'
+              }}>
+                Included Amenities
+              </h4>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '0.5rem'
+              }}>
+                {room.amenities.slice(0, 6).map((amenity, index) => (
+                  <div key={index} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    fontSize: '0.8rem'
+                  }}>
+                    <FiCheck style={{ color: '#64ffda', fontSize: '0.7rem' }} />
+                    {amenity}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Book Button */}
+          <button
+            type="button"
+            onClick={() => {
+              if (validateBooking()) {
+                setShowPayment(true);
+              }
+            }}
+            disabled={loading || bookingSummary.nights === 0}
+            style={{
+              width: '100%',
+              padding: '1rem',
+              background: bookingSummary.nights === 0
+                ? 'rgba(255, 255, 255, 0.1)'
+                : 'linear-gradient(135deg, #64ffda 0%, #bb86fc 100%)',
+              border: 'none',
+              borderRadius: '0.75rem',
+              color: bookingSummary.nights === 0 ? 'rgba(255, 255, 255, 0.5)' : '#0a0a0a',
+              fontSize: '1rem',
+              fontWeight: '600',
+              cursor: bookingSummary.nights === 0 ? 'not-allowed' : 'pointer',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5rem'
+            }}
+          >
+            {loading ? (
+              <>
+                <div style={{
+                  width: '20px',
+                  height: '20px',
+                  border: '2px solid rgba(255, 255, 255, 0.3)',
+                  borderTop: '2px solid #fff',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }} />
+                Processing...
+              </>
+            ) : (
+              <>
+                <FiCreditCard />
+                {bookingSummary.nights === 0 ? 'Select Dates to Continue' : 'Proceed to Payment'}
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 

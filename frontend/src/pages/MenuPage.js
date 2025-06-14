@@ -24,12 +24,13 @@ const MenuPage = () => {
 
   const fetchMenuData = async () => {
     try {
-      const [menuResponse, categoriesResponse] = await Promise.all([
-        axios.get('http://localhost:8080/api/menu'),
-        axios.get('http://localhost:8080/api/categories')
-      ]);
+      const menuResponse = await axios.get('http://localhost:8080/api/menus');
       setMenuItems(menuResponse.data);
-      setCategories(categoriesResponse.data);
+
+      // Extract unique categories from menu items
+      const uniqueCategories = [...new Set(menuResponse.data.map(item => item.category))];
+      setCategories(uniqueCategories.map(cat => ({ _id: cat, name: cat })));
+
       setLoading(false);
     } catch (error) {
       setError('Failed to load menu. Please try again later.');
@@ -60,8 +61,8 @@ const MenuPage = () => {
     const matchesPrice = (!filters.minPrice || item.price >= filters.minPrice) &&
                         (!filters.maxPrice || item.price <= filters.maxPrice);
     const matchesDietary = filters.dietary.length === 0 ||
-                          filters.dietary.every(diet => item.dietary.includes(diet));
-    
+                          filters.dietary.every(diet => item.dietaryTags && item.dietaryTags.includes(diet));
+
     return matchesSearch && matchesCategory && matchesPrice && matchesDietary;
   });
 
@@ -225,11 +226,17 @@ const MenuPage = () => {
           {sortedItems.map((item) => (
             <div key={item._id} className="menu-card">
               <div className="menu-item-image">
-                <img src={`http://localhost:8080/${item.image}`} alt={item.name} />
-                {item.isPopular && (
+                <img
+                  src={item.image || "/placeholder-food.jpg"}
+                  alt={item.name}
+                  onError={(e) => {
+                    e.target.src = "/placeholder-food.jpg";
+                  }}
+                />
+                {item.isRecommended && (
                   <div className="popular-badge">
                     <FiStar />
-                    <span>Popular</span>
+                    <span>Recommended</span>
                   </div>
                 )}
               </div>
@@ -239,15 +246,15 @@ const MenuPage = () => {
                 <div className="menu-item-details">
                   <div className="menu-item-price">
                     <FiTag />
-                    <span>${item.price}</span>
+                    <span>Rs. {item.price}</span>
                   </div>
                   <div className="menu-item-prep-time">
                     <FiClock />
-                    <span>{item.prepTime} mins</span>
+                    <span>{item.preparationTime} mins</span>
                   </div>
                 </div>
                 <div className="menu-item-dietary">
-                  {item.dietary.map((diet, index) => (
+                  {item.dietaryTags && item.dietaryTags.map((diet, index) => (
                     <span key={index} className="dietary-tag">
                       {diet}
                     </span>

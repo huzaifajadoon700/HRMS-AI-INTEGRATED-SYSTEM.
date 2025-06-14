@@ -378,4 +378,66 @@ body {
 [class*="glass"] {
   background: #0A192F !important;
   backdrop-filter: none !important;
-} 
+}
+
+/* Spinner animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive design for new layout */
+@media (max-width: 1400px) {
+  .booking-page .main-content {
+    grid-template-columns: 1fr 350px !important;
+    gap: 1.5rem !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .booking-page .main-content {
+    grid-template-columns: 1fr !important;
+    max-width: 800px !important;
+  }
+
+  .booking-page .booking-summary {
+    position: static !important;
+    top: auto !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .booking-page .main-content {
+    padding: 1rem !important;
+    gap: 1rem !important;
+  }
+
+  .booking-page .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .booking-page .room-header {
+    grid-template-columns: 1fr !important;
+    text-align: center !important;
+  }
+
+  .booking-page .room-header img {
+    width: 200px !important;
+    height: 150px !important;
+    margin: 0 auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .booking-page .main-content {
+    padding: 0.5rem !important;
+  }
+
+  .booking-page .header {
+    padding: 0.75rem 1rem !important;
+  }
+
+  .booking-page .header h1 {
+    font-size: 1.25rem !important;
+  }
+}

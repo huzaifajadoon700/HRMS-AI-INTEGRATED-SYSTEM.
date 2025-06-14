@@ -5,6 +5,15 @@
   background: var(--primary-bg);
 }
 
+/* Full width page container override */
+.page-container.full-width {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  background: var(--primary-bg);
+}
+
 /* Form Container Styles */
 .form-container {
   max-width: 600px;

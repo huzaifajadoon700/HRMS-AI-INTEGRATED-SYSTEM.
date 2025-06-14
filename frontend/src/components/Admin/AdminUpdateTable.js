@@ -3,7 +3,11 @@ import { Card, Form, Button, Spinner, Table } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./AdminManageTables.css";
+import {
+  FiEdit, FiSave, FiRefreshCw, FiTable, FiUsers, FiMapPin,
+  FiImage, FiCheck, FiX, FiGrid, FiList, FiSearch
+} from "react-icons/fi";
+import "./AdminManageRooms.css";
 
 const AdminUpdateTable = () => {
   const navigate = useNavigate();
@@ -108,6 +112,7 @@ const AdminUpdateTable = () => {
   };
 
   return (
+    <div className="enhanced-update-table-module-container">
     <div className="admin-manage-tables p-4">
       <h2 className="page-title mb-4">Update Table</h2>
 
@@ -257,7 +262,8 @@ const AdminUpdateTable = () => {
         </div>
       </div>
     </div>
+    </div>
   );
 };
 
-export default AdminUpdateTable; 
+export default AdminUpdateTable;

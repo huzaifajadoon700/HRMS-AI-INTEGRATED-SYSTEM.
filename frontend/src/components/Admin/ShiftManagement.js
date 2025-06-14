@@ -142,7 +142,7 @@ const ShiftManagement = () => {
   const stats = getShiftStats();
 
   return (
-    <div className="shift-management-container">
+    <div className="enhanced-shift-management-module-container">
       <div className="shift-header">
         <div className="header-content">
           <h2>Shift Management</h2>

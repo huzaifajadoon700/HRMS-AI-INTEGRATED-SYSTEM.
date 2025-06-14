@@ -11,9 +11,16 @@ const AdminManageRooms = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [image, setImage] = useState(null);
   const [price, setPrice] = useState("");
-  const [roomName, setRoomName] = useState("");
+  const [roomNumber, setRoomNumber] = useState("");
   const [roomType, setRoomType] = useState("");
   const [roomDescription, setRoomDescription] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [amenities, setAmenities] = useState([]);
+  const [floor, setFloor] = useState("");
+  const [size, setSize] = useState("");
+  const [bedType, setBedType] = useState("");
+  const [smokingAllowed, setSmokingAllowed] = useState(false);
+  const [petFriendly, setPetFriendly] = useState(false);
   const [errors, setErrors] = useState({});
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -48,10 +55,17 @@ const AdminManageRooms = () => {
   // Reset form fields and errors
   const resetForm = () => {
     setErrors({});
-    setRoomName("");
+    setRoomNumber("");
     setRoomType("");
     setRoomDescription("");
     setPrice("");
+    setCapacity("");
+    setAmenities([]);
+    setFloor("");
+    setSize("");
+    setBedType("");
+    setSmokingAllowed(false);
+    setPetFriendly(false);
     setImage(null);
     setSelectedRoom(null);
   };
@@ -85,10 +99,11 @@ const AdminManageRooms = () => {
   // Validate form fields
   const validateForm = () => {
     const newErrors = {};
-    if (!roomName.trim()) newErrors.roomName = "Room Name is required.";
+    if (!roomNumber.trim()) newErrors.roomNumber = "Room Number is required.";
     if (!roomType) newErrors.roomType = "Room Type is required.";
     if (!roomDescription.trim()) newErrors.roomDescription = "Description is required.";
     if (!price || price <= 0 || isNaN(price)) newErrors.price = "Please enter a valid price.";
+    if (!capacity || capacity <= 0 || isNaN(capacity)) newErrors.capacity = "Please enter a valid capacity.";
     if (!image && !selectedRoom) newErrors.image = "Please upload an image.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -100,10 +115,17 @@ const AdminManageRooms = () => {
     if (!validateForm()) return;
 
     const formData = new FormData();
-    formData.append("roomName", roomName);
+    formData.append("roomNumber", roomNumber);
     formData.append("roomType", roomType);
     formData.append("description", roomDescription);
     formData.append("price", price);
+    formData.append("capacity", capacity);
+    formData.append("amenities", JSON.stringify(amenities));
+    formData.append("floor", floor);
+    formData.append("size", size);
+    formData.append("bedType", bedType);
+    formData.append("smokingAllowed", smokingAllowed);
+    formData.append("petFriendly", petFriendly);
     if (image) formData.append("image", image);
 
     try {
@@ -145,10 +167,17 @@ const AdminManageRooms = () => {
 
   // Handle room update (pre-fill form)
   const handleUpdateRoom = (room) => {
-    setRoomName(room.roomName);
+    setRoomNumber(room.roomNumber);
     setRoomType(room.roomType);
     setRoomDescription(room.description);
     setPrice(room.price);
+    setCapacity(room.capacity || "");
+    setAmenities(room.amenities || []);
+    setFloor(room.floor || "");
+    setSize(room.size || "");
+    setBedType(room.bedType || "");
+    setSmokingAllowed(room.smokingAllowed || false);
+    setPetFriendly(room.petFriendly || false);
     setImage(null);
     setSelectedRoom(room);
     setShowAddRoom(true);

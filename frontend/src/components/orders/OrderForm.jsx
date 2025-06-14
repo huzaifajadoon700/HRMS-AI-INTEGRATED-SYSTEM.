@@ -72,15 +72,15 @@ const OrderForm = ({ cart, userId, clearCart, onOrderPlaced }) => {
           <ul>
             {cart.map((item) => (
               <li key={item._id}>
-                {item.name} - {item.quantity} x ${item.price.toFixed(2)}
+                {item.name} - {item.quantity} x Rs. {item.price.toFixed(0)}
               </li>
             ))}
           </ul>
           <div className="total-amount">
-            Total: $
+            Total: Rs.
             {cart
               .reduce((total, item) => total + item.price * item.quantity, 0)
-              .toFixed(2)}
+              .toFixed(0)}
           </div>
         </div>
       )}

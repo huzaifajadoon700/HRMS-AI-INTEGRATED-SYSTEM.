@@ -68,7 +68,7 @@ exports.createReservation = async (req, res) => {
         // First create the payment intent
         paymentIntent = await stripe.paymentIntents.create({
           amount: totalPrice * 100, // Convert to cents
-          currency: 'usd',
+          currency: 'pkr',
           payment_method_types: ['card'],
           metadata: {
             tableId,
@@ -158,15 +158,34 @@ function convertTimeToMinutes(timeString) {
 exports.getReservationsByUser = async (req, res) => {
   try {
     const userId = req.user._id; // Get the user ID from the authenticated request
-    
+
+    console.log("🔍 Looking for reservations for user ID:", userId);
+
     // Get user details for enriching reservations
     const User = mongoose.model('users');
     const user = await User.findById(userId).lean();
-    
+
     console.log("User data found:", user ? { name: user.name, email: user.email, phone: user.phone } : "No user found");
-    
-    const reservations = await Reservation.find({ userId }).populate("tableId").lean();
-    console.log("Reservations from database:", JSON.stringify(reservations, null, 2)); // Debug log
+
+    // Try to find reservations with current user ID format
+    let reservations = await Reservation.find({ userId }).populate("tableId").lean();
+    console.log("Reservations found with current userId:", reservations.length);
+
+    // If no reservations found, try to find with string version of user ID
+    if (reservations.length === 0) {
+      console.log("🔄 Trying to find reservations with string userId...");
+      reservations = await Reservation.find({ userId: userId.toString() }).populate("tableId").lean();
+      console.log("Reservations found with string userId:", reservations.length);
+    }
+
+    // If still no reservations, try to find by user email (fallback)
+    if (reservations.length === 0 && user) {
+      console.log("🔄 Trying to find reservations by email fallback...");
+      reservations = await Reservation.find({ email: user.email }).populate("tableId").lean();
+      console.log("Reservations found with email fallback:", reservations.length);
+    }
+
+    console.log("Final reservations from database:", reservations.length);
     
     // Enrich reservations with user data if fields are missing
     const enrichedReservations = reservations.map(reservation => {

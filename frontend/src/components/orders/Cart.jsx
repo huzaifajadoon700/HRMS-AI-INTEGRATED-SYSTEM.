@@ -1,13 +1,25 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import axios from "axios";
-import { Button, Table, Form, Card, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { toast } from "react-toastify";
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import "./Cart.css";
+import {
+  FiShoppingCart,
+  FiTrash2,
+  FiPlus,
+  FiMinus,
+  FiMapPin,
+  FiPhone,
+  FiMessageSquare,
+  FiCreditCard,
+  FiDollarSign,
+  FiTruck,
+  FiClock
+} from "react-icons/fi";
+import "./ModernCart.css";
 
 // Initialize Stripe with your publishable key
 const stripePromise = loadStripe('pk_test_51RQDO0QHBrXA72xgYssbECOe9bubZ2bWHA4m0T6EY6AvvmAfCzIDmKUCkRjpwVVIJ4IMaOiQBUawECn5GD8ADHbn00GRVmjExI');
@@ -56,10 +68,10 @@ const PaymentForm = ({ onPaymentSuccess, totalPrice, onCancel, cart }) => {
         'http://localhost:8080/api/payment/menu-payment',
         {
           amount: totalPrice,
-          currency: 'usd',
+          currency: 'pkr',
           paymentMethodId: paymentMethod.id,
           orderItems: cart.map(item => ({
-            id: item._id,
+            menuItemId: item._id,
             name: item.name,
             quantity: item.quantity,
             price: item.price
@@ -146,7 +158,7 @@ const PaymentForm = ({ onPaymentSuccess, totalPrice, onCancel, cart }) => {
                 Processing...
               </>
             ) : (
-              `Pay $${totalPrice}`
+              `Pay Rs. ${totalPrice}`
             )}
           </button>
         </div>
@@ -196,7 +208,7 @@ export default function Cart() {
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!mapContainer.current || cart.length === 0) return;
@@ -319,12 +331,12 @@ export default function Cart() {
       );
 
       const distance = response.data.routes[0].distance / 1000; // Convert to km
-      // Calculate fee: $2 base fee + $0.5 per km
-      const fee = Math.max(2, Math.ceil(2 + (distance * 0.5)));
+      // Calculate fee: Rs. 50 base fee + Rs. 10 per km
+      const fee = Math.max(50, Math.ceil(50 + (distance * 10)));
       setDeliveryFee(fee);
     } catch (error) {
       console.error("Error calculating delivery fee:", error);
-      setDeliveryFee(2); // Default fee
+      setDeliveryFee(50); // Default fee
     }
   };
 
@@ -374,7 +386,7 @@ export default function Cart() {
 
       // Format order items
       const items = cart.map(item => ({
-        itemId: item._id,
+        menuItemId: item._id,
         name: item.name,
         price: parseFloat(item.price.toFixed(2)),
         quantity: parseInt(item.quantity)
@@ -484,148 +496,213 @@ export default function Cart() {
   }
 
   return (
-    <div className="cart-container">
-      <h2>My Cart</h2>
-      {cart.length === 0 ? (
-        <Alert variant="info">Your cart is empty.</Alert>
-      ) : (
-        <>
-          <div className="row">
-            <div className="col-md-8">
-              <Table striped bordered hover variant="dark" className="cosmic-table">
-                <thead>
-                  <tr>
-                    <th>Item</th>
-                    <th style={{ width: "15%" }}>Price</th>
-                    <th style={{ width: "20%" }}>Quantity</th>
-                    <th style={{ width: "15%" }}>Total</th>
-                    <th style={{ width: "15%" }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
+    <div className="modern-cart-page">
+      {/* Hero Section */}
+      <section className="cart-hero">
+        <div className="hero-content">
+          <div className="hero-icon">
+            <FiShoppingCart size={48} />
+          </div>
+          <h1 className="hero-title">Shopping Cart</h1>
+          <p className="hero-subtitle">Review your items and proceed to checkout</p>
+        </div>
+      </section>
+
+      <div className="cart-content">
+        <div className="container-fluid">
+          {cart.length === 0 ? (
+            <div className="empty-cart">
+              <div className="empty-cart-card">
+                <FiShoppingCart size={64} className="empty-icon" />
+                <h3>Your cart is empty</h3>
+                <p>Add some delicious items to get started!</p>
+                <button
+                  className="browse-menu-btn"
+                  onClick={() => navigate("/order-food")}
+                >
+                  <FiShoppingCart className="btn-icon" />
+                  Browse Menu
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="cart-layout">
+              {/* Cart Items Section */}
+              <div className="cart-items-section">
+                <div className="section-header">
+                  <h2 className="section-title">
+                    <FiShoppingCart className="section-icon" />
+                    Cart Items ({cart.length})
+                  </h2>
+                </div>
+
+                <div className="cart-items-grid">
                   {cart.map((item, index) => (
-                    <tr key={index}>
-                      <td>{item.name}</td>
-                      <td>${item.price.toFixed(2)}</td>
-                      <td>
-                        <div className="quantity-controls">
-                          <Button
-                            variant="outline-info"
-                            size="sm"
-                            onClick={() => handleUpdateQuantity(index, Math.max(1, item.quantity - 1))}
-                            className="quantity-btn"
-                          >
-                            -
-                          </Button>
-                          <span className="quantity-display">{item.quantity}</span>
-                          <Button
-                            variant="outline-info"
-                            size="sm"
-                            onClick={() => handleUpdateQuantity(index, item.quantity + 1)}
-                            className="quantity-btn"
-                          >
-                            +
-                          </Button>
+                    <div key={index} className="cart-item-card">
+                      <div className="item-info">
+                        <h3 className="item-name">{item.name}</h3>
+                        <p className="item-price">Rs. {item.price.toFixed(0)} each</p>
+                      </div>
+
+                      <div className="item-controls">
+                        <div className="quantity-section">
+                          <label className="quantity-label">Quantity</label>
+                          <div className="quantity-controls">
+                            <button
+                              className="quantity-btn decrease"
+                              onClick={() => handleUpdateQuantity(index, Math.max(1, item.quantity - 1))}
+                            >
+                              <FiMinus />
+                            </button>
+                            <span className="quantity-display">{item.quantity}</span>
+                            <button
+                              className="quantity-btn increase"
+                              onClick={() => handleUpdateQuantity(index, item.quantity + 1)}
+                            >
+                              <FiPlus />
+                            </button>
+                          </div>
                         </div>
-                      </td>
-                      <td>${(item.price * item.quantity).toFixed(2)}</td>
-                      <td>
-                        <Button
-                          variant="danger"
-                          size="sm"
+
+                        <div className="item-total">
+                          <span className="total-label">Total</span>
+                          <span className="total-price">Rs. {(item.price * item.quantity).toFixed(0)}</span>
+                        </div>
+
+                        <button
                           className="remove-btn"
                           onClick={() => handleRemoveItem(index)}
+                          title="Remove item"
                         >
-                          <i className="fas fa-trash"></i>
-                        </Button>
-                      </td>
-                    </tr>
+                          <FiTrash2 />
+                        </button>
+                      </div>
+                    </div>
                   ))}
-                </tbody>
-              </Table>
-            </div>
-            <div className="col-md-4 ">
-              <Card className="delivery-card">
-                <Card.Body>
-                  <Card.Title>Delivery Details</Card.Title>
-                  <div className="delivery-details-grid">
-                    <div id="map" ref={mapContainer} />
-                    
-                    <Form.Group>
-                      <Form.Label>Delivery Address</Form.Label>
-                      <Form.Control
+                </div>
+              </div>
+              {/* Delivery & Checkout Section */}
+              <div className="checkout-section">
+                <div className="section-header">
+                  <h2 className="section-title">
+                    <FiTruck className="section-icon" />
+                    Delivery Details
+                  </h2>
+                </div>
+
+                <div className="delivery-card">
+                  <div className="map-container">
+                    <div id="map" ref={mapContainer} className="delivery-map" />
+                  </div>
+
+                  <div className="delivery-form">
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiMapPin className="label-icon" />
+                        Delivery Address
+                      </label>
+                      <input
                         type="text"
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
-                        placeholder="Enter delivery address"
+                        placeholder="Enter your delivery address"
+                        className="form-input"
                       />
-                    </Form.Group>
+                    </div>
 
-                    <Form.Group>
-                      <Form.Label>Contact Number</Form.Label>
-                      <Form.Control
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiPhone className="label-icon" />
+                        Contact Number
+                      </label>
+                      <input
                         type="tel"
                         placeholder="Your phone number"
+                        className="form-input"
                       />
-                    </Form.Group>
+                    </div>
 
-                    <Form.Group>
-                      <Form.Label>Delivery Notes</Form.Label>
-                      <Form.Control
-                        type="text"
-                        placeholder="Any special instructions"
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiMessageSquare className="label-icon" />
+                        Delivery Notes
+                      </label>
+                      <textarea
+                        placeholder="Any special instructions for delivery"
+                        className="form-textarea"
+                        rows="3"
                       />
-                    </Form.Group>
+                    </div>
                   </div>
 
-                  <div className="fee-breakdown">
-                    <p>
-                      <span>Subtotal:</span>
-                      <span>${cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}</span>
-                    </p>
-                    <p>
-                      <span>Delivery Fee:</span>
-                      <span>${deliveryFee.toFixed(2)}</span>
-                    </p>
-                    <h4>
-                      <span>Total Amount:</span>
-                      <span>${(cart.reduce((sum, item) => sum + item.price * item.quantity, 0) + deliveryFee).toFixed(2)}</span>
-                    </h4>
-                  </div>
+                  <div className="order-summary">
+                    <h3 className="summary-title">
+                      <FiDollarSign className="summary-icon" />
+                      Order Summary
+                    </h3>
 
-                  <Button 
-                    variant="primary" 
-                    onClick={() => {
-                      if (cart.length === 0) {
-                        toast.error("Your cart is empty!");
-                        return;
-                      }
-                      if (!deliveryAddress.trim()) {
-                        toast.error("Please enter a delivery address");
-                        return;
-                      }
-                      setShowPayment(true);
-                    }}
-                    className="place-order-btn"
-                    disabled={isLoading || cart.length === 0}
-                  >
-                    {isLoading ? (
-                      <>
-                        <span className="spinner-border" role="status" aria-hidden="true"></span>
-                        Processing...
-                      </>
-                    ) : (
-                      'Proceed to Payment'
-                    )}
-                  </Button>
-                </Card.Body>
-              </Card>
+                    <div className="summary-breakdown">
+                      <div className="summary-row">
+                        <span>Subtotal:</span>
+                        <span>Rs. {cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(0)}</span>
+                      </div>
+                      <div className="summary-row">
+                        <span>Delivery Fee:</span>
+                        <span>Rs. {deliveryFee.toFixed(0)}</span>
+                      </div>
+                      <div className="summary-row delivery-time">
+                        <span>
+                          <FiClock className="time-icon" />
+                          Estimated Delivery:
+                        </span>
+                        <span>30-45 minutes</span>
+                      </div>
+                      <div className="summary-total">
+                        <span>Total Amount:</span>
+                        <span>Rs. {(cart.reduce((sum, item) => sum + item.price * item.quantity, 0) + deliveryFee).toFixed(0)}</span>
+                      </div>
+                    </div>
+
+                    <button
+                      className="checkout-btn"
+                      onClick={() => {
+                        if (cart.length === 0) {
+                          toast.error("Your cart is empty!");
+                          return;
+                        }
+                        if (!deliveryAddress.trim()) {
+                          toast.error("Please enter a delivery address");
+                          return;
+                        }
+                        setShowPayment(true);
+                      }}
+                      disabled={isLoading || cart.length === 0}
+                    >
+                      {isLoading ? (
+                        <>
+                          <div className="loading-spinner"></div>
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <FiCreditCard className="btn-icon" />
+                          Proceed to Payment
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div className="error-message">
+                  <p>{error}</p>
+                </div>
+              )}
             </div>
-          </div>
-
-          {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
-        </>
-      )}
+          )}
+        </div>
+      </div>
     </div>
   );
 }

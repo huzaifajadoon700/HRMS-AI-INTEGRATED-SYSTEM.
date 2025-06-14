@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Table, Button, Form } from "react-bootstrap";
+import { Table, Form } from "react-bootstrap";
 import { initializeSocket, disconnectSocket } from "../services/socketService";
 
 const AdminOrders = () => {
@@ -11,7 +11,7 @@ const AdminOrders = () => {
     fetchOrders();
     
     // Initialize socket for admin updates
-    const socket = initializeSocket('admin');
+    initializeSocket('admin');
     
     // Cleanup on unmount
     return () => {

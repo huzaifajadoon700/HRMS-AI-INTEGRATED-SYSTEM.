@@ -65,7 +65,16 @@ const AdminUpdateMenu = () => {
       category: item.category,
       image: null,
     });
-    setImagePreview(item.image ? `http://localhost:8080${item.image}` : null);
+    // Set image preview with proper URL handling
+    if (item.image) {
+      if (item.image.startsWith('http://') || item.image.startsWith('https://')) {
+        setImagePreview(item.image);
+      } else {
+        setImagePreview(`http://localhost:8080${item.image}`);
+      }
+    } else {
+      setImagePreview(null);
+    }
   };
 
   const handleImageChange = (e) => {
@@ -146,6 +155,7 @@ const AdminUpdateMenu = () => {
   }
 
   return (
+    <div className="enhanced-update-menu-module-container">
     <Container fluid className="update-menu-container">
       <div className="update-menu-header">
         <h2>Update Menu Items</h2>
@@ -162,7 +172,13 @@ const AdminUpdateMenu = () => {
               >
                 <div className="menu-item-image">
                   <img
-                    src={item.image ? `http://localhost:8080${item.image}` : "/placeholder-food.jpg"}
+                    src={
+                      item.image
+                        ? (item.image.startsWith('http://') || item.image.startsWith('https://'))
+                          ? item.image
+                          : `http://localhost:8080${item.image}`
+                        : "/placeholder-food.jpg"
+                    }
                     alt={item.name}
                     onError={(e) => {
                       e.target.src = "/placeholder-food.jpg";
@@ -172,7 +188,7 @@ const AdminUpdateMenu = () => {
                 <div className="menu-item-info">
                   <h4>{item.name}</h4>
                   <p>{item.category}</p>
-                  <p>${item.price.toFixed(2)}</p>
+                  <p>Rs. {item.price.toFixed(0)}</p>
                 </div>
               </div>
             ))}
@@ -306,7 +322,8 @@ const AdminUpdateMenu = () => {
         </Col>
       </Row>
     </Container>
+    </div>
   );
 };
 
-export default AdminUpdateMenu; 
+export default AdminUpdateMenu;

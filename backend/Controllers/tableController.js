@@ -4,7 +4,7 @@ const Reservation = require('../Models/Reservations');
 // Add a new table
 const addTable = async (req, res) => {
   try {
-    const { tableName, tableType, capacity, status } = req.body;
+    const { tableName, tableType, capacity, status, description } = req.body;
     const image = req.file ? `/uploads/${req.file.filename}` : null;
 
     const newTable = new Table({
@@ -13,6 +13,7 @@ const addTable = async (req, res) => {
       capacity,
       image,
       status: status || 'Available',
+      description: description || '',
     });
 
     await newTable.save();
@@ -132,18 +133,25 @@ function convertTimeToMinutes(timeString) {
 // Update a table
 const updateTable = async (req, res) => {
   try {
-    const { tableName, tableType, capacity, status } = req.body;
+    const { tableName, tableType, capacity, status, description } = req.body;
     const image = req.file ? `/uploads/${req.file.filename}` : null;
+
+    const updateData = {
+      tableName,
+      tableType,
+      capacity,
+      status: status || undefined,
+      description: description || undefined,
+    };
+
+    // Only update image if a new one is provided
+    if (image) {
+      updateData.image = image;
+    }
 
     const updatedTable = await Table.findByIdAndUpdate(
       req.params.id,
-      {
-        tableName,
-        tableType,
-        capacity,
-        image: image || undefined, // Update image only if provided
-        status: status || undefined,
-      },
+      updateData,
       { new: true }
     );
 

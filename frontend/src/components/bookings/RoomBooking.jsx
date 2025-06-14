@@ -82,7 +82,7 @@ const PaymentForm = ({ onPaymentSuccess, totalPrice, onCancel }) => {
                         className="btn btn-primary"
                         disabled={!stripe || processing}
                     >
-                        {processing ? 'Processing...' : `Pay $${totalPrice}`}
+                        {processing ? 'Processing...' : `Pay Rs. ${totalPrice}`}
                     </button>
                 </div>
             </form>
@@ -333,7 +333,7 @@ const RoomBooking = () => {
                     </div>
                     <div className="summary-item">
                         <span>Price per Night:</span>
-                        <span>${room.price}</span>
+                        <span>Rs. {room.price}</span>
                     </div>
                     <div className="summary-item">
                         <span>Number of Nights:</span>
@@ -341,15 +341,15 @@ const RoomBooking = () => {
                     </div>
                     <div className="summary-item">
                         <span>Base Price:</span>
-                        <span>${calculateBasePrice().toFixed(2)}</span>
+                        <span>Rs. {calculateBasePrice().toFixed(2)}</span>
                     </div>
                     <div className="summary-item">
                         <span>Tax (10%):</span>
-                        <span>${calculateTax().toFixed(2)}</span>
+                        <span>Rs. {calculateTax().toFixed(2)}</span>
                     </div>
                     <div className="summary-item total">
                         <span>Total Price:</span>
-                        <span>${calculateTotalAmount().toFixed(2)}</span>
+                        <span>Rs. {calculateTotalAmount().toFixed(2)}</span>
                     </div>
                 </div>
 

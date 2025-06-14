@@ -11,26 +11,27 @@ import OrderFood from "./pages/OrderFood";
 import Cart from "./components/orders/Cart";
 import MyOrders from "./components/User/MyOrders.jsx";
 import Invoice from "./components/orders/Invoice";
-import MyBookings from "./components/User/MyBookings";
+import MyBookings from "./pages/MyBookings";
 import MyReservations from "./components/User/MyReservations";
 import AdminOrders from "./pages/AdminOrders";
-import DeliveryTracking from "./components/DeliveryTracking";
 import DeliveryTrackingPage from "./components/DeliveryTracking";
 import ReserveTable from "./pages/ReserveTable";
 import TableReservationPage from "./pages/TableReservationPage";
 import TableConfirmationPage from "./pages/TableConfirmationPage";
+import TableRecommendations from "./components/tables/TableRecommendations";
 import OrderConfirmation from "./pages/OrderConfirmation.jsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Profile from "./components/User/Profile";
+import Profile from "./pages/Profile";
 import Feedback from "./components/User/Feedback";
-import "./styles/theme.css";
+import "./styles/simple-theme.css";
 import "./styles/global.css";
 import BookingPage from './pages/BookingPage';
 import BookingConfirmation from "./pages/BookingConfirmation";
 import OrderTracking from "./pages/OrderTracking";
 import { Toaster } from 'react-hot-toast';
+import PersonalizedRecommendations from "./components/recommendations/PersonalizedRecommendations";
 
 // Layout Component for Header and Footer
 const Layout = ({ children }) => {
@@ -53,11 +54,7 @@ const AuthenticatedRoute = ({ children }) => {
   return token ? children : <Navigate to="/login" replace />;
 };
 
-// Admin Route Wrapper
-const AdminRoute = ({ children }) => {
-  const role = localStorage.getItem("role");
-  return role === "admin" ? children : <Navigate to="/" replace />;
-};
+
 
 function App() {
   return (
@@ -96,6 +93,7 @@ function App() {
           <Route path="/admin-orders" element={<Layout><AdminOrders /></Layout>} />
           <Route path="/delivery-tracking" element={<Layout><DeliveryTrackingPage /></Layout>} />
           <Route path="/reserve-table" element={<Layout><ReserveTable /></Layout>} />
+          <Route path="/table-recommendations" element={<Layout><TableRecommendations /></Layout>} />
           <Route path="/table-reservation" element={<Layout><TableReservationPage /></Layout>} />
           <Route path="/table-confirmation" element={<Layout><TableConfirmationPage /></Layout>} />
           <Route path="/profile" element={<Layout><Profile /></Layout>} />
@@ -112,6 +110,7 @@ function App() {
               <Layout><OrderTracking /></Layout>
             </AuthenticatedRoute>
           } />
+          <Route path="/recommendations" element={<Layout><PersonalizedRecommendations /></Layout>} />
           <Route path="*" element={<Layout><PageNotFound /></Layout>} />
         </Routes>
         <ToastContainer

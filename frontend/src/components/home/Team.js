@@ -30,17 +30,18 @@ export default function Teams() {
                   
                   <div className="social-links">
                     {socialIcons.slice(0, 4).map((platform, i) => (
-                      <a
+                      <button
                         key={i}
-                        href="#"
+                        type="button"
                         className="social-icon"
                         aria-label={`${platform.name} profile`}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                       >
                         {platform.name === 'Facebook' && <FiFacebook />}
                         {platform.name === 'Twitter' && <FiTwitter />}
                         {platform.name === 'Instagram' && <FiInstagram />}
                         {platform.name === 'Linkedin' && <FiLinkedin />}
-                      </a>
+                      </button>
                     ))}
                   </div>
                 </div>

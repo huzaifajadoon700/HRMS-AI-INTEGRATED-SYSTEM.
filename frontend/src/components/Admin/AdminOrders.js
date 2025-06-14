@@ -1,22 +1,30 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Container, Row, Col, Card, Table, Form, Button, Modal, Badge } from "react-bootstrap";
-import { FaEye, FaCheck, FaTimes, FaTruck, FaFilter, FaSearch, FaCalendarAlt, FaUser, FaShoppingCart, FaDollarSign, FaClock, FaChartLine } from "react-icons/fa";
-import { FiShoppingBag, FiCheckCircle, FiXCircle, FiRefreshCw, FiClock } from 'react-icons/fi';
-import "./AdminOrders.css";
 import { useNavigate } from 'react-router-dom';
+import {
+  FiShoppingBag, FiCheckCircle, FiXCircle, FiRefreshCw, FiClock,
+  FiSearch, FiFilter, FiGrid, FiList, FiEye, FiEdit, FiTrash2,
+  FiDollarSign, FiCalendar, FiUser, FiPackage, FiTrendingUp,
+  FiDownload, FiMail, FiPhone, FiMapPin, FiCreditCard
+} from 'react-icons/fi';
+import "./AdminOrders.css";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [viewMode, setViewMode] = useState("grid");
   const [stats, setStats] = useState({
     totalOrders: 0,
     pendingOrders: 0,
+    completedOrders: 0,
     totalRevenue: 0,
     averageOrderValue: 0
   });
@@ -55,6 +63,7 @@ const AdminOrders = () => {
       if (response.data && Array.isArray(response.data.orders)) {
         const validOrders = response.data.orders.filter(order => order && order._id);
         setOrders(validOrders);
+        setFilteredOrders(validOrders);
       } else {
         console.error('Invalid response structure:', response.data);
         toast.error('Invalid response from server');
@@ -78,15 +87,58 @@ const AdminOrders = () => {
     }
   };
 
+  // Filter and search functionality
+  useEffect(() => {
+    let filtered = [...orders];
+
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(order =>
+        order.orderNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.customerName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order._id?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Status filter
+    if (filterStatus !== "all") {
+      filtered = filtered.filter(order => order.status === filterStatus);
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+
+      if (sortBy === "createdAt") {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      } else if (sortBy === "totalPrice") {
+        aValue = parseFloat(aValue || 0);
+        bValue = parseFloat(bValue || 0);
+      }
+
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    setFilteredOrders(filtered);
+  }, [orders, searchQuery, filterStatus, sortBy, sortOrder]);
+
   const calculateStats = () => {
     const totalOrders = orders.length;
     const pendingOrders = orders.filter(order => order.status === "pending").length;
+    const completedOrders = orders.filter(order => order.status === "completed").length;
     const totalRevenue = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
     const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
     setStats({
       totalOrders,
       pendingOrders,
+      completedOrders,
       totalRevenue,
       averageOrderValue
     });
@@ -133,359 +185,565 @@ const AdminOrders = () => {
     }
   };
 
-  const filteredOrders = orders.filter(order => {
-    const matchesStatus = filterStatus === "all" || order.status === filterStatus;
-    const matchesSearch = order.orderNumber?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         order.customerName?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
+  const getOrderStatus = (order) => {
+    const status = order.status?.toLowerCase();
+    switch (status) {
+      case 'pending': return { status: 'pending', color: 'orange', icon: FiClock };
+      case 'processing': return { status: 'processing', color: 'blue', icon: FiRefreshCw };
+      case 'completed': return { status: 'completed', color: 'green', icon: FiCheckCircle };
+      case 'cancelled': return { status: 'cancelled', color: 'red', icon: FiXCircle };
+      default: return { status: 'unknown', color: 'gray', icon: FiClock };
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   if (loading) {
     return (
-      <Container className="admin-orders-container">
+      <div className="enhanced-view-orders-module-container">
         <div className="loading-state">
-          <FiRefreshCw className="loading-spinner" />
+          <div className="loading-spinner">
+            <FiRefreshCw className="spinning" />
+          </div>
+          <p>Loading orders...</p>
         </div>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container className="admin-orders-container">
-      <div className="page-header">
-        <h1 className="page-title">Manage Orders</h1>
-        <p className="page-subtitle">View and update order status</p>
+    <div className="enhanced-view-orders-module-container">
+      {/* Enhanced Header */}
+      <div className="enhanced-orders-header">
+        <div className="header-content">
+          <div className="title-section">
+            <div className="title-wrapper">
+              <div className="title-icon">
+                <FiShoppingBag />
+              </div>
+              <div className="title-text">
+                <h1 className="page-title">Order Management</h1>
+                <p className="page-subtitle">Monitor and manage all customer orders</p>
+              </div>
+            </div>
+
+            {/* Statistics Cards */}
+            <div className="stats-cards">
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <FiPackage />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-number">{stats.totalOrders}</div>
+                  <div className="stat-label">Total Orders</div>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <FiClock />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-number">{stats.pendingOrders}</div>
+                  <div className="stat-label">Pending Orders</div>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <FiCheckCircle />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-number">{stats.completedOrders}</div>
+                  <div className="stat-label">Completed Orders</div>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <FiDollarSign />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-number">
+                    Rs. {stats.totalRevenue.toLocaleString('en-PK')}
+                  </div>
+                  <div className="stat-label">Total Revenue</div>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <FiTrendingUp />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-number">
+                    Rs. {Math.round(stats.averageOrderValue).toLocaleString('en-PK')}
+                  </div>
+                  <div className="stat-label">Average Order</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="header-actions">
+              <button
+                className="action-btn secondary"
+                onClick={fetchOrders}
+                disabled={loading}
+              >
+                <FiRefreshCw className={loading ? 'spinning' : ''} />
+                <span>Refresh</span>
+              </button>
+
+              <button className="action-btn primary">
+                <FiDownload />
+                <span>Export</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {orders.length === 0 ? (
-        <div className="empty-state">
-          <FiShoppingBag className="empty-state-icon" />
-          <h3 className="empty-state-title">No Orders Found</h3>
-          <p className="empty-state-text">
-            There are no orders to display at the moment.
-          </p>
+      {/* Enhanced Controls */}
+      <div className="enhanced-orders-controls">
+        <div className="controls-container">
+          <div className="search-section">
+            <div className="search-box">
+              <FiSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder="Search orders by ID, customer name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+            </div>
+          </div>
+
+          <div className="filter-section">
+            <div className="filter-group">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="filter-select"
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="processing">Processing</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="filter-select"
+              >
+                <option value="createdAt">Order Date</option>
+                <option value="totalPrice">Total Amount</option>
+                <option value="orderNumber">Order Number</option>
+                <option value="customerName">Customer Name</option>
+              </select>
+            </div>
+
+            <button
+              className={`sort-btn ${sortOrder === 'asc' ? 'asc' : 'desc'}`}
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+            >
+              {sortOrder === 'asc' ? '↑' : '↓'}
+            </button>
+          </div>
+
+          <div className="view-section">
+            <div className="view-toggle">
+              <button
+                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                onClick={() => setViewMode('grid')}
+              >
+                <FiGrid />
+              </button>
+              <button
+                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                onClick={() => setViewMode('list')}
+              >
+                <FiList />
+              </button>
+            </div>
+          </div>
         </div>
-      ) : (
-        <Row className="orders-grid">
-          {orders.map((order) => (
-            <Col key={order._id} xs={12} md={6} lg={4}>
-              <Card className="order-card">
-                <Card.Body>
-                  <div className="order-header">
-                    <div className="order-info">
-                      <h3 className="order-id">Order #{order.orderNumber}</h3>
-                      <p className="order-date">
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <Badge
-                      className={`status-badge ${order.status.toLowerCase()}`}
-                      pill
-                    >
-                      {order.status === 'pending' && <FiClock className="status-icon" />}
-                      {order.status === 'completed' && <FiCheckCircle className="status-icon" />}
-                      {order.status === 'cancelled' && <FiXCircle className="status-icon" />}
-                      <span>{order.status}</span>
-                    </Badge>
-                  </div>
+      </div>
 
-                  <div className="order-items">
-                    {order.items.map((item, index) => (
-                      <div key={index} className="order-item">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="order-item-image"
-                        />
-                        <div className="order-item-details">
-                          <h4 className="order-item-name">{item.name}</h4>
-                          <p className="order-item-price">${item.price}</p>
-                          <p className="order-item-quantity">Qty: {item.quantity}</p>
+      {/* Enhanced Content */}
+      <div className="enhanced-orders-content">
+        <div className="content-container">
+          {loading ? (
+            <div className="loading-state">
+              <div className="loading-spinner">
+                <FiRefreshCw className="spinning" />
+              </div>
+              <p>Loading orders...</p>
+            </div>
+          ) : filteredOrders.length > 0 ? (
+            <div className={`orders-${viewMode}`}>
+              {viewMode === 'grid' ? (
+                <div className="orders-grid">
+                  {filteredOrders.map((order) => {
+                    const orderStatus = getOrderStatus(order);
+                    const StatusIcon = orderStatus.icon;
+                    return (
+                      <div key={order._id} className="order-card">
+                        <div className="card-header">
+                          <div className="order-id">
+                            <span className="id-label">Order</span>
+                            <span className="id-value">#{order.orderNumber || order._id.slice(-8)}</span>
+                          </div>
+                          <div className={`status-badge ${orderStatus.status}`}>
+                            <StatusIcon />
+                            <span>{orderStatus.status}</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
 
-                  <div className="order-summary">
-                    <div className="summary-item">
-                      <span>Subtotal</span>
-                      <span>${order.subtotal}</span>
-                    </div>
-                    <div className="summary-item">
-                      <span>Tax</span>
-                      <span>${order.tax}</span>
-                    </div>
-                    <div className="summary-item total">
-                      <span>Total</span>
-                      <span>${order.totalPrice}</span>
-                    </div>
-                  </div>
+                        <div className="card-content">
+                          <div className="customer-info">
+                            <div className="customer-details">
+                              <FiUser className="detail-icon" />
+                              <div>
+                                <div className="customer-name">{order.customerName || 'Unknown Customer'}</div>
+                                <div className="order-date">{formatDate(order.createdAt)}</div>
+                              </div>
+                            </div>
+                          </div>
 
-                  <div className="order-actions">
-                    {order.status === 'pending' && (
-                      <>
-                        <Button
-                          variant="success"
-                          size="sm"
-                          onClick={() => handleStatusUpdate(order._id, 'completed')}
-                        >
-                          Complete Order
-                        </Button>
-                        <Button
-                          variant="danger"
-                          size="sm"
-                          onClick={() => handleStatusUpdate(order._id, 'cancelled')}
-                        >
-                          Cancel Order
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      )}
+                          <div className="order-items">
+                            <div className="items-header">
+                              <FiPackage className="items-icon" />
+                              <span>Items ({order.items?.length || 0})</span>
+                            </div>
+                            <div className="items-list">
+                              {order.items?.slice(0, 3).map((item, index) => (
+                                <div key={index} className="item-row">
+                                  <span className="item-name">{item.name}</span>
+                                  <span className="item-quantity">x{item.quantity}</span>
+                                  <span className="item-price">Rs. {item.price}</span>
+                                </div>
+                              ))}
+                              {order.items?.length > 3 && (
+                                <div className="more-items">
+                                  +{order.items.length - 3} more items
+                                </div>
+                              )}
+                            </div>
+                          </div>
 
-      {/* Stats Cards */}
-      <Row className="mb-4">
-        <Col md={3} sm={6}>
-          <Card className="stat-card">
-            <Card.Body>
-              <div className="stat-icon">
-                <FaShoppingCart />
-              </div>
-              <div className="stat-content">
-                <h3>{stats.totalOrders}</h3>
-                <p>Total Orders</p>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={3} sm={6}>
-          <Card className="stat-card">
-            <Card.Body>
-              <div className="stat-icon pending">
-                <FaClock />
-              </div>
-              <div className="stat-content">
-                <h3>{stats.pendingOrders}</h3>
-                <p>Pending Orders</p>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={3} sm={6}>
-          <Card className="stat-card">
-            <Card.Body>
-              <div className="stat-icon revenue">
-                <FaDollarSign />
-              </div>
-              <div className="stat-content">
-                <h3>${stats.totalRevenue.toFixed(2)}</h3>
-                <p>Total Revenue</p>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={3} sm={6}>
-          <Card className="stat-card">
-            <Card.Body>
-              <div className="stat-icon average">
-                <FaChartLine />
-              </div>
-              <div className="stat-content">
-                <h3>${stats.averageOrderValue.toFixed(2)}</h3>
-                <p>Average Order Value</p>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+                          <div className="order-summary">
+                            <div className="summary-row">
+                              <span>Subtotal:</span>
+                              <span>Rs. {order.subtotal || 0}</span>
+                            </div>
+                            <div className="summary-row">
+                              <span>Tax:</span>
+                              <span>Rs. {order.tax || 0}</span>
+                            </div>
+                            <div className="summary-row total">
+                              <span>Total:</span>
+                              <span>Rs. {order.totalPrice || 0}</span>
+                            </div>
+                          </div>
+                        </div>
 
-      {/* Filters */}
-      <Card className="mb-4">
-        <Card.Body>
-          <Row>
-            <Col md={6}>
-              <div className="search-container">
-                <FaSearch className="search-icon" />
-                <Form.Control
-                  type="text"
-                  placeholder="Search orders..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="cosmic-input"
-                />
-              </div>
-            </Col>
-            <Col md={6}>
-              <div className="filter-container">
-                <FaFilter className="filter-icon" />
-                <Form.Select
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                  className="cosmic-select"
-                >
-                  <option value="all">All Orders</option>
-                  <option value="pending">Pending</option>
-                  <option value="processing">Processing</option>
-                  <option value="completed">Completed</option>
-                  <option value="cancelled">Cancelled</option>
-                </Form.Select>
-              </div>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
-
-      {/* Orders Table */}
-      <Card>
-        <Card.Body>
-          <div className="table-responsive">
-            <Table hover className="cosmic-table">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer</th>
-                  <th>Date</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOrders.length > 0 ? (
-                  filteredOrders.map((order) => (
-                    <tr key={order._id}>
-                      <td className="order-id">{order.orderNumber}</td>
-                      <td className="customer-info">
-                        <FaUser className="customer-icon" />
-                        {order.customerName}
-                      </td>
-                      <td className="order-date">
-                        <FaCalendarAlt className="date-icon" />
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="order-total">
-                        <FaDollarSign className="total-icon" />
-                        ${order.totalPrice?.toFixed(2)}
-                      </td>
-                      <td>
-                        <span className={`status-badge ${order.status.toLowerCase()}`}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td>
-                        <div className="action-buttons">
-                          <Button
-                            variant="link"
+                        <div className="card-actions">
+                          <button
+                            className="action-btn secondary small"
                             onClick={() => {
                               setSelectedOrder(order);
                               setShowDetailsModal(true);
                             }}
-                            className="cosmic-btn-view"
                           >
-                            <FaEye />
-                          </Button>
-                          {order.status === "pending" && (
+                            <FiEye />
+                            <span>View</span>
+                          </button>
+
+                          {order.status === 'pending' && (
                             <>
-                              <Button
-                                variant="link"
-                                onClick={() => handleStatusUpdate(order._id, "processing")}
-                                className="cosmic-btn-success"
+                              <button
+                                className="action-btn success small"
+                                onClick={() => handleStatusUpdate(order._id, 'completed')}
                               >
-                                <FaCheck />
-                              </Button>
-                              <Button
-                                variant="link"
-                                onClick={() => handleStatusUpdate(order._id, "cancelled")}
-                                className="cosmic-btn-danger"
+                                <FiCheckCircle />
+                                <span>Complete</span>
+                              </button>
+                              <button
+                                className="action-btn danger small"
+                                onClick={() => handleStatusUpdate(order._id, 'cancelled')}
                               >
-                                <FaTimes />
-                              </Button>
+                                <FiXCircle />
+                                <span>Cancel</span>
+                              </button>
                             </>
                           )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="text-center">
-                      No orders found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </div>
-        </Card.Body>
-      </Card>
 
-      {/* Order Details Modal */}
-      <Modal
-        show={showDetailsModal}
-        onHide={() => setShowDetailsModal(false)}
-        className="cosmic-modal"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Order Details</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {selectedOrder && (
-            <div className="order-details">
-              <div className="detail-item">
-                <span className="detail-label">Order Number:</span>
-                <span className="detail-value">{selectedOrder.orderNumber}</span>
+                          <button className="action-btn secondary small">
+                            <FiMail />
+                            <span>Contact</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="orders-list">
+                  <div className="list-header">
+                    <div className="list-header-item">Order</div>
+                    <div className="list-header-item">Customer</div>
+                    <div className="list-header-item">Date</div>
+                    <div className="list-header-item">Items</div>
+                    <div className="list-header-item">Total</div>
+                    <div className="list-header-item">Status</div>
+                    <div className="list-header-item">Actions</div>
+                  </div>
+
+                  {filteredOrders.map((order) => {
+                    const orderStatus = getOrderStatus(order);
+                    const StatusIcon = orderStatus.icon;
+                    return (
+                      <div key={order._id} className="list-item">
+                        <div className="list-cell">
+                          <div className="order-info">
+                            <div className="order-number">#{order.orderNumber || order._id.slice(-8)}</div>
+                          </div>
+                        </div>
+
+                        <div className="list-cell">
+                          <div className="customer-info">
+                            <div className="customer-name">{order.customerName || 'Unknown'}</div>
+                          </div>
+                        </div>
+
+                        <div className="list-cell">
+                          <div className="date-info">
+                            <div className="order-date">{formatDate(order.createdAt)}</div>
+                          </div>
+                        </div>
+
+                        <div className="list-cell">
+                          <div className="items-count">
+                            {order.items?.length || 0} items
+                          </div>
+                        </div>
+
+                        <div className="list-cell">
+                          <div className="total-price">
+                            Rs. {order.totalPrice || 0}
+                          </div>
+                        </div>
+
+                        <div className="list-cell">
+                          <div className={`status-badge ${orderStatus.status}`}>
+                            <StatusIcon />
+                            <span>{orderStatus.status}</span>
+                          </div>
+                        </div>
+
+                        <div className="list-cell">
+                          <div className="actions">
+                            <button
+                              className="action-btn secondary small"
+                              onClick={() => {
+                                setSelectedOrder(order);
+                                setShowDetailsModal(true);
+                              }}
+                            >
+                              <FiEye />
+                            </button>
+
+                            {order.status === 'pending' && (
+                              <>
+                                <button
+                                  className="action-btn success small"
+                                  onClick={() => handleStatusUpdate(order._id, 'completed')}
+                                >
+                                  <FiCheckCircle />
+                                </button>
+                                <button
+                                  className="action-btn danger small"
+                                  onClick={() => handleStatusUpdate(order._id, 'cancelled')}
+                                >
+                                  <FiXCircle />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <div className="empty-icon">
+                <FiShoppingBag />
               </div>
-              <div className="detail-item">
-                <span className="detail-label">Customer:</span>
-                <span className="detail-value">{selectedOrder.customerName}</span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Date:</span>
-                <span className="detail-value">
-                  {new Date(selectedOrder.createdAt).toLocaleString()}
-                </span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Status:</span>
-                <span className={`status-badge ${selectedOrder.status.toLowerCase()}`}>
-                  {selectedOrder.status}
-                </span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Total:</span>
-                <span className="detail-value">
-                  ${selectedOrder.totalPrice?.toFixed(2)}
-                </span>
-              </div>
-              <div className="detail-item">
-                <span className="detail-label">Items:</span>
-                <ul className="items-list">
-                  {selectedOrder.items?.map((item, index) => (
-                    <li key={index}>
-                      {item.name} x {item.quantity} - ${item.price?.toFixed(2)}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              <h3>No Orders Found</h3>
+              <p>
+                {searchQuery || filterStatus !== "all"
+                  ? "No orders match your current filters. Try adjusting your search criteria."
+                  : "No orders have been placed yet. Orders will appear here once customers start placing orders."}
+              </p>
+              {(searchQuery || filterStatus !== "all") && (
+                <button
+                  className="action-btn primary"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setFilterStatus("all");
+                  }}
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           )}
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowDetailsModal(false)}
-            className="cosmic-btn"
-          >
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
+        </div>
+      </div>
+
+      {/* Enhanced Order Details Modal */}
+      {showDetailsModal && selectedOrder && (
+        <div className="modal-overlay" onClick={() => setShowDetailsModal(false)}>
+          <div className="enhanced-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>Order Details</h2>
+              <button
+                className="close-btn"
+                onClick={() => setShowDetailsModal(false)}
+              >
+                <FiXCircle />
+              </button>
+            </div>
+
+            <div className="modal-content">
+              <div className="order-details-grid">
+                <div className="detail-section">
+                  <h3>Order Information</h3>
+                  <div className="detail-item">
+                    <span className="label">Order Number:</span>
+                    <span className="value">#{selectedOrder.orderNumber || selectedOrder._id.slice(-8)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Date:</span>
+                    <span className="value">{formatDate(selectedOrder.createdAt)}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Status:</span>
+                    <div className={`status-badge ${getOrderStatus(selectedOrder).status}`}>
+                      {React.createElement(getOrderStatus(selectedOrder).icon)}
+                      <span>{getOrderStatus(selectedOrder).status}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="detail-section">
+                  <h3>Customer Information</h3>
+                  <div className="detail-item">
+                    <span className="label">Name:</span>
+                    <span className="value">{selectedOrder.customerName || 'Unknown Customer'}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Email:</span>
+                    <span className="value">{selectedOrder.customerEmail || 'N/A'}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Phone:</span>
+                    <span className="value">{selectedOrder.customerPhone || 'N/A'}</span>
+                  </div>
+                </div>
+
+                <div className="detail-section full-width">
+                  <h3>Order Items</h3>
+                  <div className="items-table">
+                    <div className="items-header">
+                      <span>Item</span>
+                      <span>Quantity</span>
+                      <span>Price</span>
+                      <span>Total</span>
+                    </div>
+                    {selectedOrder.items?.map((item, index) => (
+                      <div key={index} className="item-row">
+                        <span className="item-name">{item.name}</span>
+                        <span className="item-quantity">{item.quantity}</span>
+                        <span className="item-price">Rs. {item.price}</span>
+                        <span className="item-total">Rs. {item.price * item.quantity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="detail-section">
+                  <h3>Order Summary</h3>
+                  <div className="summary-table">
+                    <div className="summary-row">
+                      <span>Subtotal:</span>
+                      <span>Rs. {selectedOrder.subtotal || 0}</span>
+                    </div>
+                    <div className="summary-row">
+                      <span>Tax:</span>
+                      <span>Rs. {selectedOrder.tax || 0}</span>
+                    </div>
+                    <div className="summary-row total">
+                      <span>Total:</span>
+                      <span>Rs. {selectedOrder.totalPrice || 0}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="modal-actions">
+              {selectedOrder.status === 'pending' && (
+                <>
+                  <button
+                    className="action-btn success"
+                    onClick={() => {
+                      handleStatusUpdate(selectedOrder._id, 'completed');
+                      setShowDetailsModal(false);
+                    }}
+                  >
+                    <FiCheckCircle />
+                    <span>Mark Complete</span>
+                  </button>
+                  <button
+                    className="action-btn danger"
+                    onClick={() => {
+                      handleStatusUpdate(selectedOrder._id, 'cancelled');
+                      setShowDetailsModal(false);
+                    }}
+                  >
+                    <FiXCircle />
+                    <span>Cancel Order</span>
+                  </button>
+                </>
+              )}
+              <button
+                className="action-btn secondary"
+                onClick={() => setShowDetailsModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

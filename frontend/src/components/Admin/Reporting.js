@@ -90,6 +90,7 @@ const ReportingAnalytics = () => {
   const calculateTotal = (data) => data.reduce((total, value) => total + value, 0);
 
   return (
+    <div className="enhanced-reporting-analytics-module-container">
     <Container>
       <Row>
         {/* Analytics Cards */}
@@ -195,6 +196,7 @@ const ReportingAnalytics = () => {
         </Col>
       </Row>
     </Container>
+    </div>
   );
 };
 

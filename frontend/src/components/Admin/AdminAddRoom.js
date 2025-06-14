@@ -1,9 +1,12 @@
   import React, { useState, useEffect } from "react";
-  import { Card, Form, Button, Spinner, Container, Row, Col } from "react-bootstrap";
   import axios from "axios";
   import { useNavigate } from "react-router-dom";
   import { toast } from "react-toastify";
-  import { FiPlus, FiImage, FiDollarSign, FiHome, FiInfo, FiTag, FiHash, FiType, FiFileText, FiLoader } from "react-icons/fi";
+  import {
+    FiImage, FiPlus, FiHome, FiDollarSign, FiUsers, FiMapPin,
+    FiWifi, FiTv, FiCoffee, FiTruck, FiEye, FiCheck, FiX,
+    FiUpload, FiSave, FiRefreshCw, FiEdit, FiLayers
+  } from "react-icons/fi";
   import "./AdminManageRooms.css";
 
   const AdminAddRoom = () => {
@@ -17,6 +20,13 @@
       status: "Available",
       description: "",
       image: null,
+      capacity: "",
+      amenities: [],
+      floor: "",
+      size: "",
+      bedType: "",
+      smokingAllowed: false,
+      petFriendly: false
     });
 
     useEffect(() => {
@@ -31,10 +41,19 @@
     }, [navigate]);
 
     const handleInputChange = (e) => {
-      const { name, value } = e.target;
+      const { name, value, type, checked } = e.target;
       setFormData((prev) => ({
         ...prev,
-        [name]: value,
+        [name]: type === 'checkbox' ? checked : value,
+      }));
+    };
+
+    const handleAmenityChange = (amenity) => {
+      setFormData((prev) => ({
+        ...prev,
+        amenities: prev.amenities.includes(amenity)
+          ? prev.amenities.filter(a => a !== amenity)
+          : [...prev.amenities, amenity]
       }));
     };
 
@@ -66,15 +85,19 @@
     const handleSubmit = async (e) => {
       e.preventDefault();
       
-      if (!formData.roomNumber || !formData.roomType || !formData.price || !formData.description) {
-        toast.error("Please fill in all required fields");
+      if (!formData.roomNumber || !formData.roomType || !formData.price || !formData.description || !formData.capacity) {
+        toast.error("Please fill in all required fields (Room Number, Type, Price, Description, Capacity)");
         return;
       }
 
       const submitData = new FormData();
       Object.keys(formData).forEach(key => {
-        if (formData[key] !== null) {
-          submitData.append(key, formData[key]);
+        if (formData[key] !== null && formData[key] !== '') {
+          if (key === 'amenities') {
+            submitData.append(key, JSON.stringify(formData[key]));
+          } else {
+            submitData.append(key, formData[key]);
+          }
         }
       });
 
@@ -100,6 +123,13 @@
           status: "Available",
           description: "",
           image: null,
+          capacity: "",
+          amenities: [],
+          floor: "",
+          size: "",
+          bedType: "",
+          smokingAllowed: false,
+          petFriendly: false
         });
         setImagePreview(null);
         
@@ -127,69 +157,265 @@
     };
 
     return (
-      <div className="admin-add-room">
-        <div className="add-room-container">
-          <div className="add-room-header">
-            <h2>Add New Room</h2>
-            <p>Fill in the details to add a new room to the system</p>
+      <div className="enhanced-add-room-module-container">
+        <div className="enhanced-add-room-header">
+          <div className="header-content">
+            <div className="title-section">
+              <div className="title-wrapper">
+                <div className="title-icon">
+                  <FiPlus />
+                </div>
+                <div className="title-text">
+                  <h1 className="page-title">Add New Room</h1>
+                  <p className="page-subtitle">Create a new room listing with detailed information</p>
+                </div>
+              </div>
+
+              <div className="header-actions">
+                <button
+                  className="action-btn secondary"
+                  onClick={() => window.history.back()}
+                >
+                  <FiX />
+                  <span>Cancel</span>
+                </button>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div className="add-room-content">
-            <div className="room-form-section">
-              <form className="room-form" onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label>Room Number</label>
-                  <input
-                    type="text"
-                    name="roomNumber"
-                    className="cosmic-input"
-                    placeholder="Enter room number"
-                    value={formData.roomNumber}
-                    onChange={handleInputChange}
-                    required
-                  />
+        <div className="enhanced-add-room-content">
+          <div className="content-container">
+            <div className="form-section">
+              <div className="form-card">
+                <div className="form-header">
+                  <h2 className="form-title">Room Details</h2>
+                  <p className="form-subtitle">Enter the basic information for the new room</p>
                 </div>
 
-                <div className="form-group">
-                  <label>Room Type</label>
-                  <select
-                    name="roomType"
-                    className="cosmic-input"
-                    value={formData.roomType}
-                    onChange={handleInputChange}
-                    required
-                  >
-                    <option value="">Select Room Type</option>
-                    <option value="Deluxe">Deluxe</option>
-                    <option value="Super Deluxe">Super Deluxe</option>
-                    <option value="Suite">Suite</option>
-                    <option value="Presidential Suite">Presidential Suite</option>
-                  </select>
-                </div>
+                <form className="enhanced-room-form" onSubmit={handleSubmit}>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiHome className="label-icon" />
+                        Room Number
+                        <span className="required">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="roomNumber"
+                        className="enhanced-input"
+                        placeholder="e.g., 101, A-205"
+                        value={formData.roomNumber}
+                        onChange={handleInputChange}
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiHome className="label-icon" />
+                        Room Type
+                        <span className="required">*</span>
+                      </label>
+                      <select
+                        name="roomType"
+                        className="enhanced-select"
+                        value={formData.roomType}
+                        onChange={handleInputChange}
+                        required
+                      >
+                        <option value="">Select Room Type</option>
+                        <option value="Single">Single Room</option>
+                        <option value="Double">Double Room</option>
+                        <option value="Twin">Twin Room</option>
+                        <option value="Suite">Suite</option>
+                        <option value="Deluxe">Deluxe Room</option>
+                        <option value="Family">Family Room</option>
+                        <option value="Presidential">Presidential Suite</option>
+                      </select>
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiDollarSign className="label-icon" />
+                        Price per Night (PKR)
+                        <span className="required">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        name="price"
+                        className="enhanced-input"
+                        placeholder="Enter price in Pakistani Rupees"
+                        value={formData.price}
+                        onChange={handleInputChange}
+                        min="1000"
+                        step="100"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiUsers className="label-icon" />
+                        Capacity (Guests)
+                        <span className="required">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        name="capacity"
+                        className="enhanced-input"
+                        placeholder="Maximum number of guests"
+                        value={formData.capacity}
+                        onChange={handleInputChange}
+                        min="1"
+                        max="10"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group full-width">
+                      <label className="form-label">
+                        <FiEdit className="label-icon" />
+                        Description
+                        <span className="required">*</span>
+                      </label>
+                      <textarea
+                        name="description"
+                        className="enhanced-textarea"
+                        placeholder="Describe the room features, amenities, and unique selling points..."
+                        value={formData.description}
+                        onChange={handleInputChange}
+                        rows="4"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Additional Details Section */}
+                  <div className="form-section-divider">
+                    <h3 className="section-title">Additional Details</h3>
+                    <p className="section-subtitle">Optional information to enhance the room listing</p>
+                  </div>
+
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiMapPin className="label-icon" />
+                        Floor
+                      </label>
+                      <input
+                        type="number"
+                        name="floor"
+                        className="enhanced-input"
+                        placeholder="Floor number"
+                        value={formData.floor}
+                        onChange={handleInputChange}
+                        min="1"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiHome className="label-icon" />
+                        Room Size (sq ft)
+                      </label>
+                      <input
+                        type="number"
+                        name="size"
+                        className="enhanced-input"
+                        placeholder="Room size in square feet"
+                        value={formData.size}
+                        onChange={handleInputChange}
+                        min="100"
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiHome className="label-icon" />
+                        Bed Type
+                      </label>
+                      <select
+                        name="bedType"
+                        className="enhanced-select"
+                        value={formData.bedType}
+                        onChange={handleInputChange}
+                      >
+                        <option value="">Select Bed Type</option>
+                        <option value="Single">Single Bed</option>
+                        <option value="Double">Double Bed</option>
+                        <option value="Queen">Queen Bed</option>
+                        <option value="King">King Bed</option>
+                        <option value="Twin">Twin Beds</option>
+                        <option value="Sofa Bed">Sofa Bed</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Amenities Section */}
+                  <div className="form-section-divider">
+                    <h3 className="section-title">Amenities & Features</h3>
+                    <p className="section-subtitle">Select available amenities for this room</p>
+                  </div>
+
+                  <div className="amenities-section">
+                    <div className="amenities-grid">
+                      {[
+                        { name: 'WiFi', icon: FiWifi },
+                        { name: 'AC', icon: FiHome },
+                        { name: 'TV', icon: FiTv },
+                        { name: 'Minibar', icon: FiCoffee },
+                        { name: 'Balcony', icon: FiHome },
+                        { name: 'Sea View', icon: FiEye },
+                        { name: 'City View', icon: FiEye },
+                        { name: 'Room Service', icon: FiHome },
+                        { name: 'Jacuzzi', icon: FiHome },
+                        { name: 'Kitchen', icon: FiCoffee },
+                        { name: 'Workspace', icon: FiHome },
+                        { name: 'Parking', icon: FiTruck }
+                      ].map(amenity => {
+                        const IconComponent = amenity.icon;
+                        return (
+                          <label key={amenity.name} className="amenity-checkbox">
+                            <input
+                              type="checkbox"
+                              checked={formData.amenities.includes(amenity.name)}
+                              onChange={() => handleAmenityChange(amenity.name)}
+                              className="checkbox-input"
+                            />
+                            <div className="checkbox-custom">
+                              <FiCheck className="check-icon" />
+                            </div>
+                            <IconComponent className="amenity-icon" />
+                            <span className="amenity-text">{amenity.name}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
 
                 <div className="form-group">
-                  <label>Price</label>
-                  <input
-                    type="number"
-                    name="price"
-                    className="cosmic-input"
-                    placeholder="Enter price per night"
-                    value={formData.price}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Description</label>
-                  <textarea
-                    name="description"
-                    className="cosmic-input"
-                    placeholder="Enter room description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    required
-                  />
+                  <div style={{display: 'flex', gap: '20px'}}>
+                    <label style={{display: 'flex', alignItems: 'center', gap: '5px', color: 'white'}}>
+                      <input
+                        type="checkbox"
+                        name="smokingAllowed"
+                        checked={formData.smokingAllowed}
+                        onChange={handleInputChange}
+                      />
+                      Smoking Allowed
+                    </label>
+                    <label style={{display: 'flex', alignItems: 'center', gap: '5px', color: 'white'}}>
+                      <input
+                        type="checkbox"
+                        name="petFriendly"
+                        checked={formData.petFriendly}
+                        onChange={handleInputChange}
+                      />
+                      Pet Friendly
+                    </label>
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -204,17 +430,18 @@
                   />
                 </div>
 
-                <button type="submit" className="cosmic-button" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <span className="spinner"></span>
-                      <span>Adding Room...</span>
-                    </>
-                  ) : (
-                    <span>Add Room</span>
-                  )}
-                </button>
-              </form>
+                  <button type="submit" className="cosmic-button" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <span className="spinner"></span>
+                        <span>Adding Room...</span>
+                      </>
+                    ) : (
+                      <span>Add Room</span>
+                    )}
+                  </button>
+                </form>
+              </div>
             </div>
 
             <div className="room-preview-section">
@@ -241,8 +468,26 @@
                   </div>
                   <div className="preview-item">
                     <span>Price:</span>
-                    <span>{formData.price ? `$${formData.price}` : 'N/A'}</span>
+                    <span>{formData.price ? `Rs. ${parseInt(formData.price).toLocaleString('en-PK')}/night` : 'N/A'}</span>
                   </div>
+                  <div className="preview-item">
+                    <span>Capacity:</span>
+                    <span>{formData.capacity ? `${formData.capacity} guests` : 'N/A'}</span>
+                  </div>
+                  <div className="preview-item">
+                    <span>Bed Type:</span>
+                    <span>{formData.bedType || 'N/A'}</span>
+                  </div>
+                  <div className="preview-item">
+                    <span>Floor:</span>
+                    <span>{formData.floor || 'N/A'}</span>
+                  </div>
+                  {formData.amenities.length > 0 && (
+                    <div className="preview-item">
+                      <span>Amenities:</span>
+                      <span>{formData.amenities.join(', ')}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Row, Col, Button, Spinner, Modal } from "react-bootstrap";
+import { Container,  Button, Spinner, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./AdminDeleteMenu.css";
@@ -15,7 +15,10 @@ const AdminDeleteMenu = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
+    const role = localStorage.getItem("role");
+
+    if (!token || role !== "admin") {
+      toast.error("Please login as admin to access this page");
       navigate("/admin/login");
       return;
     }
@@ -26,18 +29,40 @@ const AdminDeleteMenu = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
+
+      if (!token) {
+        toast.error("Please login to view menu items");
+        navigate("/admin/login");
+        return;
+      }
+
+      console.log("Fetching menu items...");
       const response = await axios.get("http://localhost:8080/api/menus", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
       });
-      
+
+      console.log("Menu items response:", response.data);
+
       if (response.data && Array.isArray(response.data)) {
         setMenuItems(response.data);
       } else {
         console.error("Invalid response format:", response.data);
-        toast.error("Failed to load menu items");
+        toast.error("Failed to load menu items - invalid response format");
       }
     } catch (error) {
       console.error("Error fetching menu items:", error);
+
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        toast.error("Session expired. Please login again.");
+        navigate("/admin/login");
+        return;
+      }
+
       toast.error(error.response?.data?.message || "Error fetching menu items");
     } finally {
       setLoading(false);
@@ -50,16 +75,41 @@ const AdminDeleteMenu = () => {
     try {
       setDeleting(true);
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:8080/api/menus/${selectedItem._id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+
+      // Check if user is authenticated
+      if (!token) {
+        toast.error("Please login to delete menu items");
+        navigate("/admin/login");
+        return;
+      }
+
+      console.log("Deleting menu item:", selectedItem._id);
+
+      const response = await axios.delete(`http://localhost:8080/api/menus/${selectedItem._id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
       });
-      
+
+      console.log("Delete response:", response);
       toast.success("Menu item deleted successfully");
+
+      // Refresh the menu items list
       await fetchMenuItems();
       setShowDeleteModal(false);
       setSelectedItem(null);
     } catch (error) {
       console.error("Error deleting menu item:", error);
+
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        toast.error("Session expired. Please login again.");
+        navigate("/admin/login");
+        return;
+      }
+
       toast.error(error.response?.data?.message || "Error deleting menu item");
     } finally {
       setDeleting(false);
@@ -75,6 +125,7 @@ const AdminDeleteMenu = () => {
   }
 
   return (
+    <div className="enhanced-delete-menu-module-container">
     <Container fluid className="delete-menu-container">
       <div className="delete-menu-header">
         <h2>Delete Menu Items</h2>
@@ -91,26 +142,40 @@ const AdminDeleteMenu = () => {
             <div key={item._id} className="menu-item-card">
               <div className="menu-item-image">
                 <img
-                  src={item.image ? `http://localhost:8080${item.image}` : "/placeholder-food.jpg"}
+                  src={
+                    item.image
+                      ? (item.image.startsWith('http://') || item.image.startsWith('https://'))
+                        ? item.image
+                        : `http://localhost:8080${item.image}`
+                      : "/placeholder-food.jpg"
+                  }
                   alt={item.name}
                   onError={(e) => {
                     e.target.src = "/placeholder-food.jpg";
+                    e.target.onerror = null;
                   }}
                 />
               </div>
               <div className="menu-item-info">
                 <h4>{item.name}</h4>
-                <p>{item.category}</p>
-                <p>${item.price.toFixed(2)}</p>
+                <p className="item-category">{item.category}</p>
+                <p className="item-price">Rs. {item.price?.toFixed(0) || '0'}</p>
+                <p className="item-availability">
+                  Status: <span className={item.availability ? 'available' : 'unavailable'}>
+                    {item.availability ? 'Available' : 'Unavailable'}
+                  </span>
+                </p>
                 <Button
                   variant="danger"
                   className="delete-button"
+                  size="lg"
                   onClick={() => {
+                    console.log("Delete button clicked for item:", item);
                     setSelectedItem(item);
                     setShowDeleteModal(true);
                   }}
                 >
-                  Delete Item
+                  🗑️ DELETE THIS ITEM
                 </Button>
               </div>
             </div>
@@ -140,8 +205,17 @@ const AdminDeleteMenu = () => {
           </Button>
           <Button
             variant="danger"
+            size="lg"
             onClick={handleDelete}
             disabled={deleting}
+            style={{
+              background: 'linear-gradient(135deg, #dc3545 0%, #ff4757 100%)',
+              border: '2px solid #dc3545',
+              fontWeight: '700',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              padding: '0.75rem 2rem'
+            }}
           >
             {deleting ? (
               <>
@@ -153,16 +227,17 @@ const AdminDeleteMenu = () => {
                   aria-hidden="true"
                   className="me-2"
                 />
-                Deleting...
+                DELETING...
               </>
             ) : (
-              "Delete"
+              "🗑️ YES, DELETE IT!"
             )}
           </Button>
         </Modal.Footer>
       </Modal>
     </Container>
+    </div>
   );
 };
 
-export default AdminDeleteMenu; 
+export default AdminDeleteMenu;

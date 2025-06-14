@@ -1,13 +1,26 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "./StaffManagement.css";
+import { useNavigate } from "react-router-dom";
+import {
+  FiUsers, FiPlus, FiSearch, FiFilter, FiGrid, FiList,
+  FiEdit, FiTrash2, FiMail, FiPhone, FiMapPin, FiUser,
+  FiRefreshCw, FiEye, FiUserPlus, FiX, FiCheck, FiClock,
+  FiStar, FiAward, FiShield, FiBriefcase
+} from "react-icons/fi";
+import "./AdminManageRooms.css";
 
 const StaffManagement = () => {
+  const navigate = useNavigate();
   const [staff, setStaff] = useState([]);
+  const [filteredStaff, setFilteredStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
+  const [selectedDepartment, setSelectedDepartment] = useState("all");
+  const [sortBy, setSortBy] = useState("name");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [viewMode, setViewMode] = useState("grid");
   const [showAddModal, setShowAddModal] = useState(false);
   const [newStaff, setNewStaff] = useState({
     name: "",
@@ -15,12 +28,74 @@ const StaffManagement = () => {
     phone: "",
     role: "",
     department: "",
-    status: "active"
+    status: "active",
+    salary: "",
+    joinDate: "",
+    address: ""
   });
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (!token || role !== "admin") {
+      toast.error("Please login as admin to access this page");
+      navigate("/login");
+      return;
+    }
+
     fetchStaff();
-  }, []);
+  }, [navigate]);
+
+  // Filter and search functionality
+  useEffect(() => {
+    let filtered = [...staff];
+
+    // Search filter
+    if (searchQuery) {
+      filtered = filtered.filter(member =>
+        member.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        member.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        member.phone?.includes(searchQuery) ||
+        member.department?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Role filter
+    if (selectedRole !== "all") {
+      filtered = filtered.filter(member => member.role === selectedRole);
+    }
+
+    // Department filter
+    if (selectedDepartment !== "all") {
+      filtered = filtered.filter(member => member.department === selectedDepartment);
+    }
+
+    // Sort
+    filtered.sort((a, b) => {
+      let aValue = a[sortBy] || '';
+      let bValue = b[sortBy] || '';
+
+      if (sortBy === "joinDate") {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      } else if (sortBy === "salary") {
+        aValue = parseFloat(aValue) || 0;
+        bValue = parseFloat(bValue) || 0;
+      } else {
+        aValue = aValue.toString().toLowerCase();
+        bValue = bValue.toString().toLowerCase();
+      }
+
+      if (sortOrder === "asc") {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    setFilteredStaff(filtered);
+  }, [staff, searchQuery, selectedRole, selectedDepartment, sortBy, sortOrder]);
 
   const fetchStaff = async () => {
     try {
@@ -29,7 +104,17 @@ const StaffManagement = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStaff(response.data);
+      setFilteredStaff(response.data);
+      toast.success("Staff data loaded successfully");
     } catch (error) {
+      console.error("Error fetching staff:", error);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        toast.error("Session expired. Please login again.");
+        navigate("/login");
+        return;
+      }
       toast.error("Failed to fetch staff members");
     } finally {
       setLoading(false);
@@ -38,6 +123,12 @@ const StaffManagement = () => {
 
   const handleAddStaff = async (e) => {
     e.preventDefault();
+
+    if (!newStaff.name || !newStaff.email || !newStaff.phone || !newStaff.role || !newStaff.department) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     try {
       const token = localStorage.getItem("token");
       const response = await axios.post(
@@ -53,11 +144,22 @@ const StaffManagement = () => {
         phone: "",
         role: "",
         department: "",
-        status: "active"
+        status: "active",
+        salary: "",
+        joinDate: "",
+        address: ""
       });
-      toast.success("Staff member added successfully");
+      toast.success("Staff member added successfully!");
     } catch (error) {
-      toast.error("Failed to add staff member");
+      console.error("Error adding staff:", error);
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        toast.error("Session expired. Please login again.");
+        navigate("/login");
+        return;
+      }
+      toast.error(error.response?.data?.message || "Failed to add staff member");
     }
   };
 
@@ -69,61 +171,125 @@ const StaffManagement = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStaff(staff.filter(member => member._id !== id));
-        toast.success("Staff member deleted successfully");
+        toast.success("Staff member deleted successfully!");
       } catch (error) {
-        toast.error("Failed to delete staff member");
+        console.error("Error deleting staff:", error);
+        if (error.response?.status === 401 || error.response?.status === 403) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          toast.error("Session expired. Please login again.");
+          navigate("/login");
+          return;
+        }
+        toast.error(error.response?.data?.message || "Failed to delete staff member");
       }
     }
   };
 
-  const filteredStaff = staff.filter(member => {
-    const matchesSearch = member.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         member.email.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = selectedRole === "all" || member.role === selectedRole;
-    return matchesSearch && matchesRole;
-  });
+  const getRoleIcon = (role) => {
+    switch (role?.toLowerCase()) {
+      case 'manager': return FiShield;
+      case 'chef': return FiBriefcase;
+      case 'waiter': return FiUser;
+      case 'host': return FiUsers;
+      default: return FiUser;
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'active': return 'green';
+      case 'inactive': return 'red';
+      case 'on-leave': return 'orange';
+      default: return 'gray';
+    }
+  };
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
+      <div className="enhanced-staff-management-module-container">
+        <div className="loading-state">
+          <div className="loading-spinner">
+            <FiRefreshCw className="spinning" />
+          </div>
+          <p>Loading staff members...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="staff-management-container">
-      <div className="staff-header">
-        <h2>Staff Management</h2>
-        <div className="header-actions">
-          <div className="search-box">
-            <input
-              type="text"
-              placeholder="Search staff members..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="form-control"
-            />
+    <div className="enhanced-staff-management-module-container">
+      {/* Enhanced Header */}
+      <div className="enhanced-staff-header">
+        <div className="header-content">
+          <div className="title-section">
+            <div className="title-wrapper">
+              <div className="title-icon">
+                <FiUsers />
+              </div>
+              <div className="title-text">
+                <h1 className="page-title">Staff Management</h1>
+                <p className="page-subtitle">Manage your team members and their information</p>
+              </div>
+            </div>
+
+            {/* Statistics Cards */}
+            <div className="stats-cards">
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <FiUsers />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-number">{staff.length}</div>
+                  <div className="stat-label">Total Staff</div>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <FiCheck />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-number">
+                    {staff.filter(s => s.status === 'active').length}
+                  </div>
+                  <div className="stat-label">Active Staff</div>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <FiBriefcase />
+                </div>
+                <div className="stat-content">
+                  <div className="stat-number">
+                    {[...new Set(staff.map(s => s.department))].length}
+                  </div>
+                  <div className="stat-label">Departments</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="header-actions">
+              <button
+                className="action-btn secondary"
+                onClick={fetchStaff}
+                disabled={loading}
+              >
+                <FiRefreshCw className={loading ? 'spinning' : ''} />
+                <span>Refresh</span>
+              </button>
+
+              <button
+                className="action-btn primary"
+                onClick={() => setShowAddModal(true)}
+              >
+                <FiUserPlus />
+                <span>Add Staff</span>
+              </button>
+            </div>
           </div>
-          <select
-            value={selectedRole}
-            onChange={(e) => setSelectedRole(e.target.value)}
-            className="form-control role-select"
-          >
-            <option value="all">All Roles</option>
-            <option value="manager">Manager</option>
-            <option value="chef">Chef</option>
-            <option value="waiter">Waiter</option>
-            <option value="host">Host</option>
-          </select>
-          <button
-            className="btn btn-primary add-staff-btn"
-            onClick={() => setShowAddModal(true)}
-          >
-            Add Staff Member
-          </button>
         </div>
       </div>
 

@@ -1,18 +1,27 @@
-import React, { useState, useEffect } from "react";
+  import React, { useState, useEffect } from "react";
+ import "./sidebar.css"
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Dashboard.css";
+import {
+  FiHome, FiUser, FiLayers, FiGrid, FiShoppingCart, FiUsers,
+  FiBarChart, FiSettings, FiMenu, FiX, FiChevronDown, FiChevronRight,
+  FiLogOut, FiSearch, FiBell, FiMail, FiCalendar, FiTrendingUp,
+  FiActivity, FiStar, FiHeart, FiBookOpen, FiCoffee, FiMapPin,
+  FiClock, FiDollarSign, FiPieChart, FiTarget,
+  FiPlus, FiEdit, FiTrash
+} from "react-icons/fi";
+import "./EnhancedDashboardModule.css";
 import Dashboardmodule from "./dashboardmodule";
 import AdminAddRoom from "./AdminAddRoom";
 import AdminViewRooms from "./AdminViewRooms";
-import AdminUpdateRoom from "./AdminUpdateRoom";
+import AdminRoomUpdate from "./AdminRoomUpdate";
 import AdminAddTable from "./AdminAddTable";
 import AdminViewTables from "./AdminViewTables";
 import AdminUpdateTable from "./AdminUpdateTable";
 import AdminDeleteTable from "./AdminDeleteTable";
 import AdminManageBookings from "./AdminManageBookings";
 import AdminManageReservations from "./AdminManageReservations";
-import AdminCustomerManagement from "./CustomerManagement";
+import AdminCustomerManagement from "./AdminCustomerManagement";
 import OnlineOrderPlacement from "./OrderPlacement";
 import AdminUserManagement from "./UserManagement";
 import StaffManagement from "./StaffManagement";
@@ -29,12 +38,17 @@ import AdminAddMenu from "./AdminAddMenu";
 import AdminUpdateMenu from "./AdminUpdateMenu";
 import AdminDeleteMenu from "./AdminDeleteMenu";
 import SentimentAnalysis from "./SentimentAnalysis";
+import TableRecommendationAnalytics from "./TableRecommendationAnalytics";
+import RecommendationEvaluation from "./RecommendationEvaluation";
+import RoomRecommendationAnalytics from "./RoomRecommendationAnalytics";
 
 const Dashboard = () => {
   const [selectedModule, setSelectedModule] = useState("Dashboard");
   const [userName, setUserName] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [notifications, setNotifications] = useState(3);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,66 +72,90 @@ const Dashboard = () => {
   };
 
   const menuItems = [
-    { name: "Dashboard", icon: "bi-speedometer2" },
-    { name: "User Profile", icon: "bi-person-circle" },
+    {
+      name: "Dashboard",
+      icon: FiHome,
+      component: "Dashboard",
+      badge: "Live",
+      badgeColor: "success"
+    },
+    {
+      name: "User Profile",
+      icon: FiUser,
+      component: "User Profile"
+    },
     {
       name: "Room Management",
-      icon: "bi-building",
+      icon: FiLayers,
       submenu: [
-        { name: "View Rooms", component: "AdminViewRooms" },
-        { name: "Add Room", component: "AdminAddRoom" },
-        { name: "Update Room", component: "AdminUpdateRoom" },
-        { name: "Delete Room", component: "AdminDeleteRoom" }
+        { name: "View Rooms", component: "AdminViewRooms", icon: FiGrid },
+        { name: "Add Room", component: "AdminAddRoom", icon: FiPlus },
+        { name: "Update Room", component: "AdminRoomUpdate", icon: FiEdit },
+        { name: "Delete Room", component: "AdminDeleteRoom", icon: FiTrash },
+        { name: "ML Analytics", component: "RoomRecommendationAnalytics", icon: FiStar }
       ],
     },
     {
       name: "Menu Management",
-      icon: "bi-list-check",
+      icon: FiCoffee,
       submenu: [
-        { name: "View Menu", component: "AdminViewMenus" },
-        { name: "Add Menu", component: "AdminAddMenu" },
-        { name: "Update Menu", component: "AdminUpdateMenu" },
-        { name: "Delete Menu", component: "AdminDeleteMenu" }
+        { name: "View Menu", component: "AdminViewMenus", icon: FiBookOpen },
+        { name: "Add Menu", component: "AdminAddMenu", icon: FiPlus },
+        { name: "Update Menu", component: "AdminUpdateMenu", icon: FiEdit },
+        { name: "Delete Menu", component: "AdminDeleteMenu", icon: FiTrash },
+        { name: "ML Analytics", component: "RecommendationEvaluation", icon: FiStar }
       ]
     },
     {
       name: "Table Management",
-      icon: "bi-grid",
+      icon: FiGrid,
       submenu: [
-        { name: "View Tables", component: "AdminViewTables" },
-        { name: "Add Table", component: "AdminAddTable" },
-        { name: "Update Table", component: "AdminUpdateTable" },
-        { name: "Delete Table", component: "AdminDeleteTable" }
+        { name: "View Tables", component: "AdminViewTables", icon: FiGrid },
+        { name: "Add Table", component: "AdminAddTable", icon: FiPlus },
+        { name: "Update Table", component: "AdminUpdateTable", icon: FiEdit },
+        { name: "Delete Table", component: "AdminDeleteTable", icon: FiTrash },
+        { name: "Analytics", component: "TableRecommendationAnalytics", icon: FiTrendingUp }
       ],
     },
     {
       name: "Order Management",
-      icon: "bi-cart-check",
+      icon: FiShoppingCart,
+      badge: notifications > 0 ? notifications.toString() : null,
+      badgeColor: "warning",
       submenu: [
-        { name: "View Orders", component: "AdminOrders", route: "/admin/orders" },
-        { name: "Manage Bookings", component: "AdminManageBookings" },
-        { name: "Manage Reservations", component: "AdminManageReservations" }
+        { name: "View Orders", component: "AdminOrders", icon: FiShoppingCart, route: "/admin/orders" },
+        { name: "Manage Bookings", component: "AdminManageBookings", icon: FiCalendar },
+        { name: "Manage Reservations", component: "AdminManageReservations", icon: FiMapPin }
       ]
     },
     {
       name: "Staff Management",
-      icon: "bi-person-badge",
+      icon: FiUsers,
       submenu: [
-        { name: "Staff List", component: "StaffManagement" },
-        { name: "Shift Management", component: "ShiftManagement" }
+        { name: "Staff List", component: "StaffManagement", icon: FiUsers },
+        { name: "Shift Management", component: "ShiftManagement", icon: FiClock }
       ]
     },
-    { name: "Customer Management", icon: "bi-people", component: "AdminCustomerManagement" },
     {
-      name: "Analytics",
-      icon: "bi-graph-up",
+      name: "Customer Management",
+      icon: FiHeart,
+      component: "AdminCustomerManagement"
+    },
+    {
+      name: "Analytics & Reports",
+      icon: FiBarChart,
       submenu: [
-        { name: "Reports", component: "ReportingAnalytics" },
-        { name: "Sentiment Analysis", component: "SentimentAnalysis" },
-        { name: "Recommendations", component: "RecommendationSystem" }
+        { name: "Business Reports", component: "ReportingAnalytics", icon: FiPieChart },
+        { name: "Sentiment Analysis", component: "SentimentAnalysis", icon: FiActivity },
+        { name: "Recommendations", component: "RecommendationSystem", icon: FiTarget },
+        { name: "ML Evaluation", component: "RecommendationEvaluation", icon: FiStar }
       ]
     },
-    { name: "Settings", icon: "bi-gear", component: "AdminSettings" }
+    {
+      name: "Settings",
+      icon: FiSettings,
+      component: "AdminSettings"
+    }
   ];
 
   const renderContent = () => {
@@ -130,8 +168,8 @@ const Dashboard = () => {
         return <AdminAddRoom />;
       case "AdminViewRooms":
         return <AdminViewRooms />;
-      case "AdminUpdateRoom":
-        return <AdminUpdateRoom />;
+      case "AdminRoomUpdate":
+        return <AdminRoomUpdate />;
       case "AdminDeleteRoom":
         return <AdminDeleteRoom />;
       case "AdminAddTable":
@@ -146,7 +184,7 @@ const Dashboard = () => {
         return <AdminManageBookings />;
       case "AdminManageReservations":
         return <AdminManageReservations />;
-      case "Customer Management":
+      case "AdminCustomerManagement":
         return <AdminCustomerManagement />;
       case "Online Orders":
         return <OnlineOrderPlacement />;
@@ -174,90 +212,256 @@ const Dashboard = () => {
         return <AdminUpdateMenu />;
       case "AdminDeleteMenu":
         return <AdminDeleteMenu />;
+      case "TableRecommendationAnalytics":
+        return <TableRecommendationAnalytics />;
+      case "RecommendationEvaluation":
+        return <RecommendationEvaluation />;
+      case "RoomRecommendationAnalytics":
+        return <RoomRecommendationAnalytics />;
+      case "MenuRecommendationAnalytics":
+        return <RecommendationEvaluation />;
       default:
         return <Dashboardmodule />;
     }
   };
 
   return (
-    <div className="dashboard-container">
-      {/* Sidebar */}
-      <aside className={`sidebar ${isSidebarCollapsed ? "collapsed" : ""}`}>
-        <div className="sidebar-header">
-          <div className="logo-container" onClick={() => navigate("/")}>
-            <img src="/images/logo.webp" alt="HRMS Logo" className="logo" />
-            {!isSidebarCollapsed && <span className="logo-text">HRMS</span>}
+    <div className="enhanced-dashboard-container">
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="mobile-overlay"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Enhanced Sidebar */}
+      <aside className={`enhanced-sidebar ${isSidebarCollapsed ? "collapsed" : ""} ${isMobileMenuOpen ? "mobile-open" : ""}`}>
+
+        {/* Sidebar Toggle Button */}
+        <button
+          className="sidebar-toggle-btn"
+          onClick={toggleSidebar}
+          title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          {isSidebarCollapsed ? <FiChevronRight /> : <FiChevronDown />}
+        </button>
+
+
+        {/* Admin Profile Section */}
+        {!isSidebarCollapsed && (
+          <div className="admin-profile">
+            <div className="profile-info">
+              <h4 className="profile-name">{userName || "Default Admin"}</h4>
+              <p className="profile-role">ADMINISTRATOR</p>
+            </div>
           </div>
-          <button className="sidebar-toggle" onClick={toggleSidebar}>
-            <i className={`bi bi-chevron-${isSidebarCollapsed ? "right" : "left"}`}></i>
-          </button>
+        )}
+
+        {/* Navigation Menu */}
+        <div className="sidebar-menu">
+          <div className="menu-section">
+            <h6 className="menu-title">
+              <FiActivity className="section-icon" />
+              {!isSidebarCollapsed && "Main Modules"}
+            </h6>
+            <ul className="menu-list">
+              {menuItems.map((item) => {
+                const IconComponent = item.icon;
+                const isActive = selectedModule === item.name || selectedModule === item.component;
+                const hasSubmenu = item.submenu && item.submenu.length > 0;
+                const isDropdownOpen = openDropdown === item.name;
+
+                return (
+                  <React.Fragment key={item.name}>
+                    <li
+                      className={`menu-item ${isActive ? "active" : ""} ${hasSubmenu ? "has-submenu" : ""}`}
+                      onClick={() =>
+                        hasSubmenu ? toggleDropdown(item.name) : setSelectedModule(item.component || item.name)
+                      }
+                    >
+                      <div className="menu-item-content">
+                        <div className="menu-item-left">
+                          <div className="menu-icon">
+                            <IconComponent />
+                          </div>
+                          {!isSidebarCollapsed && (
+                            <span className="menu-text">{item.name}</span>
+                          )}
+                        </div>
+
+                        {!isSidebarCollapsed && (
+                          <div className="menu-item-right">
+                            {item.badge && (
+                              <span className={`menu-badge ${item.badgeColor || 'primary'}`}>
+                                {item.badge}
+                              </span>
+                            )}
+                            {hasSubmenu && (
+                              <div className="dropdown-arrow">
+                                {isDropdownOpen ? <FiChevronDown /> : <FiChevronRight />}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {isSidebarCollapsed && (
+                        <div className="menu-tooltip">
+                          <span>{item.name}</span>
+                          {item.badge && (
+                            <span className={`tooltip-badge ${item.badgeColor || 'primary'}`}>
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </li>
+
+                    {hasSubmenu && isDropdownOpen && !isSidebarCollapsed && (
+                      <ul className="submenu">
+                        {item.submenu.map((subItem) => {
+                          const SubIconComponent = subItem.icon || FiGrid;
+                          const isSubActive = selectedModule === subItem.component;
+
+                          return (
+                            <li
+                              key={subItem.name}
+                              className={`submenu-item ${isSubActive ? "active" : ""}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedModule(subItem.component);
+                              }}
+                            >
+                              <div className="submenu-item-content">
+                                <div className="submenu-icon">
+                                  <SubIconComponent />
+                                </div>
+                                <span className="submenu-text">{subItem.name}</span>
+                              </div>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </ul>
+          </div>
         </div>
 
-        <div className="sidebar-menu">
-          <h6 className="menu-title">Modules</h6>
-          <ul className="menu-list">
-            {menuItems.map((item) => (
-              <React.Fragment key={item.name}>
-                <li
-                  className={`menu-item ${selectedModule === item.name || selectedModule === item.component ? "active" : ""}`}
-                  onClick={() =>
-                    item.submenu ? toggleDropdown(item.name) : setSelectedModule(item.component || item.name)
-                  }
-                >
-                  <i className={`bi ${item.icon}`}></i>
-                  {!isSidebarCollapsed && (
-                    <>
-                      <span>{item.name}</span>
-                      {item.submenu && (
-                        <i
-                          className={`bi bi-chevron-${openDropdown === item.name ? "up" : "down"} ms-auto`}
-                        ></i>
-                      )}
-                    </>
-                  )}
-                  {isSidebarCollapsed && item.submenu && (
-                    <div className="menu-tooltip">{item.name}</div>
-                  )}
-                </li>
-                {item.submenu && openDropdown === item.name && (
-                  <ul className="submenu">
-                    {item.submenu.map((subItem) => (
-                      <li
-                        key={subItem.name}
-                        className={`submenu-item ${selectedModule === subItem.component ? "active" : ""}`}
-                        onClick={() => setSelectedModule(subItem.component)}
-                      >
-                        {!isSidebarCollapsed && <span>{subItem.name}</span>}
-                        {isSidebarCollapsed && <i className="bi bi-dot"></i>}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </React.Fragment>
-            ))}
-          </ul>
-        </div>
+
       </aside>
 
-      {/* Main Content */}
-      <main className="main-content">
-        <nav className="navbar">
-          <div className="search-container">
-            <i className="bi bi-search"></i>
-            <input type="text" placeholder="Search..." className="search-input" />
-          </div>
-          <div className="user-actions">
-            <div className="user-greeting">
-              <i className="bi bi-person-circle"></i>
-              <span className="user-name">{userName || "Guest User"}</span>
-            </div>
-            <button className="logout-button" onClick={handleLogout}>
-              <i className="bi bi-box-arrow-right"></i>
-              <span className="logout-text">Logout</span>
+      {/* Enhanced Main Content */}
+      <main className="enhanced-main-content">
+        {/* Enhanced Top Navigation */}
+        <nav className="enhanced-navbar">
+          <div className="navbar-left">
+            <button
+              className="mobile-menu-toggle"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              <FiMenu />
             </button>
+            <div className="breadcrumb">
+              <FiHome className="breadcrumb-icon" />
+              <span className="breadcrumb-text">Dashboard</span>
+              {selectedModule !== "Dashboard" && (
+                <>
+                  <FiChevronRight className="breadcrumb-separator" />
+                  <span className="breadcrumb-current">{selectedModule}</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="navbar-center">
+            <div className="global-search">
+              <FiSearch className="search-icon" />
+              <input
+                type="text"
+                placeholder="Global search..."
+                className="search-input"
+              />
+              <div className="search-shortcut">⌘K</div>
+            </div>
+          </div>
+
+          <div className="navbar-right">
+            <div className="navbar-actions">
+              <button className="action-btn notification-btn">
+                <FiBell className="action-icon" />
+                {notifications > 0 && (
+                  <span className="notification-badge">{notifications}</span>
+                )}
+                <div className="notification-dropdown">
+                  <div className="notification-header">
+                    <h4>Notifications</h4>
+                    <span className="notification-count">{notifications} new</span>
+                  </div>
+                  <div className="notification-list">
+                    <div className="notification-item">
+                      <div className="notification-icon">
+                        <FiShoppingCart />
+                      </div>
+                      <div className="notification-content">
+                        <p>New order received</p>
+                        <span>2 minutes ago</span>
+                      </div>
+                    </div>
+                    <div className="notification-item">
+                      <div className="notification-icon">
+                        <FiCalendar />
+                      </div>
+                      <div className="notification-content">
+                        <p>Room booking confirmed</p>
+                        <span>5 minutes ago</span>
+                      </div>
+                    </div>
+                    <div className="notification-item">
+                      <div className="notification-icon">
+                        <FiUsers />
+                      </div>
+                      <div className="notification-content">
+                        <p>New staff member added</p>
+                        <span>10 minutes ago</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="notification-footer">
+                    <button className="view-all-btn">View All</button>
+                  </div>
+                </div>
+              </button>
+
+              <button className="action-btn mail-btn">
+                <FiMail className="action-icon" />
+              </button>
+
+              <div className="user-menu">
+                <div className="user-info">
+                  <div className="user-details">
+                    <span className="user-name">{userName || "Default Admin"}</span>
+                    <span className="user-role">ADMINISTRATOR</span>
+                  </div>
+                </div>
+                <button className="logout-button" onClick={handleLogout}>
+                  <FiLogOut className="logout-icon" />
+                  <span className="logout-text">Logout</span>
+                </button>
+              </div>
+            </div>
           </div>
         </nav>
-        <div className="content-wrapper">{renderContent()}</div>
+
+        {/* Enhanced Content Wrapper */}
+        <div className="enhanced-content-wrapper">
+          <div className="content-container">
+            {renderContent()}
+          </div>
+        </div>
       </main>
     </div>
   );

@@ -58,13 +58,18 @@ const TestimonialPage = () => {
     ]
   };
 
-  const renderStars = (rating = 5) => (
-    <div className="rating">
-      {[...Array(rating)].map((_, i) => (
-        <FiStar key={i} className={i < rating ? 'star-filled' : 'star-empty'} />
-      ))}
-    </div>
-  );
+  const renderStars = (rating = 5) => {
+    // Ensure rating is a valid number and round it to nearest integer
+    const validRating = Math.max(0, Math.min(5, Math.round(Number(rating) || 5)));
+
+    return (
+      <div className="rating">
+        {[...Array(validRating)].map((_, i) => (
+          <FiStar key={i} className={i < validRating ? 'star-filled' : 'star-empty'} />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <section className="testimonials-section">

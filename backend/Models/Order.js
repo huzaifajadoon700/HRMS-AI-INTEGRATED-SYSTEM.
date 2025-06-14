@@ -8,9 +8,19 @@ const orderSchema = new mongoose.Schema({
   },
   items: [
     {
+      menuItemId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Menu'
+        // Completely removed required field to fix mobile app issue
+      },
       name: { type: String, required: true },
       price: { type: Number, required: true },
       quantity: { type: Number, required: true },
+      customizations: { type: String, default: '' },
+      addOns: [{
+        name: String,
+        price: Number
+      }]
     },
   ],
   totalPrice: { type: Number, required: true },
@@ -42,5 +52,10 @@ const orderSchema = new mongoose.Schema({
 
 // Add geospatial index for delivery location
 orderSchema.index({ deliveryLocation: "2dsphere" });
+
+// Clear any existing model to prevent caching issues
+if (mongoose.models.Order) {
+  delete mongoose.models.Order;
+}
 
 module.exports = mongoose.model("Order", orderSchema);

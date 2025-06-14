@@ -61,6 +61,7 @@ const AdminDeleteTable = () => {
   };
 
   return (
+    <div className="enhanced-delete-table-module-container">
     <div className="admin-manage-tables p-4">
       <h2 className="page-title mb-4">Delete Tables</h2>
 
@@ -151,7 +152,8 @@ const AdminDeleteTable = () => {
         </Card.Body>
       </Card>
     </div>
+    </div>
   );
 };
 
-export default AdminDeleteTable; 
+export default AdminDeleteTable;

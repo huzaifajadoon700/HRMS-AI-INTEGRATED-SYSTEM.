@@ -1,7 +1,22 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { FiCalendar, FiUsers, FiDollarSign, FiClock, FiInfo, FiDownload, FiUser, FiMail, FiPhone, FiCreditCard } from "react-icons/fi";
+import {
+  FiCalendar,
+  FiUsers,
+  FiDollarSign,
+  FiClock,
+  FiInfo,
+  FiDownload,
+  FiUser,
+  FiMail,
+  FiPhone,
+  
+  FiEdit,
+  FiX,
+  FiCheckCircle,
+  FiRefreshCw,
+  } from "react-icons/fi";
 import { toast } from "react-toastify";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -13,7 +28,7 @@ const MyReservations = () => {
   const [error, setError] = useState(null);
   const [downloadingInvoice, setDownloadingInvoice] = useState(false);
   const navigate = useNavigate();
-  const invoiceRef = useRef(null);
+  const invoiceRef = useRef(null); // eslint-disable-line no-unused-vars
   const [activeTab, setActiveTab] = useState('upcoming');
 
   const fetchReservations = async () => {
@@ -66,7 +81,7 @@ const MyReservations = () => {
     });
     
     fetchReservations();
-  }, [navigate]);
+  }, [navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleCancelReservation = async (reservationId, reservationDate) => {
     // Check if reservation date is in the past
@@ -284,16 +299,30 @@ const MyReservations = () => {
 
   if (loading) {
     return (
-      <div className="reservations-container">
-        <div className="loading-spinner">Loading reservations...</div>
+      <div className="modern-reservations-page">
+        <div className="loading-section">
+          <div className="loading-spinner">
+            <FiRefreshCw className="spinning" size={32} />
+            <p>Loading your reservations...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="reservations-container">
-        <div className="error-message">{error}</div>
+      <div className="modern-reservations-page">
+        <div className="error-section">
+          <div className="error-card">
+            <FiX size={48} className="error-icon" />
+            <h3>Something went wrong</h3>
+            <p>{error}</p>
+            <button className="retry-btn" onClick={fetchReservations}>
+              Try Again
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -313,186 +342,259 @@ const MyReservations = () => {
   });
 
   return (
-    <div className="reservations-container">
-      <h2 className="reservations-title">My Reservations</h2>
-      
-      {/* Future Reservations Section */}
-      <h3 className="section-title">Upcoming Reservations</h3>
-      {!sortedReservations.some(r => !isDateInPast(r.reservationDate)) && (
-        <div className="no-reservations">
-          <p>No upcoming reservations found.</p>
+    <div className="modern-reservations-page">
+      {/* Hero Section */}
+      <section className="reservations-hero">
+        <div className="hero-content">
+          <div className="hero-icon">
+            <FiCalendar size={48} />
+          </div>
+          <h1 className="hero-title">My Reservations</h1>
+          <p className="hero-subtitle">Manage your table reservations</p>
         </div>
-      )}
-      
-        <div className="reservations-grid">
-        {sortedReservations.map((reservation) => {
-          const isPast = isDateInPast(reservation.reservationDate);
-          
-          if (!isPast) {
-            return (
-              <div key={reservation._id} className="reservation-card">
-                <div className="reservation-header">
-                  <h3 className="table-name">Table {reservation.tableNumber}</h3>
-                  <div className="status-badges">
-                  <span className="reservation-status">Confirmed</span>
-                    {reservation.paymentStatus && getPaymentStatusBadge(reservation.paymentStatus)}
-                  </div>
-                </div>
-                
-                <div className="reservation-details">
-                  <div className="detail-item">
-                    <FiUser className="detail-icon" />
-                    <span>{reservation.fullName || 'Not provided'}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiMail className="detail-icon" />
-                    <span>{reservation.email || 'Not provided'}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiPhone className="detail-icon" />
-                    <span>{reservation.phone || 'Not provided'}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiCalendar className="detail-icon" />
-                    <span>{formatDate(reservation.reservationDate)}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiClock className="detail-icon" />
-                    <span>{formatTime(reservation.time)} - {formatTime(reservation.endTime || "")}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiUsers className="detail-icon" />
-                    <span>{reservation.guests} Guests</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiDollarSign className="detail-icon" />
-                    <span>${reservation.totalPrice}</span>
-                  </div>
+      </section>
 
-                  {reservation.specialRequests && (
-                    <div className="detail-item special-requests">
-                      <FiInfo className="detail-icon" />
-                      <span>{reservation.specialRequests}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="reservation-footer">
-                  <button 
-                    className="cancel-button"
-                    onClick={() => handleCancelReservation(reservation._id, reservation.reservationDate)}
-                  >
-                    Cancel Reservation
-                  </button>
-                  <button 
-                    className="modify-button"
-                    onClick={() => navigate(`/reserve-table?edit=${reservation._id}`)}
-                  >
-                    Modify
-                  </button>
-                  <button
-                    className="invoice-button"
-                    onClick={() => handleDownloadInvoice(reservation)}
-                    disabled={downloadingInvoice}
-                  >
-                    <FiDownload className="me-1" /> {downloadingInvoice ? 'Generating...' : 'Invoice'}
-                  </button>
-                </div>
+      {/* Stats Section */}
+      <section className="reservations-stats">
+        <div className="container-fluid">
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon">
+                <FiCalendar />
               </div>
-            );
-          }
-          return null;
-        })}
-      </div>
-      
-      {/* Past Reservations Section */}
-      <h3 className="section-title">Past Reservations</h3>
-      {!sortedReservations.some(r => isDateInPast(r.reservationDate)) && (
-        <div className="no-reservations">
-          <p>No past reservations found.</p>
+              <div className="stat-content">
+                <h3>{reservations.length}</h3>
+                <p>Total Reservations</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <FiClock />
+              </div>
+              <div className="stat-content">
+                <h3>{sortedReservations.filter(r => !isDateInPast(r.reservationDate)).length}</h3>
+                <p>Upcoming</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <FiCheckCircle />
+              </div>
+              <div className="stat-content">
+                <h3>{sortedReservations.filter(r => isDateInPast(r.reservationDate)).length}</h3>
+                <p>Completed</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <FiDollarSign />
+              </div>
+              <div className="stat-content">
+                <h3>${reservations.reduce((sum, r) => sum + (r.totalPrice || 0), 0).toFixed(0)}</h3>
+                <p>Total Spent</p>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
-      
-      <div className="reservations-grid">
-        {sortedReservations.map((reservation) => {
-          const isPast = isDateInPast(reservation.reservationDate);
-          
-          if (isPast) {
-            return (
-              <div key={reservation._id} className="reservation-card past-reservation">
-                <div className="reservation-header">
-                  <h3 className="table-name">Table {reservation.tableNumber}</h3>
-                  <div className="status-badges">
-                  <span className="reservation-status past">Past</span>
-                    {reservation.paymentStatus && getPaymentStatusBadge(reservation.paymentStatus)}
-                  </div>
-                </div>
-                
-                <div className="reservation-details">
-                  <div className="detail-item">
-                    <FiUser className="detail-icon" />
-                    <span>{reservation.fullName || 'Not provided'}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiMail className="detail-icon" />
-                    <span>{reservation.email || 'Not provided'}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiPhone className="detail-icon" />
-                    <span>{reservation.phone || 'Not provided'}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiCalendar className="detail-icon" />
-                    <span>{formatDate(reservation.reservationDate)}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiClock className="detail-icon" />
-                    <span>{formatTime(reservation.time)} - {formatTime(reservation.endTime || "")}</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiUsers className="detail-icon" />
-                    <span>{reservation.guests} Guests</span>
-                  </div>
-                  
-                  <div className="detail-item">
-                    <FiDollarSign className="detail-icon" />
-                    <span>${reservation.totalPrice}</span>
-                  </div>
-                  
-                  {reservation.specialRequests && (
-                    <div className="detail-item special-requests">
-                      <FiInfo className="detail-icon" />
-                      <span>{reservation.specialRequests}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="reservation-footer">
-                  <button
-                    className="invoice-button full-width"
-                    onClick={() => handleDownloadInvoice(reservation)}
-                    disabled={downloadingInvoice}
-                  >
-                    <FiDownload className="me-1" /> {downloadingInvoice ? 'Generating...' : 'Download Invoice'}
-                  </button>
-                </div>
+      </section>
+
+      {/* Controls Section */}
+      <section className="reservations-controls">
+        <div className="container-fluid">
+          <div className="controls-grid">
+            <div className="tab-section">
+              <button
+                className={`tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
+                onClick={() => setActiveTab('upcoming')}
+              >
+                <FiClock className="tab-icon" />
+                Upcoming
+              </button>
+              <button
+                className={`tab-btn ${activeTab === 'past' ? 'active' : ''}`}
+                onClick={() => setActiveTab('past')}
+              >
+                <FiCheckCircle className="tab-icon" />
+                Past
+              </button>
+            </div>
+            <div className="refresh-section">
+              <button
+                className="refresh-btn"
+                onClick={fetchReservations}
+                disabled={loading}
+              >
+                <FiRefreshCw className={loading ? 'spinning' : ''} />
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+      {/* Main Content */}
+      <section className="reservations-content">
+        <div className="container-fluid">
+          {reservations.length === 0 ? (
+            <div className="empty-section">
+              <div className="empty-card">
+                <FiCalendar size={64} className="empty-icon" />
+                <h3>No Reservations Found</h3>
+                <p>You haven't made any table reservations yet. Book your table now!</p>
+                <button className="reserve-btn" onClick={() => navigate("/reserve-table")}>
+                  <FiCalendar className="btn-icon" />
+                  Reserve Table
+                </button>
               </div>
-            );
-          }
-          return null;
-        })}
-      </div>
+            </div>
+          ) : (
+            <div className="reservations-grid">
+              {sortedReservations.map((reservation) => {
+                const isPast = isDateInPast(reservation.reservationDate);
+                const showCard = activeTab === 'upcoming' ? !isPast : isPast;
+
+                if (!showCard) return null;
+
+                return (
+                  <div key={reservation._id} className={`modern-reservation-card ${isPast ? 'past-reservation' : ''}`}>
+                    <div className="reservation-header">
+                      <div className="table-info">
+                        <h3 className="table-name">Table {reservation.tableNumber}</h3>
+                        <div className="reservation-id">#{reservation._id?.slice(-6) || 'N/A'}</div>
+                      </div>
+                      <div className="status-section">
+                        <div className={`reservation-status ${isPast ? 'past' : 'confirmed'}`}>
+                          {isPast ? <FiCheckCircle /> : <FiClock />}
+                          <span>{isPast ? 'Completed' : 'Confirmed'}</span>
+                        </div>
+                        {reservation.paymentStatus && (
+                          <div className={`payment-status status-${reservation.paymentStatus}`}>
+                            {reservation.paymentStatus.charAt(0).toUpperCase() + reservation.paymentStatus.slice(1)}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                
+                    <div className="reservation-details">
+                      <div className="details-grid">
+                        <div className="detail-item">
+                          <div className="detail-icon">
+                            <FiUser />
+                          </div>
+                          <div className="detail-content">
+                            <label>Guest Name</label>
+                            <span>{reservation.fullName || 'Not provided'}</span>
+                          </div>
+                        </div>
+
+                        <div className="detail-item">
+                          <div className="detail-icon">
+                            <FiMail />
+                          </div>
+                          <div className="detail-content">
+                            <label>Email</label>
+                            <span>{reservation.email || 'Not provided'}</span>
+                          </div>
+                        </div>
+
+                        <div className="detail-item">
+                          <div className="detail-icon">
+                            <FiPhone />
+                          </div>
+                          <div className="detail-content">
+                            <label>Phone</label>
+                            <span>{reservation.phone || 'Not provided'}</span>
+                          </div>
+                        </div>
+
+                        <div className="detail-item">
+                          <div className="detail-icon">
+                            <FiCalendar />
+                          </div>
+                          <div className="detail-content">
+                            <label>Date</label>
+                            <span>{formatDate(reservation.reservationDate)}</span>
+                          </div>
+                        </div>
+
+                        <div className="detail-item">
+                          <div className="detail-icon">
+                            <FiClock />
+                          </div>
+                          <div className="detail-content">
+                            <label>Time</label>
+                            <span>{formatTime(reservation.time)} - {formatTime(reservation.endTime || "")}</span>
+                          </div>
+                        </div>
+
+                        <div className="detail-item">
+                          <div className="detail-icon">
+                            <FiUsers />
+                          </div>
+                          <div className="detail-content">
+                            <label>Guests</label>
+                            <span>{reservation.guests} People</span>
+                          </div>
+                        </div>
+
+                        <div className="detail-item">
+                          <div className="detail-icon">
+                            <FiDollarSign />
+                          </div>
+                          <div className="detail-content">
+                            <label>Total Amount</label>
+                            <span>${reservation.totalPrice}</span>
+                          </div>
+                        </div>
+
+                        {reservation.specialRequests && (
+                          <div className="detail-item special-requests">
+                            <div className="detail-icon">
+                              <FiInfo />
+                            </div>
+                            <div className="detail-content">
+                              <label>Special Requests</label>
+                              <span>{reservation.specialRequests}</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="reservation-actions">
+                      {!isPast && (
+                        <>
+                          <button
+                            className="action-btn cancel-btn"
+                            onClick={() => handleCancelReservation(reservation._id, reservation.reservationDate)}
+                          >
+                            <FiX className="btn-icon" />
+                            Cancel
+                          </button>
+                          <button
+                            className="action-btn modify-btn"
+                            onClick={() => navigate(`/reserve-table?edit=${reservation._id}`)}
+                          >
+                            <FiEdit className="btn-icon" />
+                            Modify
+                          </button>
+                        </>
+                      )}
+                      <button
+                        className="action-btn invoice-btn"
+                        onClick={() => handleDownloadInvoice(reservation)}
+                        disabled={downloadingInvoice}
+                      >
+                        <FiDownload className="btn-icon" />
+                        {downloadingInvoice ? 'Generating...' : 'Invoice'}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

@@ -62,7 +62,7 @@ export default function Invoice() {
 
     // Always fetch fresh order data from the server to ensure we have the latest
     fetchOrderDetails(currentOrderId);
-  }, [orderId, navigate, location]);
+  }, [orderId, navigate, location]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchOrderDetails = async (currentOrderId) => {
     try {
@@ -303,10 +303,10 @@ export default function Invoice() {
       <div id="invoice" className="invoice-container">
         <div className="invoice-header">
           <div className="company-info">
-            <h1>Hotel Management System</h1>
-            <p>123 Main Street, Islamabad, Pakistan</p>
-            <p>Phone: +92 123 456 7890</p>
-            <p>Email: info@hotelmanagement.com</p>
+            <h1>Hotel & Restaurant Management System</h1>
+            <p>123 Main Street, Karachi, Pakistan</p>
+            <p>Phone: +92 21 123 456 7890</p>
+            <p>Email: info@hrms-pakistan.com</p>
           </div>
           <div className="invoice-info">
             <h2>INVOICE</h2>
@@ -329,9 +329,9 @@ export default function Invoice() {
               <tr>
                 <th>Item</th>
                 <th>Quantity</th>
-                <th>Unit Price</th>
+                <th>Unit Price (PKR)</th>
                 <th>Add-ons</th>
-                <th>Total</th>
+                <th>Total (PKR)</th>
               </tr>
             </thead>
             <tbody>
@@ -397,13 +397,13 @@ export default function Invoice() {
                   <tr key={index}>
                     <td>{itemName}</td>
                     <td>{itemQuantity}</td>
-                    <td>${itemPrice.toFixed(2)}</td>
+                    <td>Rs. {itemPrice.toFixed(0)}</td>
                     <td>
                       {item.addons && item.addons.length > 0 ? (
                         <ul className="addons-list">
                           {item.addons.map((addon, idx) => (
                             <li key={idx}>
-                              {addon.name} (+${(addon.price || 0).toFixed(2)})
+                              {addon.name} (+Rs. {(addon.price || 0).toFixed(0)})
                             </li>
                           ))}
                         </ul>
@@ -411,7 +411,7 @@ export default function Invoice() {
                         'No add-ons'
                       )}
                     </td>
-                    <td>${total.toFixed(2)}</td>
+                    <td>Rs. {total.toFixed(0)}</td>
                   </tr>
                 );
               })}
@@ -422,15 +422,15 @@ export default function Invoice() {
         <div className="invoice-summary">
           <div className="summary-row">
             <span>Subtotal:</span>
-            <span>${(order.totalPrice - (order.deliveryFee || 0)).toFixed(2)}</span>
+            <span>Rs. {(order.totalPrice - (order.deliveryFee || 0)).toFixed(0)}</span>
           </div>
           <div className="summary-row">
             <span>Tax (10%):</span>
-            <span>${((order.totalPrice - (order.deliveryFee || 0)) * 0.1).toFixed(2)}</span>
+            <span>Rs. {((order.totalPrice - (order.deliveryFee || 0)) * 0.1).toFixed(0)}</span>
           </div>
           <div className="summary-row total">
             <span>Total Amount:</span>
-            <span>${order.totalPrice.toFixed(2)}</span>
+            <span>Rs. {order.totalPrice.toFixed(0)}</span>
           </div>
         </div>
 

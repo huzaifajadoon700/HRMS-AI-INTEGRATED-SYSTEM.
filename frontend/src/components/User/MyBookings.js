@@ -151,10 +151,10 @@ const MyBookings = () => {
         <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; background: white; color: #333; padding: 20px;">
           <div style="display: flex; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
             <div>
-              <h1 style="font-size: 24px; color: #333; margin-bottom: 5px;">Night Elegance</h1>
-              <p style="color: #666; margin: 5px 0;">123 Luxury Avenue</p>
-              <p style="color: #666; margin: 5px 0;">City, State 12345</p>
-              <p style="color: #666; margin: 5px 0;">Tel: (555) 123-4567</p>
+              <h1 style="font-size: 24px; color: #333; margin-bottom: 5px;">Hotel & Restaurant Management System</h1>
+              <p style="color: #666; margin: 5px 0;">123 Main Street, Karachi</p>
+              <p style="color: #666; margin: 5px 0;">Karachi, Pakistan 75000</p>
+              <p style="color: #666; margin: 5px 0;">Tel: +92 21 123 456 7890</p>
             </div>
             <div style="text-align: right;">
               <h2 style="font-size: 22px; color: #333; margin-bottom: 10px;">INVOICE</h2>
@@ -193,7 +193,7 @@ const MyBookings = () => {
                     <p style="margin: 5px 0;">Guests: ${booking.guests}</p>
                     <p style="margin: 5px 0;">Duration: ${nights} night(s)</p>
                   </td>
-                  <td style="padding: 10px; border: 1px solid #eee;">$${booking.basePrice || (booking.totalPrice * 0.9).toFixed(2)}</td>
+                  <td style="padding: 10px; border: 1px solid #eee;">Rs. ${parseInt(booking.basePrice || (booking.totalPrice * 0.9)).toLocaleString('en-PK')}</td>
                 </tr>
                 ${booking.specialRequests ? `
                 <tr>
@@ -209,15 +209,15 @@ const MyBookings = () => {
           <div style="margin-top: 20px; background-color: #f9f9f9; border-radius: 8px; padding: 15px;">
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
               <span>Subtotal:</span>
-              <span>$${booking.basePrice || (booking.totalPrice * 0.9).toFixed(2)}</span>
+              <span>Rs. ${parseInt(booking.basePrice || (booking.totalPrice * 0.9)).toLocaleString('en-PK')}</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
               <span>Tax (10%):</span>
-              <span>$${booking.taxAmount || (booking.totalPrice * 0.1).toFixed(2)}</span>
+              <span>Rs. ${parseInt(booking.taxAmount || (booking.totalPrice * 0.1)).toLocaleString('en-PK')}</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 2px solid #eee; font-weight: 700; font-size: 16px;">
               <span>Total:</span>
-              <span>$${booking.totalPrice}</span>
+              <span>Rs. ${parseInt(booking.totalPrice).toLocaleString('en-PK')}</span>
             </div>
             <div style="display: flex; justify-content: space-between; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; font-style: italic;">
               <span>Payment Method:</span>
@@ -226,7 +226,7 @@ const MyBookings = () => {
           </div>
 
           <div style="margin-top: 30px; text-align: center; color: #666;">
-            <p style="font-weight: 600; margin-bottom: 5px;">Thank you for choosing Night Elegance</p>
+            <p style="font-weight: 600; margin-bottom: 5px;">Thank you for choosing our Hotel & Restaurant Management System</p>
             <small style="font-size: 12px; color: #999;">This is a computer-generated invoice and requires no signature</small>
           </div>
         </div>
@@ -369,7 +369,7 @@ const MyBookings = () => {
                   
                   <div className="detail-item">
                     <FiDollarSign className="detail-icon" />
-                    <span>${booking.totalPrice}</span>
+                    <span>Rs. {parseInt(booking.totalPrice).toLocaleString('en-PK')}</span>
                   </div>
 
                   <div className="detail-item">
@@ -465,7 +465,7 @@ const MyBookings = () => {
                   
                   <div className="detail-item">
                     <FiDollarSign className="detail-icon" />
-                    <span>${booking.totalPrice}</span>
+                    <span>Rs. {parseInt(booking.totalPrice).toLocaleString('en-PK')}</span>
                   </div>
 
                   <div className="detail-item">

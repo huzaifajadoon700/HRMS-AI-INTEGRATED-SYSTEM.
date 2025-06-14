@@ -213,7 +213,7 @@ const MenuManagement = () => {
               </td>
               <td>{item.name}</td>
               <td>{item.description}</td>
-              <td>${parseFloat(item.price).toFixed(2)}</td>
+              <td>Rs. {parseFloat(item.price).toFixed(0)}</td>
               <td>{item.category}</td>
               <td>
                 <span className={`availability-badge ${item.availability ? "available" : "unavailable"}`}>

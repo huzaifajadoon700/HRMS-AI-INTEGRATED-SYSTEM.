@@ -6,7 +6,6 @@ import axios from 'axios';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import PageLayout from '../components/layout/PageLayout';
-import Heading from '../components/common/Heading';
 import './TableReservationPage.css';
 
 // Initialize Stripe
@@ -82,7 +81,7 @@ const PaymentForm = ({ onPaymentSuccess, totalPrice }) => {
         className="btn btn-accent w-100 mt-3"
         disabled={!stripe || processing}
       >
-        {processing ? 'Processing...' : `Pay $${totalPrice}`}
+        {processing ? 'Processing...' : `Pay Rs. ${totalPrice}`}
       </button>
     </form>
   );
@@ -106,7 +105,6 @@ const TableReservationPage = () => {
     isAvailable: true,
     message: ""
   });
-  const [paymentMethodId, setPaymentMethodId] = useState(null);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   const getImageUrl = (imagePath) => {
@@ -240,7 +238,6 @@ const TableReservationPage = () => {
 
   const handlePaymentSuccess = async (paymentMethodId) => {
     try {
-      setPaymentMethodId(paymentMethodId);
       await handleSubmit(null, paymentMethodId);
     } catch (error) {
       console.error('Payment error:', error);
@@ -269,7 +266,7 @@ const TableReservationPage = () => {
         return;
       }
 
-      const totalPrice = tableDetails.tableCapacity * 10;
+      const totalPrice = tableDetails.tableCapacity * 500; // Rs. 500 per person
 
       // Save user contact information to localStorage for future use
       if (formData.fullName) localStorage.setItem('name', formData.fullName);
@@ -539,7 +536,7 @@ const TableReservationPage = () => {
                     </div>
                     <div className="summary-item">
                       <span>Total Price:</span>
-                      <span>${tableDetails.tableCapacity * 10}</span>
+                      <span>Rs. {(tableDetails.tableCapacity * 500).toLocaleString('en-PK')}</span>
                     </div>
                   </div>
 
@@ -558,9 +555,9 @@ const TableReservationPage = () => {
                   <div className="payment-section mt-4">
                     <h3 className="text-accent h5 mb-3">Payment Details</h3>
                     <Elements stripe={stripePromise}>
-                      <PaymentForm 
+                      <PaymentForm
                         onPaymentSuccess={handlePaymentSuccess}
-                        totalPrice={tableDetails.tableCapacity * 10}
+                        totalPrice={tableDetails.tableCapacity * 500}
                       />
                     </Elements>
                   </div>

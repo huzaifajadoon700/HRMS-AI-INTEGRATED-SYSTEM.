@@ -16,17 +16,25 @@ exports.createBooking = async (req, res) => {
     const overlappingBooking = await Booking.findOne({
       roomId,
       $or: [
-        { 
-          checkInDate: { $lte: checkInDate },
-          checkOutDate: { $gte: checkInDate }
+        // Case 1: New booking starts during an existing booking
+        {
+          checkInDate: { $lt: checkInDate },
+          checkOutDate: { $gt: checkInDate }
         },
-        { 
-          checkInDate: { $lte: checkOutDate },
-          checkOutDate: { $gte: checkOutDate }
+        // Case 2: New booking ends during an existing booking
+        {
+          checkInDate: { $lt: checkOutDate },
+          checkOutDate: { $gt: checkOutDate }
         },
-        { 
+        // Case 3: New booking completely encompasses an existing booking
+        {
           checkInDate: { $gte: checkInDate },
           checkOutDate: { $lte: checkOutDate }
+        },
+        // Case 4: Existing booking completely encompasses new booking
+        {
+          checkInDate: { $lte: checkInDate },
+          checkOutDate: { $gte: checkOutDate }
         }
       ]
     });
@@ -45,7 +53,7 @@ exports.createBooking = async (req, res) => {
         // First create the payment intent
         paymentIntent = await stripe.paymentIntents.create({
           amount: totalPrice * 100, // Convert to cents
-          currency: 'usd',
+          currency: 'pkr',
           payment_method_types: ['card'],
           metadata: {
             roomId,
@@ -111,9 +119,36 @@ exports.createBooking = async (req, res) => {
 exports.getBookingsByUser = async (req, res) => {
   try {
     const userId = req.user._id; // Get the user ID from the authenticated request
-    const bookings = await Booking.find({ userId }).populate("roomId");
+
+    console.log("🔍 Looking for bookings for user ID:", userId);
+
+    // Try to find bookings with current user ID format
+    let bookings = await Booking.find({ userId }).populate("roomId");
+    console.log("Bookings found with current userId:", bookings.length);
+
+    // If no bookings found, try to find with string version of user ID
+    if (bookings.length === 0) {
+      console.log("🔄 Trying to find bookings with string userId...");
+      bookings = await Booking.find({ userId: userId.toString() }).populate("roomId");
+      console.log("Bookings found with string userId:", bookings.length);
+    }
+
+    // If still no bookings, try to find by user email (fallback)
+    if (bookings.length === 0) {
+      console.log("🔄 Trying to find bookings by email fallback...");
+      const User = require('../Models/User');
+      const user = await User.findById(userId);
+      if (user) {
+        // This would require adding email field to bookings, which might not exist
+        // For now, we'll just log this attempt
+        console.log("User email for fallback search:", user.email);
+      }
+    }
+
+    console.log("Final bookings found:", bookings.length);
     res.status(200).json(bookings);
   } catch (error) {
+    console.error("Error fetching bookings:", error);
     res.status(500).json({ error: "Error fetching bookings" });
   }
 };
@@ -121,9 +156,25 @@ exports.getBookingsByUser = async (req, res) => {
 // Fetch all bookings (admin only)
 exports.getAllBookings = async (req, res) => {
   try {
+    console.log("🏨 Admin fetching all bookings...");
+    console.log("🔐 User making request:", req.user);
+
     const bookings = await Booking.find().populate("roomId");
+    console.log("🏨 Found bookings:", bookings.length);
+
+    if (bookings.length > 0) {
+      console.log("🏨 Sample booking:", {
+        id: bookings[0]._id,
+        totalPrice: bookings[0].totalPrice,
+        roomType: bookings[0].roomType,
+        checkInDate: bookings[0].checkInDate,
+        checkOutDate: bookings[0].checkOutDate
+      });
+    }
+
     res.status(200).json(bookings);
   } catch (error) {
+    console.error("❌ Error fetching bookings:", error);
     res.status(500).json({ error: "Error fetching bookings" });
   }
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { FiCalendar, FiUsers, FiHome, FiDollarSign, FiCreditCard } from "react-icons/fi";
+import { FiCalendar, FiUsers, FiCreditCard } from "react-icons/fi";
 import "./EditBooking.css";
 
 const EditBooking = ({ bookingId, onClose, onSuccess }) => {
@@ -96,7 +96,7 @@ const EditBooking = ({ bookingId, onClose, onSuccess }) => {
     if (bookingId) {
       fetchBooking();
     }
-  }, [bookingId, navigate]);
+  }, [bookingId, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const calculateNights = (checkIn, checkOut) => {
     if (!checkIn || !checkOut) return 0;

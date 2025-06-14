@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { Card, Badge, Button, Spinner, Form, InputGroup } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { io } from "socket.io-client";
-import { FiSearch, FiFilter, FiShoppingBag, FiClock, FiCheckCircle, FiXCircle } from "react-icons/fi";
+import {
+  FiSearch,
+  FiShoppingBag,
+  FiClock,
+  FiCheckCircle,
+  FiXCircle,
+  FiTruck,
+  FiPackage,
+  FiDollarSign,
+  FiCalendar,
+  FiRefreshCw,
+  FiEye
+} from "react-icons/fi";
 import "./MyOrders.css";
-import { toast } from "react-hot-toast";
 
 const MyOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -20,7 +29,6 @@ const MyOrders = () => {
     sortOrder: "desc"
   });
   const navigate = useNavigate();
-  const [socket, setSocket] = useState(null);
 
   // Function to check if an order should be marked as delivered
   const checkOrderDeliveryStatus = (order) => {
@@ -68,67 +76,14 @@ const MyOrders = () => {
       return;
     }
 
-    // Initialize socket connection
-    const newSocket = io("http://localhost:8080", {
-      auth: { token }
-    });
-    setSocket(newSocket);
-
-    // Setup socket event listeners
-    newSocket.on("orderStatusUpdate", (data) => {
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order._id === data.orderId
-            ? { 
-                ...order, 
-                status: data.status === 'Delivered' ? 'delivered' : order.status,
-                deliveryStatus: data.deliveryStatus 
-              }
-            : order
-        )
-      );
-    });
-
-    newSocket.on("orderCancelled", (data) => {
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order._id === data.orderId
-            ? { ...order, status: "cancelled" }
-            : order
-        )
-      );
-    });
-
     // Fetch initial orders
     fetchOrders();
-
-    // Set up interval to check for delivered orders - run every 30 seconds
-    const deliveryCheckInterval = setInterval(() => {
-      setOrders(prevOrders => {
-        const updatedOrders = prevOrders.map(order => {
-          if (checkOrderDeliveryStatus(order)) {
-            updateOrderStatus(order._id, 'delivered');
-            return { ...order, status: 'delivered' };
-          }
-          return order;
-        });
-        return updatedOrders;
-      });
-    }, 30000);
-
-    // Cleanup
-    return () => {
-      if (newSocket) {
-        newSocket.disconnect();
-      }
-      clearInterval(deliveryCheckInterval);
-    };
-  }, []); // Dependencies removed to prevent constant re-runs
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch orders when page or filters change
   useEffect(() => {
     fetchOrders();
-  }, [page, filters]);
+  }, [page, filters]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchOrders = async () => {
     try {
@@ -182,14 +137,6 @@ const MyOrders = () => {
     setPage(1); // Reset to first page when filters change
   };
 
-  const handleSort = (sortBy) => {
-    setFilters(prev => ({
-      ...prev,
-      sortBy,
-      sortOrder: prev.sortOrder === "asc" ? "desc" : "asc"
-    }));
-  };
-
   const handleCancelOrder = async (orderId) => {
     try {
       const token = localStorage.getItem("token");
@@ -204,58 +151,11 @@ const MyOrders = () => {
     }
   };
 
-  const handleReorder = async (order) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `http://localhost:8080/api/orders/${order._id}/reorder`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      navigate("/cart");
-    } catch (error) {
-      console.error("Error reordering:", error);
-      alert(error.response?.data?.message || "Failed to reorder. Please try again.");
-    }
-  };
-
-  const handleRateOrder = async (orderId, rating, feedback) => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        `http://localhost:8080/api/orders/${orderId}/rate`,
-        { rating, feedback },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      fetchOrders();
-    } catch (error) {
-      console.error("Error rating order:", error);
-      alert(error.response?.data?.message || "Failed to rate order. Please try again.");
-    }
-  };
-
   const handleViewInvoice = (order) => {
     if (!order || !order._id) {
-      toast.error('Invalid order data');
       return;
     }
     navigate(`/invoice/${order._id}`);
-  };
-
-  const getStatusBadge = (status) => {
-    const statusColors = {
-      pending: "warning",
-      confirmed: "info",
-      preparing: "primary",
-      out_for_delivery: "success",
-      delivered: "success",
-      cancelled: "danger"
-    };
-    return <Badge bg={statusColors[status] || "secondary"}>{status}</Badge>;
-  };
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleString();
   };
 
   const calculateOrderTotal = (order) => {
@@ -265,222 +165,287 @@ const MyOrders = () => {
       return sum + ((item.price || 0) * (item.quantity || 0));
     }, 0);
     
-    const deliveryFee = order.deliveryFee || 4.00; // Default delivery fee
+    const deliveryFee = order.deliveryFee || 50; // Default delivery fee in Rs.
     return subtotal + deliveryFee;
   };
 
-  if (loading) {
-    return (
-      <div className="loading-spinner">
-        <Spinner animation="border" variant="primary" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="error-message">
-        <p>{error}</p>
-        <Button variant="primary" onClick={fetchOrders}>
-          Try Again
-        </Button>
-      </div>
-    );
-  }
+  // Loading and error states are handled in the modern UI below
 
   return (
-    <div className="my-orders-container">
-      <div className="my-orders-header">
-        <h1 className="page-title">My Orders</h1>
-      </div>
-
-      <div className="filters-container">
-        <div className="filter-item">
-          <label className="filter-label">Status:</label>
-          <Form.Select
-            name="status"
-            value={filters.status}
-            onChange={handleFilterChange}
-            className="filter-input"
-          >
-            <option value="">All</option>
-            <option value="pending">Pending</option>
-            <option value="delivered">Delivered</option>
-            <option value="cancelled">Cancelled</option>
-          </Form.Select>
-        </div>
-
-        <div className="filter-item">
-          <label className="filter-label">Sort By:</label>
-          <Form.Select
-            name="sortBy"
-            value={filters.sortBy}
-            onChange={handleFilterChange}
-            className="filter-input"
-          >
-            <option value="createdAt">Date</option>
-            <option value="total">Total</option>
-            <option value="status">Status</option>
-          </Form.Select>
-        </div>
-
-        <div className="filter-item">
-          <InputGroup>
-            <Form.Control
-              type="text"
-              placeholder="Search orders..."
-              name="search"
-              value={filters.search}
-              onChange={handleFilterChange}
-              className="search-input"
-            />
-            <InputGroup.Text>
-              <FiSearch />
-            </InputGroup.Text>
-          </InputGroup>
-        </div>
-      </div>
-
-      {loading ? (
-        <div className="text-center p-5">
-          <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
-          </Spinner>
-        </div>
-      ) : error ? (
-        <div className="alert alert-danger">{error}</div>
-      ) : orders.length === 0 ? (
-        <Card className="empty-orders-card">
-          <Card.Body className="text-center">
-            <h4>No Orders Found</h4>
-            <p>Try adjusting your filters or start a new order!</p>
-            <Button variant="primary" onClick={() => navigate("/order-food")}>
-              Order Now
-            </Button>
-          </Card.Body>
-        </Card>
-      ) : (
-        <>
-          <div className="orders-grid">
-            {orders.map((order) => {
-              const total = calculateOrderTotal(order);
-              return (
-                <div key={order._id} className="order-card">
-                  <div className="order-header">
-                    <span className="order-id">Order #{order._id?.slice(-6) || 'N/A'}</span>
-                    <Badge 
-                      className={`status-badge status-${(order.status || 'pending').toLowerCase()}`}
-                    >
-                      {order.status || 'Pending'}
-                    </Badge>
-                  </div>
-                  
-                  <div className="order-date">
-                    {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }) : 'Date not available'}
-                  </div>
-
-                  <div className="order-items">
-                    {(order.items || []).map((item, index) => {
-                      // Extract the item name safely using the same logic as in the invoice
-                      const itemName = item.name || 
-                                    (item._doc && item._doc.name) || 
-                                    (item.__parentArray && item.__parentArray[0] && item.__parentArray[0].name) || 
-                                    'Unknown Item';
-                                    
-                      const itemQuantity = typeof item.quantity === 'number' ? item.quantity : 
-                                  (item._doc?.quantity || item.__parentArray?.[0]?.quantity || 1);
-                      
-                      return (
-                        <div key={index} className="order-item">
-                          <span>{itemName} × {itemQuantity || 0}</span>
-                          <span>$ {(item.price || 0).toFixed(2)}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="price-breakdown">
-                    <div className="price-row">
-                      <span>Subtotal:</span>
-                      <span>$ {((total - (order.deliveryFee || 4.00)) || 0).toFixed(2)}</span>
-                    </div>
-                    <div className="price-row">
-                      <span>Delivery Fee:</span>
-                      <span>$ {(order.deliveryFee || 4.00).toFixed(2)}</span>
-                    </div>
-                    <div className="order-total">
-                      <span>Total Amount:</span>
-                      <span>$ {total.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  <div className="order-actions">
-                    {(order.status === 'pending' || !order.status) && (
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        className="btn-cosmic btn-cosmic-danger"
-                        onClick={() => handleCancelOrder(order._id)}
-                      >
-                        <FiXCircle /> Cancel Order
-                      </Button>
-                    )}
-                    
-                    {order.status !== 'delivered' && order.status !== 'cancelled' && (
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      className="btn-cosmic"
-                      onClick={() => navigate(`/track-order/${order._id}`)}
-                    >
-                      <FiClock /> Track Order
-                    </Button>
-                    )}
-                    
-                    <Button
-                      variant="info"
-                      size="sm"
-                      className="btn-cosmic"
-                      onClick={() => handleViewInvoice(order)}
-                      disabled={!order._id}
-                    >
-                      <FiShoppingBag /> View Invoice
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+    <div className="modern-orders-page">
+      {/* Hero Section */}
+      <section className="orders-hero">
+        <div className="hero-content">
+          <div className="hero-icon">
+            <FiShoppingBag size={48} />
           </div>
+          <h1 className="hero-title">My Orders</h1>
+          <p className="hero-subtitle">Track and manage your food orders</p>
+        </div>
+      </section>
 
-          {totalPages > 1 && (
-            <div className="pagination-container">
-              <Button
-                variant="outline-primary"
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
+      {/* Stats Section */}
+      <section className="orders-stats">
+        <div className="container-fluid">
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon">
+                <FiPackage />
+              </div>
+              <div className="stat-content">
+                <h3>{orders.length}</h3>
+                <p>Total Orders</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <FiClock />
+              </div>
+              <div className="stat-content">
+                <h3>{orders.filter(o => o.status === 'pending' || o.status === 'confirmed' || o.status === 'preparing').length}</h3>
+                <p>Active Orders</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <FiTruck />
+              </div>
+              <div className="stat-content">
+                <h3>{orders.filter(o => o.status === 'delivered').length}</h3>
+                <p>Delivered</p>
+              </div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-icon">
+                <FiDollarSign />
+              </div>
+              <div className="stat-content">
+                <h3>Rs. {orders.reduce((sum, o) => sum + (calculateOrderTotal(o) || 0), 0).toFixed(0)}</h3>
+                <p>Total Spent</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Controls Section */}
+      <section className="orders-controls">
+        <div className="container-fluid">
+          <div className="controls-grid">
+            <div className="search-section">
+              <div className="search-box">
+                <FiSearch className="search-icon" />
+                <input
+                  type="text"
+                  placeholder="Search orders..."
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                  className="search-input"
+                />
+              </div>
+            </div>
+            <div className="filter-section">
+              <select
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className="status-filter"
               >
-                Previous
-              </Button>
-              <span className="mx-3">
-                Page {page} of {totalPages}
-              </span>
-              <Button
-                variant="outline-primary"
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
+                <option value="">All Orders</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="preparing">Preparing</option>
+                <option value="ready">Ready</option>
+                <option value="delivered">Delivered</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+            <div className="refresh-section">
+              <button
+                className="refresh-btn"
+                onClick={fetchOrders}
+                disabled={loading}
               >
-                Next
-              </Button>
+                <FiRefreshCw className={loading ? 'spinning' : ''} />
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <section className="orders-content">
+        <div className="container-fluid">
+          {loading ? (
+            <div className="loading-section">
+              <div className="loading-spinner">
+                <FiRefreshCw className="spinning" size={32} />
+                <p>Loading your orders...</p>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="error-section">
+              <div className="error-card">
+                <FiXCircle size={48} className="error-icon" />
+                <h3>Something went wrong</h3>
+                <p>{error}</p>
+                <button className="retry-btn" onClick={fetchOrders}>
+                  Try Again
+                </button>
+              </div>
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="empty-section">
+              <div className="empty-card">
+                <FiShoppingBag size={64} className="empty-icon" />
+                <h3>No Orders Found</h3>
+                <p>You haven't placed any orders yet. Start ordering delicious food!</p>
+                <button className="order-btn" onClick={() => navigate("/order-food")}>
+                  <FiShoppingBag className="btn-icon" />
+                  Order Now
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="orders-grid">
+              {orders.map((order) => {
+                const total = calculateOrderTotal(order);
+                const statusIcon = {
+                  pending: <FiClock />,
+                  confirmed: <FiCheckCircle />,
+                  preparing: <FiPackage />,
+                  ready: <FiTruck />,
+                  delivered: <FiCheckCircle />,
+                  cancelled: <FiXCircle />
+                };
+
+                return (
+                  <div key={order._id} className="modern-order-card">
+                    <div className="order-header">
+                      <div className="order-info">
+                        <h3 className="order-id">#{order._id?.slice(-6) || 'N/A'}</h3>
+                        <p className="order-date">
+                          <FiCalendar className="date-icon" />
+                          {order.createdAt ? new Date(order.createdAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          }) : 'Date not available'}
+                        </p>
+                      </div>
+                      <div className={`order-status status-${(order.status || 'pending').toLowerCase()}`}>
+                        {statusIcon[order.status || 'pending']}
+                        <span>{order.status || 'Pending'}</span>
+                      </div>
+                    </div>
+
+                    <div className="order-items">
+                      <h4 className="items-title">
+                        <FiShoppingBag className="items-icon" />
+                        Order Items
+                      </h4>
+                      <div className="items-list">
+                        {(order.items || []).map((item, index) => {
+                          const itemName = item.name ||
+                                        (item._doc && item._doc.name) ||
+                                        (item.__parentArray && item.__parentArray[0] && item.__parentArray[0].name) ||
+                                        'Unknown Item';
+
+                          const itemQuantity = typeof item.quantity === 'number' ? item.quantity :
+                                      (item._doc?.quantity || item.__parentArray?.[0]?.quantity || 1);
+
+                          return (
+                            <div key={index} className="item-row">
+                              <div className="item-details">
+                                <span className="item-name">{itemName}</span>
+                                <span className="item-quantity">Qty: {itemQuantity || 0}</span>
+                              </div>
+                              <span className="item-price">Rs. {(item.price || 0).toFixed(0)}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="order-summary">
+                      <div className="summary-row">
+                        <span>Subtotal:</span>
+                        <span>Rs. {((total - (order.deliveryFee || 50)) || 0).toFixed(0)}</span>
+                      </div>
+                      <div className="summary-row">
+                        <span>Delivery Fee:</span>
+                        <span>Rs. {(order.deliveryFee || 50).toFixed(0)}</span>
+                      </div>
+                      <div className="summary-total">
+                        <span>Total Amount:</span>
+                        <span>Rs. {total.toFixed(0)}</span>
+                      </div>
+                    </div>
+
+                    <div className="order-actions">
+                      {(order.status === 'pending' || !order.status) && (
+                        <button
+                          className="action-btn cancel-btn"
+                          onClick={() => handleCancelOrder(order._id)}
+                        >
+                          <FiXCircle className="btn-icon" />
+                          Cancel
+                        </button>
+                      )}
+
+                      {order.status !== 'delivered' && order.status !== 'cancelled' && (
+                        <button
+                          className="action-btn track-btn"
+                          onClick={() => navigate(`/track-order/${order._id}`)}
+                        >
+                          <FiClock className="btn-icon" />
+                          Track Order
+                        </button>
+                      )}
+
+                      <button
+                        className="action-btn invoice-btn"
+                        onClick={() => handleViewInvoice(order)}
+                        disabled={!order._id}
+                      >
+                        <FiEye className="btn-icon" />
+                        View Invoice
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
-        </>
-      )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="pagination-section">
+              <div className="pagination-controls">
+                <button
+                  className="pagination-btn"
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  Previous
+                </button>
+                <span className="pagination-info">
+                  Page {page} of {totalPages}
+                </span>
+                <button
+                  className="pagination-btn"
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

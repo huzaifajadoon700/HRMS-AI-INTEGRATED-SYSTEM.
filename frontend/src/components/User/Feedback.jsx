@@ -3,6 +3,7 @@ import { Form, Button, Card } from 'react-bootstrap';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaStar } from 'react-icons/fa';
+import { FiHeart, FiThumbsUp, FiMessageSquare } from 'react-icons/fi';
 
 const API_URL = 'http://localhost:8080';
 
@@ -259,28 +260,69 @@ const Feedback = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <Card className="shadow-lg" style={{
-        background: 'rgba(10, 25, 47, 0.95)',
-        backdropFilter: 'blur(12px)',
-        border: '1px solid rgba(0, 163, 255, 0.1)',
-        borderRadius: '1.5rem'
+    <div style={{
+      width: '100%',
+      minHeight: '100vh',
+      background: '#0a192f',
+      padding: '0',
+      color: '#ffffff',
+      marginTop: '80px'
+    }}>
+      {/* Hero Section */}
+      <div style={{
+        padding: '2rem 0',
+        textAlign: 'center',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
-        <Card.Header className="py-3" style={{
-          background: 'linear-gradient(135deg, #0066FF 0%, #00C2FF 100%)',
-          borderTopLeftRadius: '1.5rem',
-          borderTopRightRadius: '1.5rem',
-          borderBottom: 'none'
+        <h1 style={{
+          fontSize: '2rem',
+          fontWeight: '600',
+          color: '#64ffda',
+          marginBottom: '0.5rem'
         }}>
-          <h4 className="mb-0 fw-bold text-white">Share Your Experience</h4>
-        </Card.Header>
-        <Card.Body className="p-4">
+          Share Your Experience
+        </h1>
+        <p style={{
+          fontSize: '1rem',
+          color: '#b0b0b0',
+          margin: '0'
+        }}>
+          Your feedback helps us improve our service
+        </p>
+      </div>
+
+      {/* Main Content */}
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '3rem 2rem',
+        display: 'grid',
+        gridTemplateColumns: window.innerWidth > 768 ? '1fr 300px' : '1fr',
+        gap: '3rem',
+        alignItems: 'start'
+      }}>
+        {/* Feedback Form */}
+        <Card className="shadow-lg" style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '1rem'
+        }}>
+          <Card.Header className="py-3" style={{
+            background: 'rgba(100, 255, 218, 0.1)',
+            borderTopLeftRadius: '1rem',
+            borderTopRightRadius: '1rem',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            <h5 className="mb-0" style={{ color: '#64ffda', fontSize: '1.1rem' }}>Rate Your Experience</h5>
+          </Card.Header>
+        <Card.Body className="p-3">
           <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-4">
-              <Form.Label className="fw-bold" style={{ color: '#F0F4FC' }}>
-                How would you rate your experience?
+            <Form.Group className="mb-3">
+              <Form.Label style={{ color: '#64ffda', fontSize: '0.9rem', fontWeight: '600' }}>
+                Rating
               </Form.Label>
-              <div className="d-flex gap-2">
+              <div className="d-flex gap-1 justify-content-center">
                 {[...Array(5)].map((_, index) => {
                   const ratingValue = index + 1;
                   return (
@@ -294,8 +336,8 @@ const Feedback = () => {
                         className="d-none"
                       />
                       <FaStar
-                        className="fs-2"
-                        color={ratingValue <= (hover || formData.rating) ? "#00A3FF" : "#4a5568"}
+                        size={20}
+                        color={ratingValue <= (hover || formData.rating) ? "#64ffda" : "#4a5568"}
                         onMouseEnter={() => setHover(ratingValue)}
                         onMouseLeave={() => setHover(null)}
                         style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
@@ -304,84 +346,41 @@ const Feedback = () => {
                   );
                 })}
               </div>
-              <div className="d-flex justify-content-between mt-1">
-                <small style={{ color: '#F0F4FC' }}>Poor</small>
-                <small style={{ color: '#F0F4FC' }}>Excellent</small>
-              </div>
             </Form.Group>
 
-            <Form.Group className="mb-4">
-              <Form.Label className="fw-bold" style={{ color: '#F0F4FC' }}>
-                Tell us more about your experience
+            <Form.Group className="mb-3">
+              <Form.Label style={{ color: '#64ffda', fontSize: '0.9rem', fontWeight: '600' }}>
+                Comments
               </Form.Label>
               <Form.Control
                 as="textarea"
-                rows={4}
+                rows={3}
                 name="comment"
                 value={formData.comment}
                 onChange={handleChange}
-                placeholder="Share your thoughts about our service, food, and overall experience..."
+                placeholder="Share your thoughts..."
                 required
                 style={{
-                  background: 'rgba(0, 5, 26, 0.8)',
-                  border: '1px solid rgba(0, 163, 255, 0.2)',
-                  color: '#F0F4FC',
-                  borderRadius: '0.75rem',
-                  padding: '1rem',
-                  transition: 'all 0.3s ease',
-                  '&::placeholder': {
-                    color: '#718096'
-                  }
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: '#ffffff',
+                  borderRadius: '0.5rem',
+                  padding: '0.75rem',
+                  fontSize: '0.9rem',
+                  transition: 'all 0.3s ease'
                 }}
               />
-              {formData.comment && (
-                <div className="mt-3">
-                  <div className="d-flex align-items-center gap-2 mb-2">
-                    <span style={{ color: '#F0F4FC' }}>Sentiment Analysis:</span>
-                    <span style={{ 
-                      color: getSentimentColor(sentimentPreview.sentiment),
-                      fontWeight: 'bold',
-                      padding: '0.25rem 0.75rem',
-                      borderRadius: '1rem',
-                      background: 'rgba(255, 255, 255, 0.1)'
-                    }}>
-                      {sentimentPreview.sentiment.replace('_', ' ')}
-                    </span>
-                    <span style={{ color: '#F0F4FC', fontSize: '0.9rem' }}>
-                      (Confidence: {(sentimentPreview.confidence * 100).toFixed(1)}%)
-                    </span>
-                  </div>
-                  {sentimentPreview.details.length > 0 && (
-                    <div className="sentiment-details" style={{ 
-                      background: 'rgba(0, 5, 26, 0.8)',
-                      borderRadius: '0.75rem',
-                      padding: '1rem',
-                      marginTop: '0.5rem'
-                    }}>
-                      <small style={{ color: '#F0F4FC', display: 'block', marginBottom: '0.5rem' }}>
-                        Detected Keywords:
-                      </small>
-                      <div className="d-flex flex-wrap gap-2">
-                        {sentimentPreview.details.map((detail, index) => (
-                          <span
-                            key={index}
-                            style={{
-                              padding: '0.25rem 0.5rem',
-                              borderRadius: '0.5rem',
-                              background: detail.score > 0 
-                                ? 'rgba(0, 255, 0, 0.2)'
-                                : 'rgba(255, 0, 0, 0.2)',
-                              color: detail.score > 0 ? '#00ff00' : '#ff0000',
-                              fontSize: '0.85rem',
-                              border: `1px solid ${detail.score > 0 ? 'rgba(0, 255, 0, 0.3)' : 'rgba(255, 0, 0, 0.3)'}`
-                            }}
-                          >
-                            {detail.isNegated ? 'not ' : ''}{detail.word}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+              {formData.comment && sentimentPreview.sentiment !== 'neutral' && (
+                <div className="mt-2">
+                  <small style={{
+                    color: getSentimentColor(sentimentPreview.sentiment),
+                    fontSize: '0.8rem',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '0.5rem',
+                    background: 'rgba(255, 255, 255, 0.1)'
+                  }}>
+                    {sentimentPreview.sentiment.replace('_', ' ')}
+                  </small>
                 </div>
               )}
             </Form.Group>
@@ -389,33 +388,80 @@ const Feedback = () => {
             <Button
               type="submit"
               disabled={loading}
-              className="w-100 py-2 fw-bold"
+              className="w-100"
               style={{
-                background: 'linear-gradient(135deg, #0066FF 0%, #00C2FF 100%)',
+                background: 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)',
                 border: 'none',
-                borderRadius: '0.75rem',
-                fontSize: '1.1rem',
-                color: '#F0F4FC',
-                boxShadow: '0 4px 15px rgba(0, 163, 255, 0.3)',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 6px 20px rgba(0, 163, 255, 0.4)'
-                }
+                borderRadius: '0.5rem',
+                fontSize: '0.9rem',
+                color: '#0a192f',
+                padding: '0.6rem',
+                fontWeight: '600',
+                transition: 'all 0.3s ease'
               }}
             >
-              {loading ? (
-                <span>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Submitting...
-                </span>
-              ) : (
-                'Submit Feedback'
-              )}
+              {loading ? 'Submitting...' : 'Submit'}
             </Button>
           </Form>
         </Card.Body>
       </Card>
+
+      {/* Sidebar */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+        <Card style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '1rem'
+        }}>
+          <Card.Body className="p-3">
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+              <FiHeart style={{ fontSize: '1.2rem', color: '#64ffda', marginRight: '0.8rem' }} />
+              <h6 style={{ color: '#ffffff', margin: '0', fontSize: '1rem' }}>Why Your Feedback Matters</h6>
+            </div>
+            <p style={{ color: '#b0b0b0', fontSize: '0.9rem', lineHeight: '1.4', margin: '0' }}>
+              Your feedback helps us understand what we're doing well and where we can improve.
+            </p>
+          </Card.Body>
+        </Card>
+
+        <Card style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '1rem'
+        }}>
+          <Card.Body className="p-3">
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+              <FiThumbsUp style={{ fontSize: '1.2rem', color: '#64ffda', marginRight: '0.8rem' }} />
+              <h6 style={{ color: '#ffffff', margin: '0', fontSize: '1rem' }}>Our Commitment</h6>
+            </div>
+            <ul style={{ color: '#b0b0b0', fontSize: '0.9rem', lineHeight: '1.4', margin: '0', paddingLeft: '1rem' }}>
+              <li>We read every feedback personally</li>
+              <li>Response within 24 hours</li>
+              <li>Continuous service improvement</li>
+            </ul>
+          </Card.Body>
+        </Card>
+
+        <Card style={{
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '1rem'
+        }}>
+          <Card.Body className="p-3">
+            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+              <FiMessageSquare style={{ fontSize: '1.2rem', color: '#64ffda', marginRight: '0.8rem' }} />
+              <h6 style={{ color: '#ffffff', margin: '0', fontSize: '1rem' }}>Contact Support</h6>
+            </div>
+            <p style={{ color: '#b0b0b0', fontSize: '0.9rem', lineHeight: '1.4', margin: '0' }}>
+              Need immediate help? Contact our support team at support@hotelroyal.com
+            </p>
+          </Card.Body>
+        </Card>
+      </div>
+      </div>
     </div>
   );
 };
