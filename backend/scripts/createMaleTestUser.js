@@ -11,6 +11,7 @@ const Menu = require('../Models/Menu');
 const Room = require('../Models/Room');
 const Table = require('../Models/Table');
 const UserFoodInteraction = require('../Models/UserFoodInteraction');
+const UserRoomInteraction = require('../Models/UserRoomInteraction');
 
 // Connect to MongoDB
 const connectDB = async () => {
@@ -249,6 +250,65 @@ const createMaleTableReservations = async (user) => {
   }
 };
 
+// Create room interactions (business traveler profile)
+const createMaleRoomInteractions = async (user) => {
+  try {
+    const rooms = await Room.find().limit(15);
+    if (rooms.length === 0) {
+      console.log('⚠️ No rooms found, skipping room interactions');
+      return [];
+    }
+
+    const interactions = [];
+    // Weighted interaction types - more views and ratings, fewer bookings
+    const interactionTypes = ['view', 'view', 'view', 'rating', 'rating', 'favorite', 'inquiry'];
+
+    // Create 25 room interactions over the last 30 days
+    for (let i = 0; i < 25; i++) {
+      const room = rooms[Math.floor(Math.random() * rooms.length)];
+      const interactionType = interactionTypes[Math.floor(Math.random() * interactionTypes.length)];
+      const daysAgo = Math.floor(Math.random() * 30);
+      const interactionDate = new Date(Date.now() - (daysAgo * 24 * 60 * 60 * 1000));
+
+      const interactionData = {
+        userId: user._id,
+        roomId: room._id,
+        interactionType: interactionType,
+        timestamp: interactionDate,
+        groupSize: Math.floor(Math.random() * 4) + 1, // 1-4 people
+        deviceType: ['mobile', 'desktop', 'tablet'][Math.floor(Math.random() * 3)],
+        sessionId: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      };
+
+      // Add rating for rating interactions
+      if (interactionType === 'rating') {
+        interactionData.rating = Math.floor(Math.random() * 2) + 4; // 4-5 stars
+      }
+
+      // Add booking details for booking interactions
+      if (interactionType === 'booking') {
+        const checkInDate = new Date(interactionDate);
+        const bookingDuration = Math.floor(Math.random() * 5) + 1; // 1-5 days
+        const checkOutDate = new Date(checkInDate.getTime() + (bookingDuration * 24 * 60 * 60 * 1000));
+
+        interactionData.checkInDate = checkInDate;
+        interactionData.checkOutDate = checkOutDate;
+        interactionData.bookingDuration = bookingDuration;
+      }
+
+      const interaction = new UserRoomInteraction(interactionData);
+      await interaction.save();
+      interactions.push(interaction);
+    }
+
+    console.log(`✅ Created ${interactions.length} room interactions for male user`);
+    return interactions;
+  } catch (error) {
+    console.error('❌ Error creating male room interactions:', error);
+    return [];
+  }
+};
+
 // Create food interactions (male preferences - spicy food, BBQ, etc.)
 const createMaleFoodInteractions = async (user) => {
   try {
@@ -260,7 +320,7 @@ const createMaleFoodInteractions = async (user) => {
 
     const interactions = [];
     const interactionTypes = ['rating', 'view', 'favorite', 'order'];
-    
+
     for (let i = 0; i < 35; i++) {
       const menu = menus[Math.floor(Math.random() * menus.length)];
       const interactionType = interactionTypes[Math.floor(Math.random() * interactionTypes.length)];
@@ -303,6 +363,7 @@ const main = async () => {
 
   await createMaleFoodOrders(user);
   await createMaleRoomBookings(user);
+  await createMaleRoomInteractions(user);
   await createMaleTableReservations(user);
   await createMaleFoodInteractions(user);
 
@@ -319,6 +380,7 @@ const main = async () => {
   console.log('\n🎯 This MALE user has:');
   console.log('- 11 food orders in the last 30 days (Rs. 28,450)');
   console.log('- 4 room bookings in the last 30 days (Rs. 88,000)');
+  console.log('- 25 room interactions (views, ratings, favorites)');
   console.log('- 8 table reservations in the last 30 days (Rs. 34,300)');
   console.log('- 35+ food interactions (ratings, views, favorites)');
   console.log('- Total spending: Rs. 150,750+ across all modules');

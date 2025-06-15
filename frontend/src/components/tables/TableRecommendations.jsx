@@ -31,15 +31,185 @@ const TableRecommendations = () => {
     try {
       setLoading(true);
 
-      // Load recommendations
-      const recsResponse = await tableRecommendationService.getRecommendations(context);
-      if (recsResponse && recsResponse.recommendations) {
-        setRecommendations(recsResponse.recommendations || []);
+      // Check if user is authenticated
+      const token = localStorage.getItem('token');
+
+      if (token) {
+        // Try to load personalized recommendations for authenticated users
+        try {
+          const recsResponse = await tableRecommendationService.getRecommendations({
+            ...context,
+            numRecommendations: 8,
+            useCache: true
+          });
+
+          console.log('📊 Initial table recommendations response:', recsResponse);
+
+          if (recsResponse && recsResponse.success && recsResponse.recommendations) {
+            // Process recommendations to ensure all required fields
+            const processedRecommendations = recsResponse.recommendations.map((rec, index) => ({
+              ...rec,
+              rank: rec.rank || index + 1,
+              score: rec.score || 0.5,
+              confidence: rec.confidence || 'medium',
+              explanation: rec.explanation || `This table matches your preferences for ${context.occasion || 'dining'}`,
+              table: {
+                ...rec.table,
+                image: rec.table.image || '/images/placeholder-table.jpg'
+              }
+            }));
+
+            setRecommendations(processedRecommendations);
+            setRecommendationStats({
+              totalRecommendations: processedRecommendations.length,
+              mlModelActive: !recsResponse.fallback,
+              fallbackMode: recsResponse.fallback || false,
+              cached: recsResponse.cached || false
+            });
+
+            console.log('✅ Initial recommendations loaded:', processedRecommendations.length);
+            console.log('📊 Initial recommendation stats set:', {
+              totalRecommendations: processedRecommendations.length,
+              mlModelActive: !recsResponse.fallback,
+              fallbackMode: recsResponse.fallback || false,
+              cached: recsResponse.cached || false
+            });
+            return; // Success, exit early
+          }
+        } catch (authError) {
+          console.log('⚠️ Authentication failed, falling back to popular tables:', authError.message);
+        }
+      } else {
+        console.log('⚠️ No authentication token, using popular tables for guest user');
+      }
+
+      // Fallback for unauthenticated users or auth failures: Use popular tables
+      console.log('⚠️ Loading popular tables as recommendations');
+      try {
+        const popularResponse = await tableRecommendationService.getPopularTables({ limit: 8 });
+
+        if (popularResponse && popularResponse.success && popularResponse.tables) {
+          // Convert popular tables to recommendation format
+          const popularRecommendations = popularResponse.tables.map((table, index) => ({
+            tableId: table._id,
+            table: {
+              ...table,
+              image: table.image || '/images/placeholder-table.jpg'
+            },
+            score: table.score || (8 - index) / 8,
+            reason: 'popularity',
+            confidence: 'medium',
+            rank: index + 1,
+            explanation: `Popular table with ${table.avgRating ? table.avgRating.toFixed(1) + '/5 stars' : 'high ratings'}`,
+            contextFactors: {
+              occasion: context.occasion,
+              partySize: context.partySize,
+              timePreference: context.timeSlot
+            }
+          }));
+
+          setRecommendations(popularRecommendations);
+          setRecommendationStats({
+            totalRecommendations: popularRecommendations.length,
+            mlModelActive: false,
+            fallbackMode: true,
+            cached: false
+          });
+
+          console.log('✅ Popular tables loaded as recommendations:', popularRecommendations.length);
+          console.log('📊 Popular tables stats set:', {
+            totalRecommendations: popularRecommendations.length,
+            mlModelActive: false,
+            fallbackMode: true,
+            cached: false
+          });
+        } else {
+          throw new Error('No popular tables available');
+        }
+      } catch (popularError) {
+        console.error('❌ Failed to load popular tables:', popularError);
+
+        // Final fallback: Load all available tables
+        try {
+          const fallbackResponse = await tableService.getAllTables();
+          const availableTables = fallbackResponse.filter(table => table.status === 'Available');
+
+          // Smart fallback based on context
+          const smartFallbackRecommendations = availableTables
+            .map((table, index) => {
+              let score = 0.5;
+              let explanation = `Available table suitable for ${context.occasion || 'dining'}`;
+
+              // Boost score based on context matching
+              if (table.capacity >= context.partySize && table.capacity <= context.partySize + 2) {
+                score += 0.2;
+                explanation += ` (perfect size for ${context.partySize} guests)`;
+              }
+
+              if (context.occasion === 'romantic' && ['Intimate', 'Romantic'].includes(table.ambiance)) {
+                score += 0.3;
+                explanation += ' (romantic ambiance)';
+              }
+
+              if (table.avgRating >= 4.0) {
+                score += 0.1;
+                explanation += ` (${table.avgRating}/5 stars)`;
+              }
+
+              return {
+                tableId: table._id,
+                table: table,
+                score: Math.min(score, 1.0),
+                reason: 'smart_fallback',
+                confidence: score > 0.7 ? 'high' : 'medium',
+                rank: index + 1,
+                explanation: explanation,
+                contextFactors: {
+                  occasion: context.occasion,
+                  partySize: context.partySize,
+                  timePreference: context.timeSlot
+                }
+              };
+            })
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 8);
+
+          setRecommendations(smartFallbackRecommendations);
+          setRecommendationStats({
+            totalRecommendations: smartFallbackRecommendations.length,
+            mlModelActive: false,
+            fallbackMode: true,
+            cached: false
+          });
+
+          console.log('✅ Final fallback recommendations generated:', smartFallbackRecommendations.length);
+          console.log('📊 Final fallback stats set:', {
+            totalRecommendations: smartFallbackRecommendations.length,
+            mlModelActive: false,
+            fallbackMode: true,
+            cached: false
+          });
+        } catch (finalError) {
+          console.error('❌ All fallback methods failed:', finalError);
+          setError('No recommendations available at the moment. Please try again later.');
+          setRecommendationStats({
+            totalRecommendations: 0,
+            mlModelActive: false,
+            fallbackMode: false,
+            cached: false
+          });
+        }
       }
 
     } catch (error) {
-      console.error('Error loading initial data:', error);
+      console.error('❌ Error loading initial data:', error);
       setError('Failed to load recommendations. Please try again.');
+      setRecommendationStats({
+        totalRecommendations: 0,
+        mlModelActive: false,
+        fallbackMode: false,
+        cached: false
+      });
     } finally {
       setLoading(false);
     }
