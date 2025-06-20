@@ -1,3 +1,4 @@
+// Updated: Improved app structure clarity
 import React from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
 import { Home, Booking, AboutUs, Contact, PageNotFound, Room, Services, Team, Testimonial, Help } from "./pages/index";
