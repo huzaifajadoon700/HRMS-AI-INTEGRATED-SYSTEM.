@@ -1,3 +1,4 @@
+// Updated: Improved booking confirmation clarity
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FiCalendar, FiUsers, FiCreditCard, FiArrowLeft, FiDownload, FiCheck, FiHome, FiDollarSign, FiPrinter, FiHash } from 'react-icons/fi';
