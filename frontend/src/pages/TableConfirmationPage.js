@@ -1,3 +1,4 @@
+// Updated: Improved table confirmation clarity
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { FiCalendar,  FiUsers, FiCheckCircle, FiDownload, FiArrowLeft, FiDollarSign, FiCreditCard, FiHash, FiUser,  FiPrinter, } from 'react-icons/fi';
