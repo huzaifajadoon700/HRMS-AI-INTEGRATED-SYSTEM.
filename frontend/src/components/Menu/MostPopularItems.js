@@ -15,8 +15,8 @@ const MostPopularItems = () => {
       if (imagePath.startsWith("http")) return imagePath;
       const cleanPath = imagePath.replace(/^\/+/, "");
       return cleanPath.includes("uploads")
-        ? `http://localhost:8080/${cleanPath}`
-        : `http://localhost:8080/uploads/${cleanPath}`;
+        ? `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`
+        : `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
     } catch (error) {
       console.error("Error formatting image URL:", error);
       return "/images/placeholder-food.jpg";
@@ -27,7 +27,7 @@ const MostPopularItems = () => {
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/menus");
+        const response = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/menus");
         // Get top 3 items with highest ratings/popularity
         const topItems = response.data
           .sort((a, b) => (b.rating || 4.5) - (a.rating || 4.5))

@@ -26,7 +26,7 @@ export default function OrderFood() {
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/menus');
+                const response = await axios.get('https://hrms-ai-integrated-system-production.up.railway.app/api/menus');
                 setMenuItems(response.data);
                 setFilteredItems(response.data);
                 

@@ -59,14 +59,14 @@ const OrderConfirmation = () => {
   const testBackendConnection = async () => {
     try {
       logInfo("Testing backend connection", {
-        url: 'http://localhost:8080/api/health',
+        url: 'https://hrms-ai-integrated-system-production.up.railway.app/api/health',
         timestamp: new Date().toISOString()
       });
       
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
       
-      const response = await fetch('http://localhost:8080/api/health', {
+      const response = await fetch('https://hrms-ai-integrated-system-production.up.railway.app/api/health', {
         method: 'GET',
         signal: controller.signal,
         headers: {

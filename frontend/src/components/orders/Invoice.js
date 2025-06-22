@@ -83,7 +83,7 @@ export default function Invoice() {
       console.log("Authorization token present:", !!token);
       console.log("Token:", token.substring(0, 15) + "...");
       
-      const response = await axios.get(`http://localhost:8080/api/orders/${currentOrderId}`, {
+      const response = await axios.get(`https://hrms-ai-integrated-system-production.up.railway.app/api/orders/${currentOrderId}`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'

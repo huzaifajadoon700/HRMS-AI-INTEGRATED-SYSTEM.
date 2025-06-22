@@ -1,7 +1,7 @@
 // src/api/rooms.ts
 export const fetchRooms = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/rooms");
+      const response = await fetch("https://hrms-ai-integrated-system-production.up.railway.app/api/rooms");
       return await response.json();
     } catch (error) {
       console.error("Error fetching rooms:", error);

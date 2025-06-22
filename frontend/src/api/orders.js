@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/orders"; // Backend URL
+const API_URL = "https://hrms-ai-integrated-system-production.up.railway.app/api/orders"; // Backend URL
 
 // ✅ Fetch menu items (from admin-side menus)
 export const fetchMenuItems = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/api/menus");
+    const response = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/menus");
     return response.data;
   } catch (error) {
     console.error("Error fetching menu:", error);

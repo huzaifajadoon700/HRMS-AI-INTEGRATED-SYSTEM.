@@ -23,7 +23,7 @@ const AdminViewTable = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8080/api/tables', {
+      const response = await axios.get('https://hrms-ai-integrated-system-production.up.railway.app/api/tables', {
         headers: { Authorization: `Bearer ${token}` }
       });
       

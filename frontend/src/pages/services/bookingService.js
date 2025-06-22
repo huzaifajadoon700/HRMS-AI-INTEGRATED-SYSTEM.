@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/api/bookings";
+const API_URL = "https://hrms-ai-integrated-system-production.up.railway.app/api/bookings";
 
 // Create a new booking
 export const createBooking = async (bookingData, token) => {

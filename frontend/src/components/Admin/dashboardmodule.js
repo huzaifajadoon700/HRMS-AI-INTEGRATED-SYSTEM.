@@ -51,7 +51,7 @@ export default function Dashboardmodule() {
         console.log("🔄 Fetching dashboard analytics...");
 
         // Fetch comprehensive analytics data from backend
-        const analyticsResponse = await axios.get("http://localhost:8080/api/admin/dashboard/analytics", {
+        const analyticsResponse = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/admin/dashboard/analytics", {
           headers: { Authorization: `Bearer ${token}` },
         });
 

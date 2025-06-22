@@ -20,8 +20,8 @@ const Rooms = () => {
       if (imagePath.startsWith("http")) return imagePath;
       const cleanPath = imagePath.replace(/^\/+/, "");
       return cleanPath.includes("uploads")
-        ? `http://localhost:8080/${cleanPath}`
-        : `http://localhost:8080/uploads/${cleanPath}`;
+        ? `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`
+        : `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
     } catch (error) {
       console.error("Error formatting image URL:", error);
       return "/images/placeholder-room.jpg";

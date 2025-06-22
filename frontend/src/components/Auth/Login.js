@@ -59,7 +59,7 @@ const AuthPage = () => {
         ? { email: formData.email, password: formData.password }
         : { name: formData.name, email: formData.email, password: formData.password };
 
-      const response = await fetch(`http://localhost:8080/auth${endpoint}`, {
+      const response = await fetch(`https://hrms-ai-integrated-system-production.up.railway.app/auth${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -96,7 +96,7 @@ const AuthPage = () => {
       // Clear previous user data before logging in
       localStorage.clear();
       
-      const res = await fetch("http://localhost:8080/auth/google", {
+      const res = await fetch("https://hrms-ai-integrated-system-production.up.railway.app/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: googleToken }),

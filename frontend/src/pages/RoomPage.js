@@ -58,9 +58,9 @@ const RoomPage = () => {
       if (imagePath.startsWith('http')) return imagePath;
       const cleanPath = imagePath.replace(/^\/+/, '');
       if (cleanPath.includes('uploads')) {
-        return `http://localhost:8080/${cleanPath}`;
+        return `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`;
       }
-      return `http://localhost:8080/uploads/${cleanPath}`;
+      return `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
     } catch (error) {
       console.error('Error formatting image URL:', error);
       return '/images/placeholder-room.jpg';
@@ -80,7 +80,7 @@ const RoomPage = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/rooms');
+        const response = await axios.get('https://hrms-ai-integrated-system-production.up.railway.app/api/rooms');
         setRooms(response.data);
       } catch (error) {
         setError('Failed to load rooms. Please try again.');
@@ -97,7 +97,7 @@ const RoomPage = () => {
   useEffect(() => {
     const fetchPopularRooms = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/rooms/popular?count=6');
+        const response = await axios.get('https://hrms-ai-integrated-system-production.up.railway.app/api/rooms/popular?count=6');
         if (response.data.success) {
           setPopularRooms(response.data.popularRooms);
         }
@@ -117,7 +117,7 @@ const RoomPage = () => {
       setRecommendationsLoading(true);
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/rooms/recommendations/${user.id}?count=8`,
+          `https://hrms-ai-integrated-system-production.up.railway.app/api/rooms/recommendations/${user.id}?count=8`,
           {
             headers: { Authorization: `Bearer ${user.token}` }
           }
@@ -142,7 +142,7 @@ const RoomPage = () => {
 
     try {
       await axios.post(
-        'http://localhost:8080/api/rooms/interactions',
+        'https://hrms-ai-integrated-system-production.up.railway.app/api/rooms/interactions',
         {
           userId: user.id,
           roomId,
@@ -329,7 +329,7 @@ const RoomPage = () => {
   // Check for double booking
   const checkRoomAvailability = async (roomId, checkInDate, checkOutDate) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/rooms/availability`, {
+      const response = await axios.get(`https://hrms-ai-integrated-system-production.up.railway.app/api/rooms/availability`, {
         params: {
           checkInDate,
           checkOutDate

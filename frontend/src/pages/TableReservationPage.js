@@ -113,8 +113,8 @@ const TableReservationPage = () => {
       if (imagePath.startsWith("http")) return imagePath;
       const cleanPath = imagePath.replace(/^\/+/, "");
       return cleanPath.includes("uploads")
-        ? `http://localhost:8080/${cleanPath}`
-        : `http://localhost:8080/uploads/${cleanPath}`;
+        ? `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`
+        : `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
     } catch (error) {
       console.error("Error formatting image URL:", error);
       return "/images/placeholder-table.jpg";
@@ -203,7 +203,7 @@ const TableReservationPage = () => {
       
       setAvailability({ ...availability, isChecking: true });
       
-      const response = await axios.get(`http://localhost:8080/api/tables/availability`, {
+      const response = await axios.get(`https://hrms-ai-integrated-system-production.up.railway.app/api/tables/availability`, {
         params: {
           reservationDate: formData.date,
           time: formData.time,
@@ -291,7 +291,7 @@ const TableReservationPage = () => {
 
       console.log("Sending reservation data:", reservationData);
 
-      const response = await axios.post('http://localhost:8080/api/reservations', reservationData, {
+      const response = await axios.post('https://hrms-ai-integrated-system-production.up.railway.app/api/reservations', reservationData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

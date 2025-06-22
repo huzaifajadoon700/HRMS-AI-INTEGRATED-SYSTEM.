@@ -17,11 +17,11 @@ export const getImageUrl = (imagePath, fallback = "/images/placeholder-food.jpg"
     
     // Check if it already includes uploads in the path
     if (cleanPath.includes('uploads')) {
-      return `http://localhost:8080/${cleanPath}`;
+      return `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`;
     }
     
     // Default to uploads folder
-    return `http://localhost:8080/uploads/${cleanPath}`;
+    return `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
     
   } catch (error) {
     console.error('Error formatting image URL:', error);

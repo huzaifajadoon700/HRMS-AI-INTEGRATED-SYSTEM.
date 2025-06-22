@@ -25,7 +25,7 @@ const TableReservation = () => {
 
   const fetchTables = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/tables");
+      const response = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/tables");
       setTables(response.data);
 
       // If user is logged in, also fetch recommendations
