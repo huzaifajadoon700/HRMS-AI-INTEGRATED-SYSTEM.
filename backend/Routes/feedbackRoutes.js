@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { submitFeedback, getFeedbackAnalytics, getUserFeedback } = require('../Controllers/feedbackController');
-const { ensureAuthenticated, ensureAdmin } = require('../Middlewares/auth');
+const { ensureAuthenticated, ensureAdmin } = require('../Middlewares/Auth');
 
 // User routes
 router.post('/', ensureAuthenticated, submitFeedback);
