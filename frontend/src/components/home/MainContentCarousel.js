@@ -78,7 +78,7 @@ const MainContentCarousel = () => {
               <FiHome />
             </div>
             <div className="btn-content">
-              <span className="btn-title">Book Room</span>
+              <span className="btn-title">BOOK ROOM</span>
               <span className="btn-subtitle">Luxury Stays</span>
             </div>
             <FiArrowRight className="btn-arrow" />
@@ -89,7 +89,7 @@ const MainContentCarousel = () => {
               <FiCoffee />
             </div>
             <div className="btn-content">
-              <span className="btn-title">Order Food</span>
+              <span className="btn-title">ORDER FOOD</span>
               <span className="btn-subtitle">Gourmet Cuisine</span>
             </div>
             <FiArrowRight className="btn-arrow" />
@@ -100,7 +100,7 @@ const MainContentCarousel = () => {
               <FiCalendar />
             </div>
             <div className="btn-content">
-              <span className="btn-title">Reserve Table</span>
+              <span className="btn-title">RESERVE TABLE</span>
               <span className="btn-subtitle">Fine Dining</span>
             </div>
             <FiArrowRight className="btn-arrow" />

@@ -8,7 +8,7 @@ const {
     deleteMenu,
     toggleAvailability,
 } = require('../Controllers/MenuController');
-const { ensureAuthenticated, ensureAdmin } = require('../Middlewares/auth');
+const { ensureAuthenticated, ensureAdmin } = require('../Middlewares/Auth');
 const upload = require('../Middlewares/uploadpic');
 
 // Public routes
