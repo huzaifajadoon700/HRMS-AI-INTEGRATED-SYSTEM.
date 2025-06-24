@@ -97,7 +97,7 @@ const RoomPage = () => {
   useEffect(() => {
     const fetchPopularRooms = async () => {
       try {
-        const response = await axios.get('https://hrms-ai-integrated-system-production.up.railway.app/api/rooms/popular?count=6');
+        const response = await axios.get('/api/rooms/popular?count=6');
         if (response.data.success) {
           setPopularRooms(response.data.popularRooms);
         }

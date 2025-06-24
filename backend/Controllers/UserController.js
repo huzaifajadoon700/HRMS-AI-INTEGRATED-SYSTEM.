@@ -1,7 +1,9 @@
+// UserController.js - Handles user-related operations
+
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
 
-// ✅ Get User Profile
+// Controller to get the authenticated user's profile
 exports.getProfile = async (req, res) => {
   try {
     const userId = req.user._id; // Get user ID from the authenticated request
@@ -11,11 +13,13 @@ exports.getProfile = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching profile", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching profile", error: error.message });
   }
 };
 
-// ✅ Get User by ID
+// Controller to get a user by their ID
 exports.getUserById = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -25,11 +29,13 @@ exports.getUserById = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching user", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching user", error: error.message });
   }
 };
 
-// ✅ Update User Profile
+// Controller to update the authenticated user's profile
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user._id; // Get user ID from the authenticated request
@@ -48,36 +54,43 @@ exports.updateProfile = async (req, res) => {
     await user.save();
     res.status(200).json({ message: "Profile updated successfully", user });
   } catch (error) {
-    res.status(500).json({ message: "Error updating profile", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating profile", error: error.message });
   }
 };
 
-// ✅ Update User Password
+// Controller to update the authenticated user's password
+// This endpoint allows users to securely change their password after verifying the current one.
 exports.updatePassword = async (req, res) => {
-    try {
-      console.log("Update Password Request Body:", req.body);
-      const userId = req.user._id; // From authentication middleware
-      const { currentPassword, newPassword } = req.body;
-  
-      const user = await User.findById(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      // Verify current password
-      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
-      if (!isPasswordValid) {
-        return res.status(400).json({ message: "Current password is incorrect" });
-      }
-  
-      // Hash and update new password
-      const hashedPassword = await bcrypt.hash(newPassword, 10);
-      user.password = hashedPassword;
-  
-      await user.save();
-      res.status(200).json({ message: "Password updated successfully" });
-    } catch (error) {
-      res.status(500).json({ message: "Error updating password", error: error.message });
+  try {
+    console.log("Update Password Request Body:", req.body);
+    const userId = req.user._id; // From authentication middleware
+    const { currentPassword, newPassword } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-  };
-  
+
+    // Verify current password
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+    if (!isPasswordValid) {
+      return res.status(400).json({ message: "Current password is incorrect" });
+    }
+
+    // Hash and update new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+
+    await user.save();
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error updating password", error: error.message });
+  }
+};
