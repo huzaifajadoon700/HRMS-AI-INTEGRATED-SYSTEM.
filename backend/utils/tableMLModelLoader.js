@@ -398,5 +398,11 @@ function listTableModelFiles() {
   return fs.readdirSync(path.join(__dirname, '../table_ml_models'));
 }
 
+// Utility function to count total dataset entries (for demonstration)
+function countDatasetEntries(dataset) {
+  return Array.isArray(dataset) ? dataset.length : 0;
+}
+
 module.exports = TableMLModelLoader;
 module.exports.listTableModelFiles = listTableModelFiles;
+module.exports.countDatasetEntries = countDatasetEntries;
