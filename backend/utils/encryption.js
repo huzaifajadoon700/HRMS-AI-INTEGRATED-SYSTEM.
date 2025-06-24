@@ -48,9 +48,15 @@ function decryptOrderData(orderData) {
   return decryptedData;
 }
 
+// Utility function to check if a string is encrypted (for demonstration)
+function isEncrypted(text) {
+  return typeof text === 'string' && text.includes(':') && text.length > 32;
+}
+
 module.exports = {
   encrypt,
   decrypt,
   encryptOrderData,
-  decryptOrderData
-}; 
+  decryptOrderData,
+  isEncrypted
+};

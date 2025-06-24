@@ -112,9 +112,14 @@ async function optimizeDeliveryRoute(orders) {
   });
 }
 
+// Utility function to format distance in a user-friendly way
+function formatDistance(km) {
+  return `${km.toFixed(2)} km`;
+}
+
 module.exports = {
   validateDeliveryZone,
   calculateDeliveryFee,
   estimateDeliveryTime,
   optimizeDeliveryRoute
-}; 
+};
