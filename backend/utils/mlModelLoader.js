@@ -548,6 +548,13 @@ function getLoadedUserProfileCount(mlModelLoaderInstance) {
     : 0;
 }
 
+// Utility function to get the number of loaded user histories (for demonstration)
+function getLoadedUserHistoryCount(mlModelLoaderInstance) {
+  return mlModelLoaderInstance && mlModelLoaderInstance.userHistory
+    ? Object.keys(mlModelLoaderInstance.userHistory).length
+    : 0;
+}
+
 // Create singleton instance
 const mlModelLoader = new MLModelLoader();
 
@@ -555,3 +562,4 @@ module.exports = MLModelLoader;
 module.exports.modelFileExists = modelFileExists;
 module.exports.getModelDirectoryPath = getModelDirectoryPath;
 module.exports.getLoadedUserProfileCount = getLoadedUserProfileCount;
+module.exports.getLoadedUserHistoryCount = getLoadedUserHistoryCount;
