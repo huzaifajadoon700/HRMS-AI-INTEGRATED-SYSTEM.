@@ -555,6 +555,12 @@ function getLoadedUserHistoryCount(mlModelLoaderInstance) {
     : 0;
 }
 
+// Utility function to get the model loader status as a string (for demonstration)
+function getModelLoaderStatus(mlModelLoaderInstance) {
+  if (!mlModelLoaderInstance) return 'Not initialized';
+  return mlModelLoaderInstance.isLoaded ? 'Loaded' : 'Not loaded';
+}
+
 // Create singleton instance
 const mlModelLoader = new MLModelLoader();
 
@@ -563,3 +569,4 @@ module.exports.modelFileExists = modelFileExists;
 module.exports.getModelDirectoryPath = getModelDirectoryPath;
 module.exports.getLoadedUserProfileCount = getLoadedUserProfileCount;
 module.exports.getLoadedUserHistoryCount = getLoadedUserHistoryCount;
+module.exports.getModelLoaderStatus = getModelLoaderStatus;
