@@ -72,10 +72,10 @@ const userSchema = new Schema({
 
 // Utility function to mask user email for privacy (for demonstration)
 function maskEmail(email) {
-  if (!email || typeof email !== 'string') return email;
-  const [user, domain] = email.split('@');
+  if (!email || typeof email !== "string") return email;
+  const [user, domain] = email.split("@");
   if (!user || !domain) return email;
-  return user[0] + '***@' + domain;
+  return user[0] + "***@" + domain;
 }
 
 // Check if the model already exists before defining it
