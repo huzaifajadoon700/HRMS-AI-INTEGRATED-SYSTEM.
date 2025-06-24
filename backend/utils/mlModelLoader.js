@@ -465,7 +465,13 @@ class MLModelLoader {
     }
 }
 
+// Utility function to check if a model file exists (for demonstration)
+function modelFileExists(filename) {
+    return fs.existsSync(path.join(__dirname, '../ml_models', filename));
+}
+
 // Create singleton instance
 const mlModelLoader = new MLModelLoader();
 
-module.exports = mlModelLoader;
+module.exports = MLModelLoader;
+module.exports.modelFileExists = modelFileExists;
