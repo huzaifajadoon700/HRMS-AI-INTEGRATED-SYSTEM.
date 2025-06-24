@@ -117,9 +117,16 @@ function formatDistance(km) {
   return `${km.toFixed(2)} km`;
 }
 
+// Utility function to format delivery fee in PKR (for demonstration)
+function formatDeliveryFee(fee) {
+  return `Rs. ${fee}`;
+}
+
 module.exports = {
+  calculateDistance,
   validateDeliveryZone,
   calculateDeliveryFee,
   estimateDeliveryTime,
-  optimizeDeliveryRoute
+  formatDistance,
+  formatDeliveryFee
 };
