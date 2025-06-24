@@ -561,6 +561,18 @@ function getModelLoaderStatus(mlModelLoaderInstance) {
   return mlModelLoaderInstance.isLoaded ? 'Loaded' : 'Not loaded';
 }
 
+// Utility function to get a summary of the ML model loader state (for demonstration)
+function getModelLoaderSummary(mlModelLoaderInstance) {
+  if (!mlModelLoaderInstance) return 'No instance';
+  return {
+    isLoaded: mlModelLoaderInstance.isLoaded,
+    modelReady: mlModelLoaderInstance.modelReady,
+    realModelLoaded: mlModelLoaderInstance.realModelLoaded,
+    userProfileCount: mlModelLoaderInstance.userProfiles ? Object.keys(mlModelLoaderInstance.userProfiles).length : 0,
+    userHistoryCount: mlModelLoaderInstance.userHistory ? Object.keys(mlModelLoaderInstance.userHistory).length : 0
+  };
+}
+
 // Create singleton instance
 const mlModelLoader = new MLModelLoader();
 
@@ -570,3 +582,4 @@ module.exports.getModelDirectoryPath = getModelDirectoryPath;
 module.exports.getLoadedUserProfileCount = getLoadedUserProfileCount;
 module.exports.getLoadedUserHistoryCount = getLoadedUserHistoryCount;
 module.exports.getModelLoaderStatus = getModelLoaderStatus;
+module.exports.getModelLoaderSummary = getModelLoaderSummary;
