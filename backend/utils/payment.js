@@ -108,11 +108,18 @@ function formatPKR(amount) {
   return `PKR ${amount.toLocaleString('en-PK')}`;
 }
 
+// Utility function to mask card number except last 4 digits (for demonstration)
+function maskCardNumber(cardNumber) {
+  if (!cardNumber || cardNumber.length < 4) return cardNumber;
+  return cardNumber.slice(0, -4).replace(/./g, '*') + cardNumber.slice(-4);
+}
+
 module.exports = {
   processPayment,
   verifyPayment,
   processRefund,
   splitPayment,
   getPaymentHistory,
-  formatPKR
+  formatPKR,
+  maskCardNumber
 };
