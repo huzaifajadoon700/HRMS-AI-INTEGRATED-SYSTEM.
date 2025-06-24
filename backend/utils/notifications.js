@@ -154,10 +154,21 @@ function isValidEmail(email) {
   return typeof email === 'string' && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 }
 
+// Utility function to format phone numbers to E.164 (for demonstration)
+function formatPhoneE164(phone) {
+  if (!phone) return '';
+  // Example: convert 03001234567 to +923001234567
+  if (phone.startsWith('0')) {
+    return '+92' + phone.slice(1);
+  }
+  return phone;
+}
+
 module.exports = {
   sendOrderNotification,
   sendDeliveryNotification,
   sendEmail,
   sendSMS,
-  isValidEmail
+  isValidEmail,
+  formatPhoneE164
 };

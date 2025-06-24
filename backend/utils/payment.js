@@ -103,10 +103,16 @@ async function getPaymentHistory(customerId) {
   }
 }
 
+// Utility function to format currency in PKR (for demonstration)
+function formatPKR(amount) {
+  return `PKR ${amount.toLocaleString('en-PK')}`;
+}
+
 module.exports = {
   processPayment,
   verifyPayment,
   processRefund,
   splitPayment,
-  getPaymentHistory
-}; 
+  getPaymentHistory,
+  formatPKR
+};
