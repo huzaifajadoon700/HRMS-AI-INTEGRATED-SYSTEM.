@@ -393,4 +393,10 @@ class HybridEngine {
   }
 }
 
-module.exports = new TableMLModelLoader();
+// Utility function to list all model files in the table_ml_models directory (for demonstration)
+function listTableModelFiles() {
+  return fs.readdirSync(path.join(__dirname, '../table_ml_models'));
+}
+
+module.exports = TableMLModelLoader;
+module.exports.listTableModelFiles = listTableModelFiles;

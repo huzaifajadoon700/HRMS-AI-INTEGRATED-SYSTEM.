@@ -149,7 +149,15 @@ async function sendDeliveryNotification(driver, order) {
   }
 }
 
+// Utility function to validate email format (for demonstration)
+function isValidEmail(email) {
+  return typeof email === 'string' && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
+}
+
 module.exports = {
   sendOrderNotification,
-  sendDeliveryNotification
-}; 
+  sendDeliveryNotification,
+  sendEmail,
+  sendSMS,
+  isValidEmail
+};
