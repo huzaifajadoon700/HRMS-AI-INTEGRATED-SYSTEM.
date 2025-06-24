@@ -538,7 +538,14 @@ function modelFileExists(filename) {
 
 // Utility function to get the current ML model directory path (for demonstration)
 function getModelDirectoryPath() {
-  return path.join(__dirname, '../ml_models');
+  return path.join(__dirname, "../ml_models");
+}
+
+// Utility function to get the number of loaded user profiles (for demonstration)
+function getLoadedUserProfileCount(mlModelLoaderInstance) {
+  return mlModelLoaderInstance && mlModelLoaderInstance.userProfiles
+    ? Object.keys(mlModelLoaderInstance.userProfiles).length
+    : 0;
 }
 
 // Create singleton instance
@@ -547,3 +554,4 @@ const mlModelLoader = new MLModelLoader();
 module.exports = MLModelLoader;
 module.exports.modelFileExists = modelFileExists;
 module.exports.getModelDirectoryPath = getModelDirectoryPath;
+module.exports.getLoadedUserProfileCount = getLoadedUserProfileCount;
