@@ -1,54 +1,74 @@
+/**
+ * Order Model for HRMS System
+ * Manages food orders, payment tracking, and delivery status
+ *
+ * @description Mongoose schema for order management with user references
+ * @version 1.0.0
+ */
+
 const mongoose = require("mongoose");
 
-const orderSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId, // Reference to the User model
-    ref: "User", // Reference to the User collection
-    required: true, // Every order must be associated with a user
-  },
-  items: [
-    {
-      menuItemId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Menu'
-        // Completely removed required field to fix mobile app issue
+const orderSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId, // Reference to the User model
+      ref: "User", // Reference to the User collection
+      required: true, // Every order must be associated with a user
+    },
+    items: [
+      {
+        menuItemId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Menu",
+          // Completely removed required field to fix mobile app issue
+        },
+        name: { type: String, required: true },
+        price: { type: Number, required: true },
+        quantity: { type: Number, required: true },
+        customizations: { type: String, default: "" },
+        addOns: [
+          {
+            name: String,
+            price: Number,
+          },
+        ],
       },
-      name: { type: String, required: true },
-      price: { type: Number, required: true },
-      quantity: { type: Number, required: true },
-      customizations: { type: String, default: '' },
-      addOns: [{
-        name: String,
-        price: Number
-      }]
+    ],
+    totalPrice: { type: Number, required: true },
+    deliveryFee: { type: Number, required: true },
+    deliveryAddress: { type: String, required: true },
+    deliveryLocation: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        required: true,
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+      },
     },
-  ],
-  totalPrice: { type: Number, required: true },
-  deliveryFee: { type: Number, required: true },
-  deliveryAddress: { type: String, required: true },
-  deliveryLocation: {
-    type: {
+    status: {
       type: String,
-      enum: ["Point"],
-      required: true,
+      enum: [
+        "pending",
+        "confirmed",
+        "preparing",
+        "out_for_delivery",
+        "delivered",
+        "canceled",
+      ],
+      default: "pending",
     },
-    coordinates: {
-      type: [Number],
-      required: true,
+    deliveryStatus: {
+      type: String,
+      enum: ["pending", "out_for_delivery", "delivered"],
+      default: "pending",
     },
+    estimatedDeliveryTime: { type: Date },
   },
-  status: {
-    type: String,
-    enum: ["pending", "confirmed", "preparing", "out_for_delivery", "delivered", "canceled"],
-    default: "pending",
-  },
-  deliveryStatus: {
-    type: String,
-    enum: ["pending", "out_for_delivery", "delivered"],
-    default: "pending",
-  },
-  estimatedDeliveryTime: { type: Date },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 // Add geospatial index for delivery location
 orderSchema.index({ deliveryLocation: "2dsphere" });
