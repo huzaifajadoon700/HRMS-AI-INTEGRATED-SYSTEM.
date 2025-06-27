@@ -1,3 +1,11 @@
+/**
+ * Payment Utility for HRMS System
+ * Stripe payment processing and transaction management
+ *
+ * @description Secure payment processing with Stripe API integration
+ * @version 1.0.0
+ */
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 async function processPayment(paymentMethod, amount) {
