@@ -1,3 +1,11 @@
+/**
+ * Global Styles for HRMS Frontend Application
+ * Layout utilities, responsive design, and theme variables
+ *
+ * @description Global CSS utilities and layout components
+ * @version 1.0.0
+ */
+
 /* Global Layout Styles */
 .page-container {
   padding-top: 80px;
@@ -144,4 +152,4 @@
   .card {
     padding: var(--spacing-md);
   }
-} 
+}
