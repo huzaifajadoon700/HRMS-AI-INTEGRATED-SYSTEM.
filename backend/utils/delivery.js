@@ -1,5 +1,14 @@
+/**
+ * Delivery Service for HRMS System
+ * Location tracking, distance calculation, and delivery management
+ *
+ * @description Delivery utilities with geolocation and route optimization
+ * @version 1.0.0
+ */
+
 const axios = require("axios");
 
+// Restaurant location configuration
 const RESTAURANT_COORDS = {
   lat: 34.1463, // Abbottabad coordinates
   lng: 73.2117,

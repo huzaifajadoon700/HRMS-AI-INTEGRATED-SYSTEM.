@@ -1,6 +1,15 @@
+/**
+ * Notification Service for HRMS System
+ * Email and SMS notifications for bookings, orders, and updates
+ *
+ * @description Multi-channel notification system with Nodemailer and Twilio
+ * @version 1.0.0
+ */
+
 const nodemailer = require("nodemailer");
 const twilio = require("twilio");
 
+// Initialize Twilio client for SMS notifications
 const twilioClient = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
