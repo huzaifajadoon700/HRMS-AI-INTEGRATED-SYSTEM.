@@ -1,11 +1,22 @@
+/**
+ * Orders API Service for HRMS Frontend
+ * Food ordering system API calls and menu management
+ *
+ * @description API service for restaurant orders and menu operations
+ * @version 1.0.0
+ */
+
 import axios from "axios";
 
-const API_URL = "https://hrms-ai-integrated-system-production.up.railway.app/api/orders"; // Backend URL
+const API_URL =
+  "https://hrms-ai-integrated-system-production.up.railway.app/api/orders"; // Backend URL
 
-// ✅ Fetch menu items (from admin-side menus)
+// ✅ Fetch menu items from restaurant database
 export const fetchMenuItems = async () => {
   try {
-    const response = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/menus");
+    const response = await axios.get(
+      "https://hrms-ai-integrated-system-production.up.railway.app/api/menus"
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching menu:", error);
@@ -26,22 +37,25 @@ export const fetchUserOrders = async (userId) => {
 
 // ✅ Place new order
 
-
 export const placeOrder = async (orderData) => {
-    try {
-        const response = await axios.post(API_URL, orderData);
-        return response.data;
-    } catch (error) {
-        console.error("Error placing order:", error.response ? error.response.data : error.message);
-        throw error;
-    }
+  try {
+    const response = await axios.post(API_URL, orderData);
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error placing order:",
+      error.response ? error.response.data : error.message
+    );
+    throw error;
+  }
 };
-
 
 // ✅ Update order before confirming
 export const updateOrder = async (orderId, updatedItems) => {
   try {
-    const response = await axios.put(`${API_URL}/${orderId}`, { items: updatedItems });
+    const response = await axios.put(`${API_URL}/${orderId}`, {
+      items: updatedItems,
+    });
     return response.data;
   } catch (error) {
     console.error("Error updating order:", error);
