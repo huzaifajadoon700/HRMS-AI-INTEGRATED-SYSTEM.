@@ -44,4 +44,33 @@ yarn-error.log*
 
 # Cache
 .cache/
-.npm/ 
+.npm/
+
+# Python files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ML Models (if large)
+*.pkl
+*.joblib
+*.h5
+*.pb
+
+# Database files
+*.sqlite
+*.db
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Test coverage
+coverage/
+.coverage
+
+# Temporary files
+temp/
+tmp/

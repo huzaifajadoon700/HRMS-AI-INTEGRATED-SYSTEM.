@@ -1,6 +1,7 @@
 {
-  "name": "practice",
+  "name": "hrms-frontend",
   "version": "0.1.0",
+  "description": "HRMS AI Integrated System - Frontend Application",
   "private": true,
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.4.0",

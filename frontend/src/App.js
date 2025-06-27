@@ -1,7 +1,32 @@
+/**
+ * HRMS AI Integrated System - Main Application Component
+ *
+ * @description Root component that handles routing, authentication, and layout
+ * @version 1.0.0
+ * @author HRMS Development Team
+ */
+
 // Updated: Improved app structure clarity
 import React from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
-import { Home, Booking, AboutUs, Contact, PageNotFound, Room, Services, Team, Testimonial, Help } from "./pages/index";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
+import {
+  Home,
+  Booking,
+  AboutUs,
+  Contact,
+  PageNotFound,
+  Room,
+  Services,
+  Team,
+  Testimonial,
+  Help,
+} from "./pages/index";
 import Header from "./components/common/Header";
 import Footer from "./components/layout/Footer";
 import LoginPage from "./components/Auth/Login";
@@ -28,10 +53,10 @@ import Profile from "./pages/Profile";
 import Feedback from "./components/User/Feedback";
 import "./styles/simple-theme.css";
 import "./styles/global.css";
-import BookingPage from './pages/BookingPage';
+import BookingPage from "./pages/BookingPage";
 import BookingConfirmation from "./pages/BookingConfirmation";
 import OrderTracking from "./pages/OrderTracking";
-import { Toaster } from 'react-hot-toast';
+import { Toaster } from "react-hot-toast";
 import PersonalizedRecommendations from "./components/recommendations/PersonalizedRecommendations";
 
 // Layout Component for Header and Footer
@@ -41,9 +66,7 @@ const Layout = ({ children }) => {
   return (
     <>
       {!excludeHeaderFooter && <Header />}
-      <main className="main-content">
-        {children}
-      </main>
+      <main className="main-content">{children}</main>
       {!excludeHeaderFooter && <Footer />}
     </>
   );
@@ -55,8 +78,6 @@ const AuthenticatedRoute = ({ children }) => {
   return token ? children : <Navigate to="/login" replace />;
 };
 
-
-
 function App() {
   return (
     <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
@@ -65,54 +86,267 @@ function App() {
         toastOptions={{
           duration: 3000,
           style: {
-            background: 'rgba(17, 34, 64, 0.9)',
-            color: '#f0f4fc',
-            border: '1px solid rgba(100, 255, 218, 0.1)',
+            background: "rgba(17, 34, 64, 0.9)",
+            color: "#f0f4fc",
+            border: "1px solid rgba(100, 255, 218, 0.1)",
           },
         }}
       />
       <Router>
         <Routes>
-          <Route path="/" element={<Layout><Home /></Layout>} />
-          <Route path="/booking" element={<Layout><Booking /></Layout>} />
-          <Route path="/about" element={<Layout><AboutUs /></Layout>} />
-          <Route path="/contact" element={<Layout><Contact /></Layout>} />
-          <Route path="/rooms" element={<Layout><Room /></Layout>} />
-          <Route path="/services" element={<Layout><Services /></Layout>} />
-          <Route path="/team" element={<Layout><Team /></Layout>} />
-          <Route path="/testimonial" element={<Layout><Testimonial /></Layout>} />
-          <Route path="/help" element={<Layout><Help /></Layout>} />
+          <Route
+            path="/"
+            element={
+              <Layout>
+                <Home />
+              </Layout>
+            }
+          />
+          <Route
+            path="/booking"
+            element={
+              <Layout>
+                <Booking />
+              </Layout>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <Layout>
+                <AboutUs />
+              </Layout>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <Layout>
+                <Contact />
+              </Layout>
+            }
+          />
+          <Route
+            path="/rooms"
+            element={
+              <Layout>
+                <Room />
+              </Layout>
+            }
+          />
+          <Route
+            path="/services"
+            element={
+              <Layout>
+                <Services />
+              </Layout>
+            }
+          />
+          <Route
+            path="/team"
+            element={
+              <Layout>
+                <Team />
+              </Layout>
+            }
+          />
+          <Route
+            path="/testimonial"
+            element={
+              <Layout>
+                <Testimonial />
+              </Layout>
+            }
+          />
+          <Route
+            path="/help"
+            element={
+              <Layout>
+                <Help />
+              </Layout>
+            }
+          />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/dashboard" element={<Layout><Dashboard /></Layout>} />
-          <Route path="/book-room" element={<Layout><BookRoom /></Layout>} />
-          <Route path="/order-food" element={<Layout><OrderFood /></Layout>} />
-          <Route path="/cart" element={<Layout><Cart /></Layout>} />
-          <Route path="/my-orders" element={<Layout><MyOrders /></Layout>} />
-          <Route path="/invoice/:orderId" element={<Layout><Invoice /></Layout>} />
-          <Route path="/my-bookings" element={<Layout><MyBookings /></Layout>} />
-          <Route path="/my-reservations" element={<Layout><MyReservations /></Layout>} />
-          <Route path="/admin-orders" element={<Layout><AdminOrders /></Layout>} />
-          <Route path="/delivery-tracking" element={<Layout><DeliveryTrackingPage /></Layout>} />
-          <Route path="/reserve-table" element={<Layout><ReserveTable /></Layout>} />
-          <Route path="/table-recommendations" element={<Layout><TableRecommendations /></Layout>} />
-          <Route path="/table-reservation" element={<Layout><TableReservationPage /></Layout>} />
-          <Route path="/table-confirmation" element={<Layout><TableConfirmationPage /></Layout>} />
-          <Route path="/profile" element={<Layout><Profile /></Layout>} />
-          <Route path="/feedback" element={<Layout><Feedback /></Layout>} />
-          <Route path="/booking-page/:id" element={<Layout><BookingPage /></Layout>} />
-          <Route path="/booking-confirmation" element={<Layout><BookingConfirmation /></Layout>} />
-          <Route path="/order-confirmation" element={
-            <AuthenticatedRoute>
-              <Layout><OrderConfirmation /></Layout>
-            </AuthenticatedRoute>
-          } />
-          <Route path="/track-order/:orderId" element={
-            <AuthenticatedRoute>
-              <Layout><OrderTracking /></Layout>
-            </AuthenticatedRoute>
-          } />
-          <Route path="/recommendations" element={<Layout><PersonalizedRecommendations /></Layout>} />
-          <Route path="*" element={<Layout><PageNotFound /></Layout>} />
+          <Route
+            path="/dashboard"
+            element={
+              <Layout>
+                <Dashboard />
+              </Layout>
+            }
+          />
+          <Route
+            path="/book-room"
+            element={
+              <Layout>
+                <BookRoom />
+              </Layout>
+            }
+          />
+          <Route
+            path="/order-food"
+            element={
+              <Layout>
+                <OrderFood />
+              </Layout>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <Layout>
+                <Cart />
+              </Layout>
+            }
+          />
+          <Route
+            path="/my-orders"
+            element={
+              <Layout>
+                <MyOrders />
+              </Layout>
+            }
+          />
+          <Route
+            path="/invoice/:orderId"
+            element={
+              <Layout>
+                <Invoice />
+              </Layout>
+            }
+          />
+          <Route
+            path="/my-bookings"
+            element={
+              <Layout>
+                <MyBookings />
+              </Layout>
+            }
+          />
+          <Route
+            path="/my-reservations"
+            element={
+              <Layout>
+                <MyReservations />
+              </Layout>
+            }
+          />
+          <Route
+            path="/admin-orders"
+            element={
+              <Layout>
+                <AdminOrders />
+              </Layout>
+            }
+          />
+          <Route
+            path="/delivery-tracking"
+            element={
+              <Layout>
+                <DeliveryTrackingPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/reserve-table"
+            element={
+              <Layout>
+                <ReserveTable />
+              </Layout>
+            }
+          />
+          <Route
+            path="/table-recommendations"
+            element={
+              <Layout>
+                <TableRecommendations />
+              </Layout>
+            }
+          />
+          <Route
+            path="/table-reservation"
+            element={
+              <Layout>
+                <TableReservationPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/table-confirmation"
+            element={
+              <Layout>
+                <TableConfirmationPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <Layout>
+                <Profile />
+              </Layout>
+            }
+          />
+          <Route
+            path="/feedback"
+            element={
+              <Layout>
+                <Feedback />
+              </Layout>
+            }
+          />
+          <Route
+            path="/booking-page/:id"
+            element={
+              <Layout>
+                <BookingPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/booking-confirmation"
+            element={
+              <Layout>
+                <BookingConfirmation />
+              </Layout>
+            }
+          />
+          <Route
+            path="/order-confirmation"
+            element={
+              <AuthenticatedRoute>
+                <Layout>
+                  <OrderConfirmation />
+                </Layout>
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="/track-order/:orderId"
+            element={
+              <AuthenticatedRoute>
+                <Layout>
+                  <OrderTracking />
+                </Layout>
+              </AuthenticatedRoute>
+            }
+          />
+          <Route
+            path="/recommendations"
+            element={
+              <Layout>
+                <PersonalizedRecommendations />
+              </Layout>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <Layout>
+                <PageNotFound />
+              </Layout>
+            }
+          />
         </Routes>
         <ToastContainer
           position="top-right"
