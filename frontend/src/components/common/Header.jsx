@@ -1,8 +1,23 @@
+/**
+ * Header Component for HRMS Frontend
+ * Navigation bar with user authentication, cart, and responsive design
+ *
+ * @description Main navigation component with role-based menu items
+ * @version 1.0.0
+ */
+
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar, Nav, Container, Button, Dropdown } from "react-bootstrap";
 import { BsCart } from "react-icons/bs";
-import { FiUser, FiShoppingBag, FiCalendar, FiHome, FiLogOut, FiLayout } from "react-icons/fi";
+import {
+  FiUser,
+  FiShoppingBag,
+  FiCalendar,
+  FiHome,
+  FiLogOut,
+  FiLayout,
+} from "react-icons/fi";
 import { BiMessageSquare } from "react-icons/bi";
 import { navList } from "../data/Data";
 import "../../styles/simple-theme.css";
@@ -58,7 +73,7 @@ export default function Header() {
     setUserRole(null);
 
     // Dispatch custom event to update header
-    window.dispatchEvent(new Event('authStateChanged'));
+    window.dispatchEvent(new Event("authStateChanged"));
 
     navigate("/login", { replace: true });
   };
@@ -107,11 +122,7 @@ export default function Header() {
               Help
             </Nav.Link>
             {userName && (
-              <Nav.Link
-                as={Link}
-                to="/feedback"
-                className="nav-link"
-              >
+              <Nav.Link as={Link} to="/feedback" className="nav-link">
                 <BiMessageSquare className="me-1" />
                 Feedback
               </Nav.Link>
@@ -119,16 +130,20 @@ export default function Header() {
           </Nav>
 
           <div className="d-flex align-items-center gap-4 auth-section">
-            <Link to="/cart" className="cart-icon position-relative text-decoration-none">
+            <Link
+              to="/cart"
+              className="cart-icon position-relative text-decoration-none"
+            >
               <BsCart size={20} className="text-light" />
-              {cartItems > 0 && (
-                <span className="cart-badge">{cartItems}</span>
-              )}
+              {cartItems > 0 && <span className="cart-badge">{cartItems}</span>}
             </Link>
 
             {userName ? (
               <Dropdown>
-                <Dropdown.Toggle variant="link" className="user-greeting d-flex align-items-center gap-2">
+                <Dropdown.Toggle
+                  variant="link"
+                  className="user-greeting d-flex align-items-center gap-2"
+                >
                   <FiUser size={18} className="text-light" />
                   <span className="text-light">{userName}</span>
                 </Dropdown.Toggle>
@@ -145,7 +160,11 @@ export default function Header() {
                   </div>
 
                   {userRole === "admin" && (
-                    <Dropdown.Item as={Link} to="/dashboard" className="admin-item">
+                    <Dropdown.Item
+                      as={Link}
+                      to="/dashboard"
+                      className="admin-item"
+                    >
                       <FiLayout className="dropdown-icon" />
                       Dashboard
                     </Dropdown.Item>
