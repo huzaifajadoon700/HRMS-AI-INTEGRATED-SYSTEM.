@@ -1,49 +1,69 @@
-import React from 'react';
-import { Card } from 'react-bootstrap';
-import { FiStar, FiMapPin, FiClock, FiUsers, FiWifi, FiCoffee, FiTv, FiCar } from 'react-icons/fi';
-import './ModernCard.css';
+/**
+ * Modern Card Component for HRMS Frontend
+ * Reusable card component for rooms, food items, and services
+ *
+ * @description Flexible card component with customizable layouts and actions
+ * @version 1.0.0
+ */
 
-const ModernCard = ({ 
-  item, 
-  type = 'food', 
-  onAction, 
-  actionText = 'Select',
+import React from "react";
+import { Card } from "react-bootstrap";
+import {
+  FiStar,
+  FiMapPin,
+  FiClock,
+  FiUsers,
+  FiWifi,
+  FiCoffee,
+  FiTv,
+  FiCar,
+} from "react-icons/fi";
+import "./ModernCard.css";
+
+const ModernCard = ({
+  item,
+  type = "food",
+  onAction,
+  actionText = "Select",
   showRating = true,
   showPrice = true,
-  className = '',
-  size = 'medium' // small, medium, large
+  className = "",
+  size = "medium", // small, medium, large
 }) => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) {
       const placeholders = {
-        food: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400',
-        room: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400',
-        table: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'
+        food: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400",
+        room: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400",
+        table:
+          "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400",
       };
       return placeholders[type] || placeholders.food;
     }
-    if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:8080${imagePath.startsWith('/') ? imagePath : '/' + imagePath}`;
+    if (imagePath.startsWith("http")) return imagePath;
+    return `http://localhost:8080${
+      imagePath.startsWith("/") ? imagePath : "/" + imagePath
+    }`;
   };
 
   const getAmenityIcon = (amenity) => {
     const icons = {
-      'wifi': <FiWifi />,
-      'coffee': <FiCoffee />,
-      'tv': <FiTv />,
-      'parking': <FiCar />,
-      'ac': '❄️',
-      'balcony': '🏞️',
-      'minibar': '🍷'
+      wifi: <FiWifi />,
+      coffee: <FiCoffee />,
+      tv: <FiTv />,
+      parking: <FiCar />,
+      ac: "❄️",
+      balcony: "🏞️",
+      minibar: "🍷",
     };
-    return icons[amenity.toLowerCase()] || '✨';
+    return icons[amenity.toLowerCase()] || "✨";
   };
 
   const renderStars = (rating) => {
     const stars = [];
     const fullStars = Math.floor(rating || 0);
     const hasHalfStar = (rating || 0) % 1 !== 0;
-    
+
     for (let i = 0; i < 5; i++) {
       if (i < fullStars) {
         stars.push(<FiStar key={i} className="star filled" />);
@@ -57,7 +77,7 @@ const ModernCard = ({
   };
 
   const formatPrice = (price) => {
-    if (!price) return 'Price on request';
+    if (!price) return "Price on request";
     return `Rs. ${price.toLocaleString()}`;
   };
 
@@ -74,7 +94,7 @@ const ModernCard = ({
             e.target.onerror = null;
           }}
         />
-        
+
         {/* Overlay Elements */}
         <div className="modern-card-overlay">
           {/* Status Badge */}
@@ -83,13 +103,15 @@ const ModernCard = ({
               {item.status}
             </div>
           )}
-          
+
           {/* Price Badge */}
           {showPrice && item.price && (
             <div className="price-badge">
               {formatPrice(item.price)}
-              {type === 'room' && <span className="price-period">/night</span>}
-              {type === 'table' && <span className="price-period">/person</span>}
+              {type === "room" && <span className="price-period">/night</span>}
+              {type === "table" && (
+                <span className="price-period">/person</span>
+              )}
             </div>
           )}
         </div>
@@ -105,7 +127,7 @@ const ModernCard = ({
           <h3 className="modern-card-title">
             {item.name || item.roomType || item.tableName}
           </h3>
-          
+
           {/* Rating */}
           {showRating && (
             <div className="rating-container">
@@ -122,15 +144,14 @@ const ModernCard = ({
         {/* Description */}
         {item.description && (
           <p className="modern-card-description">
-            {item.description.length > 100 
-              ? `${item.description.substring(0, 100)}...` 
-              : item.description
-            }
+            {item.description.length > 100
+              ? `${item.description.substring(0, 100)}...`
+              : item.description}
           </p>
         )}
 
         {/* Type-specific content */}
-        {type === 'food' && (
+        {type === "food" && (
           <div className="food-details">
             {item.cuisine && (
               <div className="detail-item">
@@ -153,7 +174,7 @@ const ModernCard = ({
           </div>
         )}
 
-        {type === 'room' && (
+        {type === "room" && (
           <div className="room-details">
             {item.capacity && (
               <div className="detail-item">
@@ -172,7 +193,9 @@ const ModernCard = ({
                     </span>
                   ))}
                   {item.amenities.length > 4 && (
-                    <span className="amenity-more">+{item.amenities.length - 4} more</span>
+                    <span className="amenity-more">
+                      +{item.amenities.length - 4} more
+                    </span>
                   )}
                 </div>
               </div>
@@ -180,7 +203,7 @@ const ModernCard = ({
           </div>
         )}
 
-        {type === 'table' && (
+        {type === "table" && (
           <div className="table-details">
             {item.capacity && (
               <div className="detail-item">
@@ -205,15 +228,16 @@ const ModernCard = ({
 
         {/* Action Button */}
         {onAction && (
-          <button 
+          <button
             className="modern-card-action-btn"
             onClick={() => onAction(item)}
-            disabled={item.status === 'unavailable' || item.availability === false}
-          >
-            {item.status === 'unavailable' || item.availability === false 
-              ? 'Unavailable' 
-              : actionText
+            disabled={
+              item.status === "unavailable" || item.availability === false
             }
+          >
+            {item.status === "unavailable" || item.availability === false
+              ? "Unavailable"
+              : actionText}
           </button>
         )}
       </Card.Body>

@@ -1,3 +1,12 @@
+/**
+ * Data Configuration for HRMS Frontend
+ * Navigation menus, service lists, and static content data
+ *
+ * @description Static data exports for UI components and navigation
+ * @version 1.0.0
+ */
+
+// Navigation menu configuration
 export const navList = [
   {
     id: 1,
@@ -28,8 +37,8 @@ export const navList = [
         id: 42,
         path: "/my-reservations",
         text: "My Reservations",
-      }
-    ]
+      },
+    ],
   },
   {
     id: 5,
@@ -86,7 +95,7 @@ export const carouselData = [
     subtitle: "Your Perfect Stay Awaits",
     btn1: "Book Room",
     btn2: "Reserve Table",
-  }
+  },
 ];
 export const about = [
   {
