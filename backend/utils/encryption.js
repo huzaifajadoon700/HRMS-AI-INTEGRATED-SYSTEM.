@@ -1,9 +1,18 @@
+/**
+ * Encryption Utility for HRMS System
+ * Provides secure data encryption and decryption functionality
+ *
+ * @description AES-256-CBC encryption for sensitive data protection
+ * @version 1.0.0
+ */
+
 const crypto = require("crypto");
 
+// Encryption configuration constants
 const ENCRYPTION_KEY =
   process.env.ENCRYPTION_KEY || "your-secret-key-32-chars-long!!";
-const IV_LENGTH = 16;
-const ALGORITHM = "aes-256-cbc";
+const IV_LENGTH = 16; // Initialization vector length
+const ALGORITHM = "aes-256-cbc"; // Advanced Encryption Standard
 
 function encrypt(text) {
   const iv = crypto.randomBytes(IV_LENGTH);

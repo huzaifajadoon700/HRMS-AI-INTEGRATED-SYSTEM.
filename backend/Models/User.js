@@ -1,3 +1,11 @@
+/**
+ * User Model for HRMS System
+ * Handles user authentication, profile management, and preferences
+ *
+ * @description Mongoose schema for user data with authentication support
+ * @version 1.0.0
+ */
+
 const mongoose = require("mongoose");
 
 // TODO: Add user role field for future role-based access control
