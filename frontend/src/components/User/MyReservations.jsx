@@ -40,7 +40,8 @@ const MyReservations = () => {
 
     try {
       setLoading(true);
-      const response = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/reservations/user", {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/reservations/user`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       console.log("Raw response data:", response.data); // Debug log
@@ -106,10 +107,11 @@ const MyReservations = () => {
     
     try {
       setLoading(true);
-      await axios.delete(`https://hrms-ai-integrated-system-production.up.railway.app/api/reservations/${reservationId}`, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      await axios.delete(`${apiUrl}/reservations/${reservationId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      
+
       toast.success("Reservation cancelled successfully!");
       // Refresh the reservations list
       fetchReservations();
@@ -390,7 +392,7 @@ const MyReservations = () => {
                 <FiDollarSign />
               </div>
               <div className="stat-content">
-                <h3>${reservations.reduce((sum, r) => sum + (r.totalPrice || 0), 0).toFixed(0)}</h3>
+                <h3>Rs. {reservations.reduce((sum, r) => sum + (r.totalPrice || 0), 0).toLocaleString('en-PK')}</h3>
                 <p>Total Spent</p>
               </div>
             </div>
@@ -542,7 +544,7 @@ const MyReservations = () => {
                           </div>
                           <div className="detail-content">
                             <label>Total Amount</label>
-                            <span>${reservation.totalPrice}</span>
+                            <span>Rs. {reservation.totalPrice?.toLocaleString('en-PK') || '0'}</span>
                           </div>
                         </div>
 

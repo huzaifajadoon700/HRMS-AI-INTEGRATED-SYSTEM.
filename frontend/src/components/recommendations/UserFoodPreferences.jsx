@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Alert, Badge } from 'react-bootstrap';
 import { FiSettings, FiSave, FiRefreshCw, FiUser } from 'react-icons/fi';
 import { recommendationHelpers } from '../../api/recommendations';
+import { apiConfig } from '../../config/api';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import './UserFoodPreferences.css';
@@ -64,7 +65,7 @@ const UserFoodPreferences = ({ userId = null, onPreferencesUpdate }) => {
       setLoading(true);
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `http://localhost:8080/api/users/${currentUserId}`,
+        `${apiConfig.endpoints.user}s/${currentUserId}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -98,7 +99,7 @@ const UserFoodPreferences = ({ userId = null, onPreferencesUpdate }) => {
       const token = localStorage.getItem('token');
       
       await axios.put(
-        `http://localhost:8080/api/users/${currentUserId}/preferences`,
+        `${apiConfig.endpoints.user}s/${currentUserId}/preferences`,
         { foodPreferences: preferences },
         {
           headers: { Authorization: `Bearer ${token}` }

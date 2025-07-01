@@ -5,7 +5,23 @@ const Reservation = require('../Models/Reservations');
 const addTable = async (req, res) => {
   try {
     const { tableName, tableType, capacity, status, description } = req.body;
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
+    // Handle image upload
+    let image = null;
+    if (req.file) {
+      if (req.file.filename) {
+        // Disk storage (development)
+        image = `/uploads/${req.file.filename}`;
+        console.log('Development table upload - saved to disk:', image);
+      } else {
+        // Memory storage (production) - don't save image path
+        console.log('Production environment detected - table file upload not supported on serverless');
+        image = null;
+      }
+    } else if (req.body.imageUrl) {
+      // Handle image URL
+      image = req.body.imageUrl;
+      console.log('Table image URL provided:', image);
+    }
 
     const newTable = new Table({
       tableName,
@@ -144,9 +160,11 @@ const updateTable = async (req, res) => {
       description: description || undefined,
     };
 
-    // Only update image if a new one is provided
+    // Handle image update
     if (image) {
       updateData.image = image;
+    } else if (req.body.imageUrl) {
+      updateData.image = req.body.imageUrl;
     }
 
     const updatedTable = await Table.findByIdAndUpdate(

@@ -174,16 +174,88 @@ const getTableRecommendations = async (req, res) => {
       timeSlot: validatedTimeSlot
     };
 
-    // Get recommendations from ML model
-    const mlRecommendations = tableMLLoader.getRecommendations(
-      validatedUserId,
-      context,
-      parseInt(numRecommendations)
-    );
+    // Always get available tables first as base data
+    const allAvailableTables = await Table.find({ status: 'Available' }).sort({ avgRating: -1, totalBookings: -1 });
 
-    // Enrich recommendations with table details using enhanced matching
+    if (allAvailableTables.length === 0) {
+      return res.status(200).json({
+        success: true,
+        recommendations: [],
+        cached: false,
+        fallback: true,
+        message: 'No tables available at the moment'
+      });
+    }
+
+    let mlRecommendations = [];
+    let usingMLModel = false;
+
+    // Try to get recommendations from ML model
+    try {
+      if (tableMLLoader.isLoaded()) {
+        mlRecommendations = tableMLLoader.getRecommendations(
+          validatedUserId,
+          context,
+          parseInt(numRecommendations)
+        );
+        usingMLModel = true;
+        console.log(`🤖 ML Model provided ${mlRecommendations.length} recommendations`);
+      }
+    } catch (mlError) {
+      console.log('⚠️ ML model failed, using smart fallback:', mlError.message);
+    }
+
+    // If ML model didn't provide enough recommendations, use smart matching
+    if (mlRecommendations.length < parseInt(numRecommendations)) {
+      console.log(`🔄 Supplementing with smart matching (need ${parseInt(numRecommendations) - mlRecommendations.length} more)`);
+
+      // Smart table matching based on context and preferences
+      const matchCriteria = { status: 'Available' };
+
+      // Match capacity preference (within reasonable range)
+      if (validatedPartySize) {
+        matchCriteria.capacity = {
+          $gte: Math.max(1, validatedPartySize - 1),
+          $lte: validatedPartySize + 2
+        };
+      }
+
+      // Match ambiance for occasion
+      if (validatedOccasion === 'Romantic') {
+        matchCriteria.ambiance = { $in: ['Intimate', 'Romantic', 'Quiet'] };
+      } else if (validatedOccasion === 'Business') {
+        matchCriteria.ambiance = { $in: ['Formal', 'Quiet'] };
+      } else if (validatedOccasion === 'Celebration') {
+        matchCriteria.ambiance = { $in: ['Lively', 'Social'] };
+      }
+
+      const smartMatchedTables = await Table.find(matchCriteria).sort({ avgRating: -1, totalBookings: -1 });
+      const tablesToUse = smartMatchedTables.length > 0 ? smartMatchedTables : allAvailableTables;
+
+      // Get existing table IDs from ML recommendations
+      const existingTableIds = new Set(mlRecommendations.map(rec => rec.tableId));
+
+      // Add smart recommendations for missing slots
+      const additionalTables = tablesToUse
+        .filter(table => !existingTableIds.has(table._id.toString()))
+        .slice(0, parseInt(numRecommendations) - mlRecommendations.length);
+
+      // Convert additional tables to recommendation format
+      const additionalRecommendations = additionalTables.map((table, index) => ({
+        tableId: table._id.toString(),
+        score: usingMLModel ? 0.6 + (Math.random() * 0.2) : (additionalTables.length - index) / additionalTables.length,
+        reason: usingMLModel ? 'smart_matching' : 'popularity',
+        confidence: 'medium',
+        rank: mlRecommendations.length + index + 1,
+        explanation: `Great table for ${validatedOccasion.toLowerCase()} dining`
+      }));
+
+      mlRecommendations = [...mlRecommendations, ...additionalRecommendations];
+    }
+
+    // Enrich recommendations with table details
     const enrichedRecommendations = await Promise.all(
-      mlRecommendations.map(async (rec, index) => {
+      mlRecommendations.slice(0, parseInt(numRecommendations)).map(async (rec, index) => {
         let table = null;
 
         // Enhanced table matching logic
@@ -192,42 +264,9 @@ const getTableRecommendations = async (req, res) => {
           table = await Table.findById(rec.tableId);
         }
 
+        // Fallback to finding table by index if direct match fails
         if (!table) {
-          // Smart table matching based on context and preferences
-          const matchCriteria = {
-            status: 'Available'
-          };
-
-          // Match capacity preference (within reasonable range)
-          if (validatedPartySize) {
-            matchCriteria.capacity = {
-              $gte: Math.max(1, validatedPartySize - 1),
-              $lte: validatedPartySize + 2
-            };
-          }
-
-          // Match ambiance for occasion
-          if (validatedOccasion === 'Romantic') {
-            matchCriteria.ambiance = { $in: ['Intimate', 'Romantic', 'Quiet'] };
-          } else if (validatedOccasion === 'Business') {
-            matchCriteria.ambiance = { $in: ['Formal', 'Quiet'] };
-          } else if (validatedOccasion === 'Celebration') {
-            matchCriteria.ambiance = { $in: ['Lively', 'Social'] };
-          }
-
-          // Find best matching table
-          const matchingTables = await Table.find(matchCriteria).sort({ avgRating: -1, totalBookings: -1 });
-
-          if (matchingTables.length > 0) {
-            // Use index to distribute recommendations across different tables
-            table = matchingTables[index % matchingTables.length];
-          }
-        }
-
-        // Final fallback to any available table
-        if (!table) {
-          const availableTables = await Table.find({ status: 'Available' }).sort({ avgRating: -1 });
-          table = availableTables[index % availableTables.length] || availableTables[0];
+          table = allAvailableTables[index % allAvailableTables.length];
           if (!table) return null;
         }
 
@@ -418,23 +457,56 @@ const getUserTableHistory = async (req, res) => {
 const getPopularTables = async (req, res) => {
   try {
     const { limit = 10 } = req.query;
+    const requestedLimit = parseInt(limit);
 
-    const popularTables = await Table.find({ status: 'Available' })
+    // First try to get available tables
+    let popularTables = await Table.find({ status: 'Available' })
       .sort({ avgRating: -1, totalBookings: -1 })
-      .limit(parseInt(limit));
+      .limit(requestedLimit * 2); // Get more to ensure we have enough
+
+    // If we don't have enough available tables, supplement with all tables
+    if (popularTables.length < requestedLimit) {
+      console.log(`⚠️ Only ${popularTables.length} available tables, supplementing with all tables`);
+
+      const allTables = await Table.find({})
+        .sort({ avgRating: -1, totalBookings: -1 })
+        .limit(requestedLimit * 2);
+
+      // Get existing IDs to avoid duplicates
+      const existingIds = new Set(popularTables.map(table => table._id.toString()));
+
+      // Add non-duplicate tables
+      const additionalTables = allTables.filter(table =>
+        !existingIds.has(table._id.toString())
+      );
+
+      popularTables = [...popularTables, ...additionalTables].slice(0, requestedLimit);
+    } else {
+      // Limit to requested amount
+      popularTables = popularTables.slice(0, requestedLimit);
+    }
+
+    // Ensure we have some data
+    if (popularTables.length === 0) {
+      return res.status(200).json({
+        success: true,
+        tables: [],
+        popularTables: [],
+        message: 'No tables found in database'
+      });
+    }
+
+    const formattedTables = popularTables.map((table, index) => ({
+      ...table.toObject(),
+      popularityRank: index + 1,
+      score: (parseInt(limit) - index) / parseInt(limit)
+    }));
 
     res.status(200).json({
       success: true,
-      tables: popularTables.map((table, index) => ({
-        ...table.toObject(),
-        popularityRank: index + 1,
-        score: (parseInt(limit) - index) / parseInt(limit)
-      })),
-      popularTables: popularTables.map((table, index) => ({
-        ...table.toObject(),
-        popularityRank: index + 1,
-        score: (parseInt(limit) - index) / parseInt(limit)
-      }))
+      tables: formattedTables,
+      popularTables: formattedTables,
+      message: `Found ${formattedTables.length} popular tables`
     });
 
   } catch (error) {
@@ -525,10 +597,146 @@ const getTableAnalytics = async (req, res) => {
   }
 };
 
+// Track table reservation from recommendations
+const trackTableReservation = async (req, res) => {
+  try {
+    const { tableId, reservationId, userId } = req.body;
+    const validatedUserId = userId || req.user?.id;
+
+    if (!tableId || !validatedUserId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Table ID and user ID are required'
+      });
+    }
+
+    // Find the most recent recommendation for this user
+    const recentRecommendation = await TableRecommendation.findOne({
+      userId: validatedUserId,
+      'recommendedTables.tableId': tableId,
+      generatedAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Within last 24 hours
+    }).sort({ generatedAt: -1 });
+
+    if (recentRecommendation) {
+      // Find the rank of this table in the recommendations
+      const tableRec = recentRecommendation.recommendedTables.find(
+        rec => rec.tableId.toString() === tableId.toString()
+      );
+
+      const rank = tableRec ? tableRec.rank : null;
+
+      // Add to reserved tables tracking
+      recentRecommendation.reservedTables.push({
+        tableId,
+        reservedAt: new Date(),
+        rank,
+        reservationId
+      });
+
+      await recentRecommendation.save();
+
+      // Also record as an interaction
+      await recordTableInteraction({
+        body: {
+          tableId,
+          interactionType: 'booking',
+          userId: validatedUserId,
+          source: 'recommendation'
+        },
+        user: { id: validatedUserId }
+      }, { status: () => ({ json: () => {} }) });
+
+      res.status(200).json({
+        success: true,
+        message: 'Table reservation tracked successfully',
+        rank
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        message: 'Reservation recorded (no recent recommendation found)'
+      });
+    }
+
+  } catch (error) {
+    console.error('Error tracking table reservation:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to track reservation',
+      error: error.message
+    });
+  }
+};
+
+// Get user's reserved tables from recommendations
+const getReservedTablesFromRecommendations = async (req, res) => {
+  try {
+    const userId = req.params.userId || req.user?.id;
+    const { limit = 10 } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    // Find recommendations with reserved tables
+    const recommendationsWithReservations = await TableRecommendation.find({
+      userId,
+      'reservedTables.0': { $exists: true } // Has at least one reserved table
+    })
+    .populate('reservedTables.tableId', 'tableName capacity location ambiance image avgRating')
+    .populate('reservedTables.reservationId')
+    .sort({ 'reservedTables.reservedAt': -1 })
+    .limit(parseInt(limit));
+
+    // Extract reserved tables with their recommendation context
+    const reservedTables = [];
+    recommendationsWithReservations.forEach(recommendation => {
+      recommendation.reservedTables.forEach(reserved => {
+        if (reserved.tableId) {
+          reservedTables.push({
+            table: reserved.tableId,
+            reservedAt: reserved.reservedAt,
+            rank: reserved.rank,
+            reservationId: reserved.reservationId,
+            recommendationContext: {
+              occasion: recommendation.context.requestedOccasion,
+              partySize: recommendation.context.requestedPartySize,
+              timeSlot: recommendation.context.requestedTime,
+              generatedAt: recommendation.generatedAt
+            }
+          });
+        }
+      });
+    });
+
+    res.status(200).json({
+      success: true,
+      reservedTables: reservedTables.slice(0, parseInt(limit)),
+      total: reservedTables.length,
+      message: reservedTables.length > 0 ?
+        `Found ${reservedTables.length} tables reserved from recommendations` :
+        'No tables reserved from recommendations yet'
+    });
+
+  } catch (error) {
+    console.error('Error getting reserved tables from recommendations:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get reserved tables',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   recordTableInteraction,
   getTableRecommendations,
   getUserTableHistory,
   getPopularTables,
-  getTableAnalytics
+  getTableAnalytics,
+  trackTableReservation,
+  getReservedTablesFromRecommendations
 };

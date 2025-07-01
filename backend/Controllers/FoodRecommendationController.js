@@ -115,11 +115,20 @@ class FoodRecommendationController {
             const allMenuItems = await Menu.find({ availability: true });
 
             if (userInteractions.length === 0) {
+                console.log('🆕 New user detected, generating popularity-based recommendations');
                 // New user - return popularity-based recommendations
                 const popularItems = await FoodRecommendationController.getPopularityBasedRecommendations(count);
+                console.log('📊 Generated', popularItems.length, 'recommendations for new user');
+
                 return {
                     items: popularItems,
-                    preferences: { newUser: true, totalInteractions: 0, algorithm: 'popularity' }
+                    preferences: { newUser: true, totalInteractions: 0, algorithm: 'popularity' },
+                    algorithmBreakdown: {
+                        popularity: popularItems.length,
+                        svd: 0,
+                        collaborative: 0,
+                        contentBased: 0
+                    }
                 };
             }
 
@@ -227,31 +236,89 @@ class FoodRecommendationController {
 
     // Get popularity-based recommendations
     static async getPopularityBasedRecommendations(count) {
-        const popularItems = await Menu.find({ availability: true })
+        console.log('🔍 Getting popularity-based recommendations, count:', count);
+
+        // First try with availability: true
+        let popularItems = await Menu.find({ availability: true })
             .sort({ popularityScore: -1, averageRating: -1, totalRatings: -1 })
             .limit(count);
 
-        return popularItems.map(item => ({
-            menuItemId: item._id,
-            menuItem: item,
-            score: item.averageRating || 3.5,
-            reason: 'popularity',
-            confidence: 'medium',
-            // Include item properties directly for easier access
-            _id: item._id,
-            name: item.name,
-            description: item.description,
-            price: item.price,
-            category: item.category,
-            image: item.image,
-            availability: item.availability,
-            cuisine: item.cuisine,
-            spiceLevel: item.spiceLevel,
-            dietaryTags: item.dietaryTags,
-            preparationTime: item.preparationTime,
-            averageRating: item.averageRating,
-            totalRatings: item.totalRatings
-        }));
+        console.log('📊 Found items with availability:true:', popularItems.length);
+
+        // If no items found with availability: true, try without availability filter
+        if (popularItems.length === 0) {
+            console.log('⚠️ No items with availability:true, trying all available items...');
+            popularItems = await Menu.find({ availability: { $ne: false } })
+                .sort({ averageRating: -1, totalRatings: -1 })
+                .limit(count);
+            console.log('📊 Found items without strict availability filter:', popularItems.length);
+        }
+
+        // If still no items, get any menu items
+        if (popularItems.length === 0) {
+            console.log('⚠️ No items found, getting any menu items...');
+            popularItems = await Menu.find({})
+                .sort({ averageRating: -1, createdAt: -1 })
+                .limit(count);
+            console.log('📊 Found any menu items:', popularItems.length);
+
+            // Log first item to check data structure
+            if (popularItems.length > 0) {
+                console.log('🔍 Sample menu item:', {
+                    name: popularItems[0].name,
+                    price: popularItems[0].price,
+                    category: popularItems[0].category,
+                    availability: popularItems[0].availability
+                });
+            }
+        }
+
+        const recommendations = popularItems.map(item => {
+            console.log('🔍 Processing menu item:', item.name, 'ID:', item._id);
+
+            // Create a flattened structure that works for both new and existing users
+            const flattenedRecommendation = {
+                // Recommendation metadata
+                menuItemId: item._id,
+                score: item.averageRating || 4.0,
+                reason: 'popularity',
+                confidence: 'medium',
+
+                // Flatten ALL menu item properties to root level
+                _id: item._id,
+                name: item.name,
+                description: item.description,
+                price: item.price,
+                category: item.category,
+                image: item.image,
+                availability: item.availability !== false,
+                cuisine: item.cuisine,
+                spiceLevel: item.spiceLevel,
+                dietaryTags: item.dietaryTags || [],
+                preparationTime: item.preparationTime,
+                averageRating: item.averageRating || 4.0,
+                totalRatings: item.totalRatings || 0,
+
+                // Additional properties
+                createdAt: item.createdAt,
+                updatedAt: item.updatedAt,
+                popularityScore: item.popularityScore,
+
+                // Also include the full menu item for backward compatibility
+                menuItem: item
+            };
+
+            console.log('✅ Flattened recommendation:', {
+                name: flattenedRecommendation.name,
+                price: flattenedRecommendation.price,
+                hasMenuItemId: !!flattenedRecommendation.menuItemId
+            });
+
+            return flattenedRecommendation;
+        });
+
+        console.log('✅ Returning', recommendations.length, 'popularity-based recommendations');
+        return recommendations;
     }
 
     // **NEW: SVD-based collaborative filtering recommendations**

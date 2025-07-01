@@ -1,4 +1,3 @@
-<!-- Updated: Enhanced confirmation pages documentation -->
 # 🎉 Confirmation Pages Enhancement Summary
 
 ## Overview

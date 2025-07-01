@@ -16,8 +16,9 @@ const RoomDetailsModal = ({ room, onClose }) => {
       if (!token || !userId) return;
 
       try {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
         await axios.post(
-          'http://localhost:8080/api/rooms/interactions',
+          `${apiUrl}/rooms/interactions`,
           {
             userId,
             roomId: room._id,
@@ -44,10 +45,12 @@ const RoomDetailsModal = ({ room, onClose }) => {
     try {
       if (imagePath.startsWith('http')) return imagePath;
       const cleanPath = imagePath.replace(/^\/+/, '');
+      // Use the base server URL (without /api) for images
+      const serverURL = process.env.REACT_APP_SERVER_URL || process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app';
       if (cleanPath.includes('uploads')) {
-        return `http://localhost:8080/${cleanPath}`;
+        return `${serverURL}/${cleanPath}`;
       }
-      return `http://localhost:8080/uploads/${cleanPath}`;
+      return `${serverURL}/uploads/${cleanPath}`;
     } catch (error) {
       console.error('Error formatting image URL:', error);
       return '/images/placeholder-room.jpg';
@@ -190,8 +193,9 @@ const RoomDetailsModal = ({ room, onClose }) => {
                 const token = localStorage.getItem('token');
                 const userId = localStorage.getItem('userId');
                 if (token && userId) {
+                  const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
                   axios.post(
-                    'http://localhost:8080/api/rooms/interactions',
+                    `${apiUrl}/rooms/interactions`,
                     {
                       userId,
                       roomId: room._id,

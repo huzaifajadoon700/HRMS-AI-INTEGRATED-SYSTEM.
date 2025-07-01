@@ -12,9 +12,9 @@ const MenuItemModal = ({ item, onClose, addToCart }) => {
         </div>
         <div className="modal-body">
           {item.image && (
-            <img 
-              src={`http://localhost:8080${item.image}`} 
-              alt={item.name} 
+            <img
+              src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${item.image}`}
+              alt={item.name}
               className="modal-image"
             />
           )}

@@ -23,6 +23,52 @@ router.post('/record-interaction', async (req, res) => {
 // Get personalized recommendations for a user
 router.get('/recommendations/:userId', ensureAuthenticated, FoodRecommendationController.getRecommendations);
 
+// Get recommendations for new users (no auth required)
+router.get('/recommendations-public/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { count = 12 } = req.query;
+
+        console.log('🔓 Public recommendations request for user:', userId);
+
+        // Generate recommendations (will automatically handle new users)
+        const recommendations = await FoodRecommendationController.generateRecommendations(userId, parseInt(count));
+
+        res.json({
+            success: true,
+            recommendations: recommendations.items,
+            preferences: recommendations.preferences,
+            algorithmBreakdown: recommendations.algorithmBreakdown,
+            cached: false,
+            userStats: {
+                totalInteractions: 0,
+                recentRatings: 0
+            }
+        });
+
+    } catch (error) {
+        console.error('Error in public recommendations:', error);
+
+        // Fallback to popular items
+        try {
+            const popularItems = await FoodRecommendationController.getPopularityBasedRecommendations(parseInt(req.query.count || 12));
+            res.json({
+                success: true,
+                recommendations: popularItems,
+                preferences: { fallback: true, algorithm: 'popularity' },
+                cached: false,
+                userStats: { totalInteractions: 0, recentRatings: 0 }
+            });
+        } catch (fallbackError) {
+            res.status(500).json({
+                success: false,
+                message: 'Error generating recommendations',
+                error: fallbackError.message
+            });
+        }
+    }
+});
+
 // Get user's food interaction history
 router.get('/history/:userId', ensureAuthenticated, FoodRecommendationController.getUserHistory);
 
@@ -98,23 +144,62 @@ router.post('/rate', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Get popular items (no auth required for public viewing)
-router.get('/popular', async (req, res) => {
+// Debug endpoint to check menu items
+router.get('/debug/menu-count', async (req, res) => {
     try {
-        const { count = 10 } = req.query;
-        
-        const popularItems = await FoodRecommendationController.getPopularityBasedRecommendations(parseInt(count));
-        
+        const Menu = require('../Models/Menu');
+        const totalCount = await Menu.countDocuments({});
+        const availableCount = await Menu.countDocuments({ availability: true });
+        const anyAvailableCount = await Menu.countDocuments({ availability: { $ne: false } });
+
+        // Get sample menu items
+        const sampleItems = await Menu.find({}).limit(3);
+
         res.json({
             success: true,
-            popularItems,
-            count: popularItems.length
+            totalMenuItems: totalCount,
+            availableTrue: availableCount,
+            availableNotFalse: anyAvailableCount,
+            sampleItems: sampleItems.map(item => ({
+                name: item.name,
+                price: item.price,
+                category: item.category,
+                availability: item.availability,
+                _id: item._id
+            })),
+            message: `Found ${totalCount} total menu items, ${availableCount} with availability:true, ${anyAvailableCount} with availability not false`
         });
-
     } catch (error) {
         res.status(500).json({
             success: false,
             error: error.message
+        });
+    }
+});
+
+// Get popular items (no auth required for public viewing)
+router.get('/popular', async (req, res) => {
+    try {
+        const { count = 10 } = req.query;
+
+        console.log('🔍 Getting popular items, count:', count);
+        const popularItems = await FoodRecommendationController.getPopularityBasedRecommendations(parseInt(count));
+
+        console.log('✅ Returning', popularItems.length, 'popular items');
+        res.json({
+            success: true,
+            popularItems,
+            recommendations: popularItems, // Also include as recommendations for compatibility
+            count: popularItems.length
+        });
+
+    } catch (error) {
+        console.error('❌ Error getting popular items:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message,
+            popularItems: [],
+            recommendations: []
         });
     }
 });

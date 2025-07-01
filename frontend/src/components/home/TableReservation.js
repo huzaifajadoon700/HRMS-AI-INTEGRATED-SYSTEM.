@@ -25,33 +25,28 @@ const TableReservation = () => {
 
   const fetchTables = async () => {
     try {
-      const response = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/tables");
-      setTables(response.data);
+      // Always fetch regular tables first as fallback
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const tablesResponse = await axios.get(`${apiUrl}/tables`);
+      console.log('Fetched tables:', tablesResponse.data);
 
-      // If user is logged in, also fetch recommendations
-      if (localStorage.getItem('token')) {
-        await fetchRecommendations();
+      if (tablesResponse.data && tablesResponse.data.length > 0) {
+        const regularTables = tablesResponse.data.slice(0, 3);
+        setTables(regularTables);
+
+        // Simply use regular tables for everyone - no recommendations
+        console.log('Using regular tables for featured tables');
+        const featuredTables = regularTables.map(table => ({
+          ...table,
+          isRecommendation: false
+        }));
+        setRecommendations(featuredTables);
       }
     } catch (error) {
+      console.error('Error fetching tables:', error);
       setError("Failed to load tables");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchRecommendations = async () => {
-    try {
-      const response = await tableRecommendationService.getRecommendations({
-        numRecommendations: 6,
-        useCache: true
-      });
-
-      if (response.success && response.recommendations) {
-        setRecommendations(response.recommendations);
-      }
-    } catch (error) {
-      console.error('Error fetching recommendations:', error);
-      // Don't show error for recommendations, just fall back to regular tables
     }
   };
 
@@ -70,10 +65,12 @@ const TableReservation = () => {
   };
 
   const getCurrentTables = () => {
-    // Always prioritize recommendations, limit to 3
+    // Always prioritize recommendations if available, otherwise use regular tables
     if (recommendations.length > 0) {
+      console.log('Using recommendations:', recommendations.length);
       return recommendations.slice(0, 3);
     }
+    console.log('Using regular tables:', tables.length);
     return tables.slice(0, 3);
   };
 
@@ -138,6 +135,46 @@ const TableReservation = () => {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.1); }
           }
+
+          /* Responsive Styles for TableReservation */
+          @media (max-width: 768px) {
+            .table-reservation-container {
+              padding: 0 1rem !important;
+            }
+            .table-reservation-grid {
+              grid-template-columns: 1fr !important;
+              gap: 1rem !important;
+              max-width: 100% !important;
+            }
+            .table-reservation-title {
+              font-size: 2rem !important;
+            }
+            .table-card-mobile {
+              max-width: 100% !important;
+              min-width: auto !important;
+              margin: 0 !important;
+            }
+            .table-features-grid {
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 0.3rem !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .table-reservation-container {
+              padding: 0 0.75rem !important;
+            }
+            .table-reservation-title {
+              font-size: 1.75rem !important;
+            }
+            .table-features-grid {
+              grid-template-columns: 1fr !important;
+              gap: 0.25rem !important;
+            }
+            .table-card-content {
+              padding: 0.75rem !important;
+            }
+          }
         `}
       </style>
       <section style={{
@@ -175,7 +212,7 @@ const TableReservation = () => {
           zIndex: 0
         }} />
 
-        <div style={{
+        <div className="table-reservation-container" style={{
           width: '100%',
           maxWidth: '1400px',
           margin: '0 auto',
@@ -184,7 +221,7 @@ const TableReservation = () => {
           zIndex: 1
         }}>
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h2 style={{
+            <h2 className="table-reservation-title" style={{
               fontSize: '2.5rem',
               fontWeight: '800',
               background: 'linear-gradient(135deg, #ffffff 0%, #bb86fc 100%)',
@@ -196,9 +233,39 @@ const TableReservation = () => {
             }}>
               Featured Tables
             </h2>
+            <Link
+              to="/reserve-table"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.75rem 1.5rem',
+                background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(29, 78, 216, 0.8))',
+                color: '#ffffff',
+                textDecoration: 'none',
+                borderRadius: '0.75rem',
+                fontWeight: '600',
+                fontSize: '0.9rem',
+                transition: 'all 0.3s ease',
+                border: '1px solid rgba(30, 64, 175, 0.6)',
+                boxShadow: '0 4px 15px rgba(30, 64, 175, 0.3)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-2px)';
+                e.currentTarget.style.boxShadow = '0 8px 25px rgba(30, 64, 175, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0)';
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(30, 64, 175, 0.3)';
+              }}
+            >
+              View All Tables
+            </Link>
           </div>
 
-          <div style={{
+          <div className="table-reservation-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: '1rem',
@@ -208,12 +275,29 @@ const TableReservation = () => {
             padding: '0.5rem'
           }}>
             {visibleTables.map((item, index) => {
-              const table = item.table || item;
-              const isRecommendation = recommendations.length > 0;
+              // Since we've already processed recommendations, item should be the table directly
+              const table = item;
+              const isRecommendation = item.isRecommendation || false;
+
+              console.log(`Table ${index}:`, {
+                table: table,
+                tableName: table.tableName,
+                image: table.image,
+                capacity: table.capacity,
+                isRecommendation: isRecommendation,
+                _id: table._id
+              });
+
+              // Skip if no valid table data
+              if (!table || !table._id) {
+                console.warn(`Skipping invalid table at index ${index}:`, table);
+                return null;
+              }
 
               return (
                 <div
                   key={table._id || index}
+                  className="table-card-mobile"
                   style={{
                     background: hoveredTable === table._id 
                       ? 'linear-gradient(145deg, rgba(187, 134, 252, 0.08) 0%, rgba(255, 107, 157, 0.04) 100%)'
@@ -251,11 +335,27 @@ const TableReservation = () => {
                     height: '160px',
                     overflow: 'hidden',
                     borderRadius: '1rem 1rem 0 0',
-                    background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%)',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    backgroundImage: `url(${tableUtils.getImageUrl(table.image)})`
+                    background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%)'
                   }}>
+                    {/* Table Image */}
+                    <img
+                      src={tableUtils.getImageUrl(table.image)}
+                      alt={table.tableName || 'Table'}
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        transition: 'transform 0.3s ease'
+                      }}
+                      onError={(e) => {
+                        e.target.src = "/images/placeholder-table.jpg";
+                        e.target.onerror = null;
+                      }}
+                    />
+
                     {/* Gradient Overlay */}
                     <div style={{
                       position: 'absolute',
@@ -333,7 +433,7 @@ const TableReservation = () => {
                     </div>
                   </div>
 
-                  <div style={{
+                  <div className="table-card-content" style={{
                     padding: '1rem',
                     display: 'flex',
                     flexDirection: 'column',
@@ -354,7 +454,7 @@ const TableReservation = () => {
                           backgroundClip: 'text',
                           lineHeight: '1.2'
                         }}>
-                          {table.tableName}
+                          {table.tableName || `Table ${index + 1}`}
                         </h3>
                         <div style={{
                           display: 'inline-flex',
@@ -372,7 +472,7 @@ const TableReservation = () => {
                       </div>
                     </div>
 
-                    <div style={{
+                    <div className="table-features-grid" style={{
                       display: 'grid',
                       gridTemplateColumns: 'repeat(3, 1fr)',
                       gap: '0.5rem'
@@ -394,7 +494,7 @@ const TableReservation = () => {
                           fontWeight: '600',
                           textAlign: 'center'
                         }}>
-                          {table.capacity} Seats
+                          {table.capacity || 4} Seats
                         </span>
                       </div>
 

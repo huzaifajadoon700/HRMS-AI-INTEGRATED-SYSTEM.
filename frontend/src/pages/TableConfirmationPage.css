@@ -296,8 +296,11 @@
 .action-section {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 1.5rem;
   padding: 2rem 0;
+  flex-wrap: wrap;
+  margin-top: 2rem;
 }
 
 .action-btn {
@@ -314,6 +317,8 @@
   min-width: 200px;
   justify-content: center;
   text-decoration: none;
+  min-height: 48px; /* Better touch target */
+  white-space: nowrap;
 }
 
 .action-btn.primary {
@@ -451,6 +456,8 @@
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
+  flex-wrap: wrap;
+  padding: 0 1rem;
 }
 
 .action-button {
@@ -459,11 +466,13 @@
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
   border-radius: 2rem;
-  font-size: var(--font-size-base);
+  font-size: 1rem;
   font-weight: 600;
   transition: all 0.3s ease;
   border: none;
   cursor: pointer;
+  min-height: 48px;
+  white-space: nowrap;
 }
 
 .action-button.download {
@@ -489,6 +498,7 @@
   border-radius: 1rem;
   padding: 3rem;
   box-shadow: var(--shadow-lg);
+  overflow-x: hidden;
 }
 
 .invoice-header {
@@ -543,11 +553,14 @@
 
 .invoice-items {
   margin-bottom: 3rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .invoice-items table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 500px; /* Ensure table doesn't get too cramped */
 }
 
 .invoice-items th {
@@ -623,10 +636,14 @@
 @media (max-width: 768px) {
   .invoice-page {
     padding: 1rem;
+    padding-top: 2rem; /* Add top margin for mobile */
   }
 
   .invoice-container {
     padding: 1.5rem;
+    margin: 0 0.5rem;
+    margin-top: 1rem; /* Additional top margin */
+    overflow-x: hidden;
   }
 
   .invoice-header {
@@ -639,10 +656,113 @@
     text-align: center;
   }
 
+  .invoice-actions {
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem; /* Add bottom margin */
+  }
+
+  .action-button {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem 1.5rem;
+  }
+
+  /* Mobile-specific table layout */
+  .invoice-items {
+    margin: 0 -1.5rem 3rem -1.5rem;
+    padding: 0 1.5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .invoice-items table {
+    min-width: 100%;
+    width: 100%;
+  }
+
+  /* Stack table content vertically on mobile */
   .invoice-items th,
   .invoice-items td {
-    padding: 0.75rem;
-    font-size: 0.9rem;
+    padding: 0.75rem 0.5rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    vertical-align: top;
+  }
+
+  /* Specific styling for description column */
+  .invoice-items td:first-child {
+    min-width: 140px;
+    padding-right: 1rem;
+  }
+
+  .invoice-items td:first-child p {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #1a1a1a;
+  }
+
+  .invoice-items td:first-child small {
+    display: block;
+    margin: 0.25rem 0;
+    line-height: 1.3;
+    color: #6c757d;
+  }
+
+  /* Details column styling */
+  .invoice-items td:nth-child(2) {
+    min-width: 100px;
+  }
+
+  .invoice-items td:nth-child(2) p {
+    margin: 0.25rem 0;
+    font-size: 0.85rem;
+    line-height: 1.3;
+  }
+
+  /* Amount column styling */
+  .invoice-items td:last-child {
+    min-width: 80px;
+    text-align: right;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .invoice-items th:first-child,
+  .invoice-items td:first-child {
+    padding-left: 1rem;
+  }
+
+  .invoice-items th:last-child,
+  .invoice-items td:last-child {
+    padding-right: 1rem;
+  }
+
+  .hotel-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .invoice-details h2 {
+    font-size: 1.3rem;
+  }
+
+  .invoice-summary {
+    margin-top: 1.5rem;
+  }
+
+  .summary-item {
+    padding: 0.75rem 0;
+    font-size: 0.95rem;
+  }
+
+  .summary-item.total {
+    font-size: 1.1rem;
+  }
+
+  .invoice-footer {
+    margin-top: 2rem;
+    padding: 1rem;
   }
 }
 
@@ -668,10 +788,18 @@
 
   .hero-title {
     font-size: 2.2rem;
+    line-height: 1.2;
   }
 
   .hero-subtitle {
     font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .reservation-id-badge {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    margin-top: 1rem;
   }
 
   .content-container {
@@ -681,54 +809,673 @@
   .summary-cards {
     grid-template-columns: 1fr;
     gap: 1rem;
+    margin-bottom: 2rem;
   }
 
   .summary-card {
-    padding: 1rem;
+    padding: 1.25rem;
+    min-height: 80px;
   }
 
   .card-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.25rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .card-content h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-content p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .detail-card {
+    margin-bottom: 1rem;
+  }
+
+  .detail-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .detail-body {
+    padding: 1.25rem;
+  }
+
+  .detail-row {
+    padding: 0.75rem 0;
   }
 
   .action-section {
     flex-direction: column;
     gap: 1rem;
+    padding: 2rem 0 1rem;
   }
 
   .action-btn {
     width: 100%;
     min-width: auto;
+    padding: 1.25rem 2rem;
+    font-size: 1.05rem;
   }
 }
 
 @media (max-width: 480px) {
+  .table-confirmation-page {
+    padding-top: 70px;
+  }
+
+  .confirmation-hero {
+    padding: 1.5rem 0.75rem;
+  }
+
   .hero-title {
     font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
   }
 
   .reservation-id-badge {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+  }
+
+  .content-container {
+    padding: 0 0.75rem;
   }
 
   .section-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
   }
 
   .summary-card {
     flex-direction: column;
     text-align: center;
     gap: 0.75rem;
+    padding: 1rem;
+    min-height: 70px;
+  }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    margin: 0 auto;
   }
 
   .card-content h3 {
     font-size: 1rem;
+    margin-bottom: 0.25rem;
   }
 
   .card-content p {
     font-size: 0.85rem;
+  }
+
+  .detail-card {
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-header {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .detail-body {
+    padding: 1rem;
+  }
+
+  .detail-row {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+
+  .action-btn {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* Invoice mobile improvements */
+  .invoice-container {
+    padding: 1rem;
+    margin: 0 0.25rem;
+  }
+
+  .hotel-info h1 {
+    font-size: 1.3rem;
+  }
+
+  .invoice-details h2 {
+    font-size: 1.3rem;
+  }
+
+  .invoice-items table {
+    min-width: 400px;
+  }
+
+  .invoice-items th,
+  .invoice-items td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  .action-button {
+    padding: 1rem;
+    font-size: 0.95rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .invoice-actions {
+    width: 100%;
+    max-width: 100%;
+    padding: 1rem 0.5rem;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
+  /* Enhanced invoice mobile styles for very small screens */
+  .invoice-page {
+    padding: 0.5rem;
+    padding-top: 1.5rem;
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .invoice-container {
+    padding: 0.75rem;
+    margin: 0;
+    border-radius: 0.5rem;
+    margin-top: 0.75rem;
+    background: rgba(17, 34, 64, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(100, 255, 218, 0.1);
+    color: #ffffff;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .invoice-header {
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+  }
+
+  .hotel-info h1 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: #64ffda;
+  }
+
+  .hotel-info p {
+    font-size: 0.8rem;
+    margin: 0.1rem 0;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .invoice-details h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+    color: #64ffda;
+  }
+
+  .invoice-details p {
+    font-size: 0.8rem;
+    margin: 0.25rem 0;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .invoice-to {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid rgba(100, 255, 218, 0.2);
+  }
+
+  .invoice-to h3 {
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+    color: #64ffda;
+  }
+
+  .invoice-to p {
+    font-size: 0.8rem;
+    margin: 0.1rem 0;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .invoice-items {
+    margin-bottom: 1.5rem;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    padding: 0 0.75rem;
+  }
+
+  .invoice-items table {
+    min-width: 100%;
+    width: auto;
+  }
+
+  /* Better mobile table layout for small screens */
+  .invoice-items th,
+  .invoice-items td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+
+  /* Description column - more space for content */
+  .invoice-items td:first-child {
+    min-width: 120px;
+    padding-right: 0.75rem;
+  }
+
+  .invoice-items td:first-child p {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .invoice-items td:first-child small {
+    font-size: 0.7rem;
+    display: block;
+    margin: 0.15rem 0;
+  }
+
+  /* Details column */
+  .invoice-items td:nth-child(2) {
+    min-width: 80px;
+  }
+
+  .invoice-items td:nth-child(2) p {
+    font-size: 0.75rem;
+    margin: 0.15rem 0;
+  }
+
+  /* Amount column */
+  .invoice-items td:last-child {
+    min-width: 70px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .invoice-items th:first-child,
+  .invoice-items td:first-child {
+    padding-left: 0.5rem;
+  }
+
+  .invoice-items th:last-child,
+  .invoice-items td:last-child {
+    padding-right: 0.5rem;
+  }
+
+  .invoice-summary {
+    margin-top: 1rem;
+  }
+
+  .summary-item {
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .summary-item.total {
+    font-size: 1rem;
+    padding-top: 0.75rem;
+    color: #64ffda;
+    border-top: 1px solid rgba(100, 255, 218, 0.3);
+  }
+
+  .summary-item.payment {
+    color: rgba(255, 255, 255, 0.8);
+    border-top: 1px solid rgba(100, 255, 218, 0.2);
+  }
+
+  .invoice-footer {
+    margin-top: 1.5rem;
+    padding: 0.75rem;
+  }
+
+  .invoice-footer p {
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+    color: #64ffda;
+  }
+
+  .invoice-footer small {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+/* Additional mobile enhancements for invoice */
+@media (max-width: 768px) {
+  /* Improve touch targets for invoice actions */
+  .invoice-actions {
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    z-index: 10;
+    background: rgba(10, 25, 47, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin: 1rem auto 2rem auto;
+    max-width: calc(100vw - 2rem);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .action-button {
+    -webkit-tap-highlight-color: rgba(100, 255, 218, 0.1);
+  }
+
+  .action-button:active {
+    transform: scale(0.98);
+  }
+
+  /* Better spacing for mobile invoice */
+  .invoice-page {
+    overflow-x: hidden;
+  }
+
+  /* Ensure proper table scrolling */
+  .invoice-items {
+    position: relative;
+  }
+
+  .invoice-items::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 20px;
+    background: linear-gradient(to left, rgba(255,255,255,0.8), transparent);
+    pointer-events: none;
+  }
+}
+
+/* Alternative mobile layout for very small screens */
+@media (max-width: 480px) {
+  /* Prevent horizontal scrolling globally */
+  html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  /* Remove scroll bars completely */
+  .invoice-page {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 0.5rem !important;
+    padding-top: 2rem !important; /* Normal top padding */
+    box-sizing: border-box !important;
+  }
+
+  /* Natural flowing action buttons for mobile */
+  .invoice-actions {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    z-index: 10 !important;
+    background: rgba(10, 25, 47, 0.98) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(100, 255, 218, 0.2) !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem !important;
+    margin: 1rem auto 1.5rem auto !important;
+    max-width: calc(100vw - 1rem) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .invoice-container {
+    max-width: calc(100vw - 1rem) !important;
+    width: calc(100vw - 1rem) !important;
+    margin: 0.5rem auto !important;
+    margin-top: 0 !important; /* No extra top margin needed */
+    padding: 0.75rem !important;
+    box-sizing: border-box !important;
+    background: rgba(17, 34, 64, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(100, 255, 218, 0.1) !important;
+    color: #ffffff !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Action button styling for mobile */
+  .action-button {
+    padding: 0.75rem 1rem !important;
+    font-size: 0.9rem !important;
+    width: 48% !important;
+    max-width: 48% !important;
+    box-sizing: border-box !important;
+    border-radius: 0.5rem !important;
+  }
+
+  .invoice-items {
+    overflow-x: hidden !important;
+    margin: 1rem 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Hide table headers on very small screens and use card layout */
+  .invoice-items table thead {
+    display: none !important;
+  }
+
+  .invoice-items table,
+  .invoice-items tbody,
+  .invoice-items tr,
+  .invoice-items td {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .invoice-items table {
+    min-width: unset !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .invoice-items tr {
+    background: rgba(17, 34, 64, 0.8) !important;
+    border: 1px solid rgba(100, 255, 218, 0.2) !important;
+    border-radius: 0.75rem !important;
+    margin-bottom: 1rem !important;
+    padding: 1rem !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+    backdrop-filter: blur(10px) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .invoice-items td {
+    border: none !important;
+    padding: 0.75rem 0 !important;
+    text-align: left !important;
+    position: relative !important;
+    color: #ffffff !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .invoice-items td:before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #64ffda;
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .invoice-items td:first-child:before {
+    content: "DESCRIPTION";
+  }
+
+  .invoice-items td:nth-child(2):before {
+    content: "DETAILS";
+  }
+
+  .invoice-items td:last-child:before {
+    content: "AMOUNT";
+  }
+
+  .invoice-items td p {
+    color: #ffffff;
+    margin: 0.25rem 0;
+    font-weight: 500;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    word-wrap: break-word;
+  }
+
+  .invoice-items td small {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.75rem;
+    line-height: 1.3;
+    display: block;
+    margin: 0.2rem 0;
+  }
+
+  .invoice-items td:last-child {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #64ffda;
+    border-top: 1px solid rgba(100, 255, 218, 0.3);
+    padding-top: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  /* Special requests row styling */
+  .invoice-items tr:has(td[colspan="3"]) {
+    background: rgba(26, 35, 50, 0.9);
+    border-left: 4px solid #64ffda;
+  }
+
+  .invoice-items td[colspan="3"] {
+    padding: 1.25rem;
+    color: #ffffff;
+  }
+
+  .invoice-items td[colspan="3"] strong {
+    color: #64ffda;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .invoice-items td[colspan="3"] p {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+  }
+
+  .invoice-items td[colspan="3"]:before {
+    content: none;
+  }
+
+  /* Remove any unwanted spacing */
+  .invoice-items::after {
+    display: none;
+  }
+}
+
+/* Tablet specific adjustments for invoice */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .invoice-container {
+    padding: 2rem;
+  }
+
+  .invoice-actions {
+    gap: 1.25rem;
+  }
+
+  .action-button {
+    min-width: 150px;
+  }
+
+  .invoice-items th,
+  .invoice-items td {
+    padding: 0.875rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Additional mobile enhancements */
+@media (max-width: 768px) {
+  /* Improve touch targets */
+  .summary-card {
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(100, 255, 218, 0.1);
+  }
+
+  .summary-card:active {
+    transform: scale(0.98);
+  }
+
+  /* Better spacing for mobile */
+  .confirmation-content {
+    padding: 1.5rem 0;
+  }
+
+  /* Ensure proper scrolling */
+  .table-confirmation-page {
+    overflow-x: hidden;
+  }
+
+  /* Better button spacing */
+  .action-section {
+    padding: 1.5rem 0;
+  }
+}
+
+/* Tablet specific adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .content-container {
+    padding: 0 1.5rem;
+  }
+
+  .action-section {
+    gap: 1.25rem;
+  }
+
+  .action-btn {
+    min-width: 180px;
   }
 }

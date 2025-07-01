@@ -1,15 +1,6 @@
-/**
- * Notification Service for HRMS System
- * Email and SMS notifications for bookings, orders, and updates
- *
- * @description Multi-channel notification system with Nodemailer and Twilio
- * @version 1.0.0
- */
+const nodemailer = require('nodemailer');
+const twilio = require('twilio');
 
-const nodemailer = require("nodemailer");
-const twilio = require("twilio");
-
-// Initialize Twilio client for SMS notifications
 const twilioClient = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
@@ -21,8 +12,8 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
+    pass: process.env.SMTP_PASS
+  }
 });
 
 async function sendEmail(to, subject, html) {
@@ -31,11 +22,11 @@ async function sendEmail(to, subject, html) {
       from: process.env.SMTP_FROM,
       to,
       subject,
-      html,
+      html
     });
     return true;
   } catch (error) {
-    console.error("Email sending error:", error);
+    console.error('Email sending error:', error);
     return false;
   }
 }
@@ -45,11 +36,11 @@ async function sendSMS(to, message) {
     await twilioClient.messages.create({
       body: message,
       to,
-      from: process.env.TWILIO_PHONE_NUMBER,
+      from: process.env.TWILIO_PHONE_NUMBER
     });
     return true;
   } catch (error) {
-    console.error("SMS sending error:", error);
+    console.error('SMS sending error:', error);
     return false;
   }
 }
@@ -70,7 +61,7 @@ async function sendOrderNotification(order, event) {
         <p>Thank you for your order! Your order #${orderNumber} has been confirmed.</p>
         <p>Total Amount: Rs. ${orderTotal}</p>
         <p>We'll notify you when your order is ready for delivery.</p>
-      `,
+      `
     },
     status_updated: {
       subject: `Order #${orderNumber} Status Update`,
@@ -78,7 +69,7 @@ async function sendOrderNotification(order, event) {
         <h2>Order Status Update</h2>
         <p>Your order #${orderNumber} status has been updated to: ${order.status}</p>
         <p>Delivery Status: ${order.deliveryStatus}</p>
-      `,
+      `
     },
     delivered: {
       subject: `Order #${orderNumber} Delivered`,
@@ -86,7 +77,7 @@ async function sendOrderNotification(order, event) {
         <h2>Order Delivered</h2>
         <p>Your order #${orderNumber} has been delivered successfully!</p>
         <p>We hope you enjoyed your meal. Please rate your experience.</p>
-      `,
+      `
     },
     cancelled: {
       subject: `Order #${orderNumber} Cancelled`,
@@ -94,8 +85,8 @@ async function sendOrderNotification(order, event) {
         <h2>Order Cancelled</h2>
         <p>Your order #${orderNumber} has been cancelled.</p>
         <p>If you have any questions, please contact our support team.</p>
-      `,
-    },
+      `
+    }
   };
 
   // SMS templates
@@ -103,7 +94,7 @@ async function sendOrderNotification(order, event) {
     created: `Order #${orderNumber} confirmed! Total: Rs. ${orderTotal}. We'll notify you when it's ready.`,
     status_updated: `Order #${orderNumber} status: ${order.status}. Delivery: ${order.deliveryStatus}`,
     delivered: `Order #${orderNumber} delivered! Hope you enjoyed your meal. Please rate your experience.`,
-    cancelled: `Order #${orderNumber} cancelled. Contact support if you have questions.`,
+    cancelled: `Order #${orderNumber} cancelled. Contact support if you have questions.`
   };
 
   // Send notifications
@@ -158,26 +149,7 @@ async function sendDeliveryNotification(driver, order) {
   }
 }
 
-// Utility function to validate email format (for demonstration)
-function isValidEmail(email) {
-  return typeof email === "string" && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
-}
-
-// Utility function to format phone numbers to E.164 (for demonstration)
-function formatPhoneE164(phone) {
-  if (!phone) return "";
-  // Example: convert 03001234567 to +923001234567
-  if (phone.startsWith("0")) {
-    return "+92" + phone.slice(1);
-  }
-  return phone;
-}
-
 module.exports = {
   sendOrderNotification,
-  sendDeliveryNotification,
-  sendEmail,
-  sendSMS,
-  isValidEmail,
-  formatPhoneE164,
-};
+  sendDeliveryNotification
+}; 

@@ -25,7 +25,8 @@ const MyBookings = () => {
     try {
       setLoading(true);
       // Fetch bookings with additional user details
-      const response = await axios.get("http://localhost:8080/api/bookings/user", {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/bookings/user`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -34,7 +35,7 @@ const MyBookings = () => {
       // Try to get the current user's information, but don't fail if it's not available
       let userProfileData = {};
       try {
-        const userProfile = await axios.get("http://localhost:8080/api/user/profile", {
+        const userProfile = await axios.get(`${apiUrl}/user/profile`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         userProfileData = userProfile.data;
@@ -103,7 +104,8 @@ const MyBookings = () => {
         return;
       }
       
-      await axios.delete(`http://localhost:8080/api/bookings/${bookingId}`, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      await axios.delete(`${apiUrl}/bookings/${bookingId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       

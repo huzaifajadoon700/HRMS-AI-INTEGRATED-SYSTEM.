@@ -1,6 +1,5 @@
 const axios = require('axios');
 
-// Updated: Improved real model test clarity
 async function testRealModel() {
     console.log('🎯 TESTING REAL SVD MODEL STATUS');
     console.log('================================\n');

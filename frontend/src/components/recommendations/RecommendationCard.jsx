@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, Badge, Button, OverlayTrigger, Tooltip, Toast } from 'react-bootstrap';
-import { FiStar, FiShoppingCart, FiHeart, FiInfo, FiClock, FiAward, FiThumbsUp, FiEye } from 'react-icons/fi';
+import { FiStar, FiShoppingCart, FiHeart, FiInfo, FiClock, FiAward } from 'react-icons/fi';
 import { recommendationHelpers, recommendationAPI } from '../../api/recommendations';
 import './RecommendationCard.css';
 
@@ -91,7 +91,8 @@ const RecommendationCard = ({
     if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
       return imagePath;
     }
-    return `http://localhost:8080${imagePath.startsWith('/') ? imagePath : '/' + imagePath}`;
+    const apiUrl = process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app';
+    return `${apiUrl}${imagePath.startsWith('/') ? imagePath : '/' + imagePath}`;
   };
 
   return (
@@ -248,7 +249,7 @@ const RecommendationCard = ({
             disabled={!menuItem.availability}
           >
             <FiShoppingCart className="btn-icon" />
-            Add to Cart
+            Add Cart
           </Button>
 
           <Button
@@ -271,24 +272,16 @@ const RecommendationCard = ({
         </div>
 
         {/* Recommendation Reason */}
-        {showReason && (
+        {showReason && reason && reason !== 'menu_item' && (
           <div className="recommendation-reason">
-            <small className="text-muted">
+            <small className="reason-text">
               <FiAward className="reason-icon" />
               {reasonText}
             </small>
           </div>
         )}
 
-        {/* Interaction Stats */}
-        {interactionCount > 0 && (
-          <div className="interaction-stats">
-            <small className="text-success">
-              <FiThumbsUp className="interaction-icon" />
-              {interactionCount} interaction{interactionCount > 1 ? 's' : ''}
-            </small>
-          </div>
-        )}
+
       </Card.Body>
 
       {/* Toast Notification */}

@@ -7,6 +7,7 @@ import {
   FiEdit, FiSave, FiRefreshCw, FiHome, FiDollarSign, FiUsers,
   FiMapPin, FiImage, FiCheck, FiX
 } from "react-icons/fi";
+import { getRoomImageUrl, handleImageError } from "../../utils/imageUtils";
 import "./AdminManageRooms.css";
 
 const AdminRoomUpdate = () => {
@@ -15,6 +16,7 @@ const AdminRoomUpdate = () => {
   const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
   const [formData, setFormData] = useState({
     roomNumber: "",
     roomType: "",
@@ -46,7 +48,8 @@ const AdminRoomUpdate = () => {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:8080/api/rooms", {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -70,6 +73,8 @@ const AdminRoomUpdate = () => {
 
   const handleSelectRoom = (room) => {
     setSelectedRoom(room);
+    setImage(null);
+    setImageUrl(room.image || ""); // Pre-fill with current image URL
     setFormData({
       roomNumber: room.roomNumber || "",
       roomType: room.roomType || "",
@@ -107,11 +112,7 @@ const AdminRoomUpdate = () => {
     setImage(e.target.files[0]);
   };
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "/images/placeholder-room.jpg";
-    if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:8080${imagePath}`;
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -133,10 +134,14 @@ const AdminRoomUpdate = () => {
     
     if (image) {
       data.append("image", image);
+    } else if (imageUrl.trim()) {
+      // If URL is provided, add it as image path
+      data.append("imageUrl", imageUrl.trim());
     }
 
     try {
-      await axios.put(`http://localhost:8080/api/rooms/${selectedRoom._id}`, data, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      await axios.put(`${apiUrl}/rooms/${selectedRoom._id}`, data, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
           "Content-Type": "multipart/form-data",
@@ -146,6 +151,7 @@ const AdminRoomUpdate = () => {
       toast.success("Room updated successfully!");
       setSelectedRoom(null);
       setImage(null);
+      setImageUrl("");
       setFormData({
         roomNumber: "",
         roomType: "",
@@ -396,25 +402,51 @@ const AdminRoomUpdate = () => {
 
                   <Form.Group className="mb-3">
                     <Form.Label>Room Image</Form.Label>
-                    {selectedRoom.image && (
-                      <div className="mb-2">
-                        <img
-                          src={getImageUrl(selectedRoom.image)}
-                          alt={selectedRoom.roomNumber}
-                          style={{ width: '100px', height: '60px', objectFit: 'cover' }}
-                          className="rounded"
-                        />
+
+                    {/* Current/Preview Image */}
+                    <div className="mb-3">
+                      <img
+                        src={imageUrl ? getRoomImageUrl(imageUrl) : getRoomImageUrl(selectedRoom.image)}
+                        alt={selectedRoom.roomNumber}
+                        style={{ width: '150px', height: '100px', objectFit: 'cover' }}
+                        className="rounded border"
+                        onError={(e) => handleImageError(e, "/images/placeholder-room.jpg")}
+                      />
+                      <div className="mt-1">
+                        <small className="text-muted">
+                          {imageUrl ? 'New image URL preview' : 'Current image'}
+                        </small>
                       </div>
-                    )}
-                    <Form.Control
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageChange}
-                      className="cosmic-input"
-                    />
-                    <Form.Text className="text-muted">
-                      Leave empty to keep current image. Max size: 5MB
-                    </Form.Text>
+                    </div>
+
+                    {/* Image URL Input */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>Image URL</Form.Label>
+                      <Form.Control
+                        type="url"
+                        value={imageUrl}
+                        onChange={(e) => setImageUrl(e.target.value)}
+                        className="cosmic-input"
+                        placeholder="https://example.com/image.jpg or https://images.unsplash.com/..."
+                      />
+                      <Form.Text className="text-muted">
+                        Paste an image URL (recommended) - changes will show immediately above
+                      </Form.Text>
+                    </Form.Group>
+
+                    {/* OR File Upload */}
+                    <Form.Group className="mb-3">
+                      <Form.Label>OR Upload File</Form.Label>
+                      <Form.Control
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="cosmic-input"
+                      />
+                      <Form.Text className="text-muted">
+                        File upload (works in development only). Max size: 5MB
+                      </Form.Text>
+                    </Form.Group>
                   </Form.Group>
 
                   <div className="d-flex gap-2">
@@ -440,6 +472,8 @@ const AdminRoomUpdate = () => {
                       variant="secondary"
                       onClick={() => {
                         setSelectedRoom(null);
+                        setImage(null);
+                        setImageUrl("");
                         setFormData({
                           roomNumber: "",
                           roomType: "",

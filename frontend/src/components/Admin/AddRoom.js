@@ -35,7 +35,8 @@ const AdminManageRooms = () => {
   const fetchRooms = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:8080/api/rooms");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms`);
       setRooms(response.data);
       setAlert({ show: true, message: "Rooms loaded successfully!", variant: "success" });
     } catch (error) {
@@ -130,13 +131,14 @@ const AdminManageRooms = () => {
 
     try {
       setLoading(true);
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       if (selectedRoom) {
-        await axios.put(`http://localhost:8080/api/rooms/${selectedRoom._id}`, formData, {
+        await axios.put(`${apiUrl}/rooms/${selectedRoom._id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setAlert({ show: true, message: "Room updated successfully!", variant: "success" });
       } else {
-        await axios.post("http://localhost:8080/api/rooms/add", formData, {
+        await axios.post(`${apiUrl}/rooms/add`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
         setAlert({ show: true, message: "Room added successfully!", variant: "success" });
@@ -155,7 +157,8 @@ const AdminManageRooms = () => {
   const handleDeleteRoom = async (id) => {
     if (window.confirm("Are you sure you want to delete this room?")) {
       try {
-        await axios.delete(`http://localhost:8080/api/rooms/${id}`);
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        await axios.delete(`${apiUrl}/rooms/${id}`);
         setAlert({ show: true, message: "Room deleted successfully!", variant: "success" });
         fetchRooms();
       } catch (error) {
@@ -287,7 +290,7 @@ const AdminManageRooms = () => {
                 <div className="mt-2">
                   <strong>Current Image:</strong>
                   <img
-                    src={`http://localhost:8080/${selectedRoom.image}`}
+                    src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}/${selectedRoom.image}`}
                     alt={selectedRoom.roomName}
                     className="img-thumbnail mt-2"
                     style={{ width: "100px" }}
@@ -332,7 +335,7 @@ const AdminManageRooms = () => {
                 <td>
                   {room.image && (
                     <img
-                      src={`http://localhost:8080/${room.image}`}
+                      src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}/${room.image}`}
                       alt={room.roomName}
                       className="room-image"
                     />
@@ -387,7 +390,7 @@ const AdminManageRooms = () => {
               <p><strong>Price:</strong> ${selectedRoom.price}</p>
               {selectedRoom.image && (
                 <img
-                  src={`http://localhost:8080/${selectedRoom.image}`}
+                  src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}/${selectedRoom.image}`}
                   alt={selectedRoom.roomName}
                   className="img-fluid rounded"
                 />

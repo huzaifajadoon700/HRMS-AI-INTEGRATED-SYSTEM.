@@ -1,12 +1,4 @@
-/**
- * App Component Styles for HRMS Frontend
- * Component-specific styling and layout management
- *
- * @description CSS styles for main App component and global overrides
- * @version 1.0.0
- */
-
-/* General Reset and Base Styles */
+/* General Reset */
 body,
 ul,
 li,
@@ -101,8 +93,7 @@ body {
 }
 .hero {
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("C:\Users\mhuza\Documents\backup21feb\frontend\public\images\card.webp")
-      no-repeat center center/cover;
+    url("/images/card.webp") no-repeat center center/cover;
   color: rgb(255, 255, 255);
   padding: 100px 20px;
 }

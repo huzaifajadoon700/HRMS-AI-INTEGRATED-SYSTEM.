@@ -42,7 +42,8 @@ const EditBooking = ({ bookingId, onClose, onSuccess }) => {
         
         console.log("Fetching booking with ID:", bookingId);
         
-        const response = await axios.get(`http://localhost:8080/api/bookings/${bookingId}`, {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/bookings/${bookingId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -59,7 +60,7 @@ const EditBooking = ({ bookingId, onClose, onSuccess }) => {
 
         // Fetch room details
         console.log("Fetching room details for roomId:", bookingData.roomId);
-        const roomResponse = await axios.get(`http://localhost:8080/api/rooms/${bookingData.roomId}`, {
+        const roomResponse = await axios.get(`${apiUrl}/rooms/${bookingData.roomId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -160,7 +161,8 @@ const EditBooking = ({ bookingId, onClose, onSuccess }) => {
       setAvailability({ ...availability, isChecking: true });
       
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:8080/api/rooms/availability`, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms/availability`, {
         params: {
           checkInDate: formData.checkInDate,
           checkOutDate: formData.checkOutDate,
@@ -231,8 +233,9 @@ const EditBooking = ({ bookingId, onClose, onSuccess }) => {
         return;
       }
       
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const response = await axios.put(
-        `http://localhost:8080/api/bookings/${bookingId}`,
+        `${apiUrl}/bookings/${bookingId}`,
         {
           checkInDate: formData.checkInDate,
           checkOutDate: formData.checkOutDate,

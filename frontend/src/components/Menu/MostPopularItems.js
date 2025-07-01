@@ -3,31 +3,21 @@ import axios from "axios";
 import { FiStar, FiInfo, FiShoppingCart, FiClock, FiThermometer, FiHeart } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { apiConfig } from "../../config/api";
+import { getMenuImageUrl, handleImageError } from "../../utils/imageUtils";
 
 const MostPopularItems = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "/images/placeholder-food.jpg";
-    try {
-      if (imagePath.startsWith("http")) return imagePath;
-      const cleanPath = imagePath.replace(/^\/+/, "");
-      return cleanPath.includes("uploads")
-        ? `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`
-        : `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
-    } catch (error) {
-      console.error("Error formatting image URL:", error);
-      return "/images/placeholder-food.jpg";
-    }
-  };
+
 
   // Fetch menu items
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const response = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/menus");
+        const response = await axios.get(apiConfig.endpoints.menus);
         // Get top 3 items with highest ratings/popularity
         const topItems = response.data
           .sort((a, b) => (b.rating || 4.5) - (a.rating || 4.5))
@@ -180,6 +170,46 @@ const MostPopularItems = () => {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.8; transform: scale(1.1); }
           }
+
+          /* Responsive Styles for MostPopularItems */
+          @media (max-width: 768px) {
+            .popular-items-container {
+              padding: 0 1rem !important;
+            }
+            .popular-items-grid {
+              grid-template-columns: 1fr !important;
+              gap: 1rem !important;
+              max-width: 100% !important;
+            }
+            .popular-items-title {
+              font-size: 2rem !important;
+            }
+            .popular-item-card {
+              max-width: 100% !important;
+              min-width: auto !important;
+              margin: 0 !important;
+            }
+            .popular-item-features {
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 0.3rem !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .popular-items-container {
+              padding: 0 0.75rem !important;
+            }
+            .popular-items-title {
+              font-size: 1.75rem !important;
+            }
+            .popular-item-features {
+              grid-template-columns: 1fr !important;
+              gap: 0.25rem !important;
+            }
+            .popular-item-content {
+              padding: 0.75rem !important;
+            }
+          }
         `}
       </style>
       <section style={{
@@ -217,7 +247,7 @@ const MostPopularItems = () => {
         zIndex: 0
       }} />
 
-      <div style={{
+      <div className="popular-items-container" style={{
         width: '100%',
         maxWidth: '1000px',
         margin: '0 auto',
@@ -226,7 +256,7 @@ const MostPopularItems = () => {
         zIndex: 1
       }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <h2 style={{
+          <h2 className="popular-items-title" style={{
             fontSize: '2.5rem',
             fontWeight: '800',
             background: 'linear-gradient(135deg, #ffffff 0%, #bb86fc 100%)',
@@ -238,9 +268,39 @@ const MostPopularItems = () => {
           }}>
             Most Popular Items
           </h2>
+          <Link
+            to="/order-food"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1.5rem',
+              background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(29, 78, 216, 0.8))',
+              color: '#ffffff',
+              textDecoration: 'none',
+              borderRadius: '0.75rem',
+              fontWeight: '600',
+              fontSize: '0.9rem',
+              transition: 'all 0.3s ease',
+              border: '1px solid rgba(30, 64, 175, 0.6)',
+              boxShadow: '0 4px 15px rgba(30, 64, 175, 0.3)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(30, 64, 175, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(30, 64, 175, 0.3)';
+            }}
+          >
+            View Full Menu
+          </Link>
         </div>
 
-        <div style={{
+        <div className="popular-items-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
           gap: '1rem',
@@ -252,6 +312,7 @@ const MostPopularItems = () => {
           {menuItems.map((item) => (
             <div
               key={item._id}
+              className="popular-item-card"
               style={{
                 background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
                 backdropFilter: 'blur(20px)',
@@ -275,7 +336,7 @@ const MostPopularItems = () => {
                 overflow: 'hidden'
               }}>
                 <img
-                  src={getImageUrl(item.image)}
+                  src={getMenuImageUrl(item.image)}
                   alt={item.name}
                   style={{
                     width: '100%',
@@ -283,10 +344,7 @@ const MostPopularItems = () => {
                     objectFit: 'cover',
                     transition: 'transform 0.3s ease'
                   }}
-                  onError={(e) => {
-                    e.target.src = "/images/placeholder-food.jpg";
-                    e.target.onerror = null;
-                  }}
+                  onError={(e) => handleImageError(e, "/images/placeholder-food.jpg")}
                 />
 
                 {/* Rating Badge */}
@@ -327,7 +385,7 @@ const MostPopularItems = () => {
               </div>
 
               {/* Content Section */}
-              <div style={{ padding: '1rem' }}>
+              <div className="popular-item-content" style={{ padding: '1rem' }}>
                 <h3 style={{
                   color: '#fff',
                   fontSize: '1rem',
@@ -369,7 +427,7 @@ const MostPopularItems = () => {
                 </p>
 
                 {/* Feature Badges */}
-                <div style={{
+                <div className="popular-item-features" style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(3, 1fr)',
                   gap: '0.5rem',

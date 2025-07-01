@@ -104,6 +104,58 @@ const Services = () => {
             0%, 100% { box-shadow: 0 0 20px rgba(100, 255, 218, 0.3); }
             50% { box-shadow: 0 0 40px rgba(100, 255, 218, 0.6); }
           }
+
+          /* Responsive Styles */
+          @media (max-width: 768px) {
+            .services-grid {
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+              gap: 1rem !important;
+              padding: 0 !important;
+            }
+            .service-card {
+              padding: 1rem !important;
+            }
+            .service-title {
+              font-size: 1rem !important;
+            }
+            .service-description {
+              font-size: 0.8rem !important;
+              -webkit-line-clamp: 3 !important;
+            }
+            .service-icon {
+              width: 2.5rem !important;
+              height: 2.5rem !important;
+              font-size: 1rem !important;
+            }
+            .feature-tags {
+              gap: 0.3rem !important;
+            }
+            .feature-tag {
+              font-size: 0.65rem !important;
+              padding: 0.15rem 0.4rem !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .services-grid {
+              grid-template-columns: 1fr !important;
+              gap: 0.75rem !important;
+            }
+            .service-card {
+              padding: 0.875rem !important;
+              margin: 0 0.5rem !important;
+            }
+            .service-title {
+              font-size: 0.95rem !important;
+            }
+            .service-description {
+              font-size: 0.75rem !important;
+            }
+            .learn-more-btn {
+              padding: 0.4rem 0.8rem !important;
+              font-size: 0.7rem !important;
+            }
+          }
         `}
       </style>
       <section style={{
@@ -177,7 +229,7 @@ const Services = () => {
           width: '100%',
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '0 2rem',
+          padding: '0 1rem',
           position: 'relative',
           zIndex: 2
         }}>
@@ -208,15 +260,16 @@ const Services = () => {
           </div>
 
           {/* Services Grid */}
-          <div style={{
+          <div className="services-grid" style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
             gap: '1.25rem',
             padding: '0.5rem 0'
           }}>
             {services.map((service, index) => (
               <div
                 key={index}
+                className="service-card"
                 style={{
                   background: hoveredCard === index
                     ? service.gradient
@@ -299,7 +352,7 @@ const Services = () => {
 
                 {/* Content */}
                 <div style={{ position: 'relative', zIndex: 2 }}>
-                  <h3 style={{
+                  <h3 className="service-title" style={{
                     fontSize: '1.1rem',
                     fontWeight: '700',
                     color: '#fff',
@@ -315,7 +368,7 @@ const Services = () => {
                     {service.title}
                   </h3>
 
-                  <p style={{
+                  <p className="service-description" style={{
                     color: 'rgba(255, 255, 255, 0.7)',
                     fontSize: '0.85rem',
                     lineHeight: '1.4',

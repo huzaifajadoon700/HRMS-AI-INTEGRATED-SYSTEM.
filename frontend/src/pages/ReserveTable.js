@@ -5,8 +5,123 @@ import { FiCalendar, FiUsers, FiClock, FiX, FiStar, FiHeart } from "react-icons/
 import Header from "../components/common/Header";
 import EditReservation from "../components/User/EditReservation";
 import TableRecommendations from "../components/tables/TableRecommendations";
-import { tableRecommendationService } from "../services/tableRecommendationService";
+import { tableRecommendationService, tableUtils } from "../services/tableRecommendationService";
 import "./ReserveTable.css";
+
+// Add responsive styles
+const responsiveStyles = `
+  @media (max-width: 768px) {
+    .reserve-table-hero {
+      padding: 1.5rem 1rem 1rem !important;
+    }
+    .reserve-table-title {
+      font-size: 2rem !important;
+    }
+    .reserve-table-subtitle {
+      font-size: 0.9rem !important;
+    }
+    .reserve-table-tabs {
+      flex-direction: column !important;
+      gap: 0.5rem !important;
+    }
+    .reserve-table-tab-button {
+      padding: 0.625rem 1rem !important;
+      font-size: 0.8rem !important;
+    }
+    .reserve-table-filters {
+      margin: 0 1rem 1.5rem !important;
+      padding: 1rem !important;
+    }
+    .reserve-table-filters-grid {
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem !important;
+    }
+    .reserve-table-filters-grid-secondary {
+      grid-template-columns: repeat(2, 1fr) !important;
+      gap: 0.75rem !important;
+    }
+    .reserve-table-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+      margin: 0 1rem !important;
+    }
+    .reserve-table-card {
+      margin: 0 !important;
+    }
+    .reserve-table-card-content {
+      padding: 1.25rem !important;
+    }
+    .reserve-table-card-title {
+      font-size: 1.1rem !important;
+    }
+    .reserve-table-card-description {
+      font-size: 0.85rem !important;
+    }
+    .reserve-table-badge {
+      padding: 0.375rem 0.625rem !important;
+      font-size: 0.75rem !important;
+    }
+    .reserve-table-feature {
+      font-size: 0.8rem !important;
+      padding: 0.375rem !important;
+    }
+    .reserve-table-button {
+      padding: 0.625rem 1rem !important;
+      font-size: 0.85rem !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .reserve-table-hero {
+      padding: 1rem 0.75rem 0.75rem !important;
+    }
+    .reserve-table-title {
+      font-size: 1.75rem !important;
+    }
+    .reserve-table-subtitle {
+      font-size: 0.85rem !important;
+    }
+    .reserve-table-filters {
+      margin: 0 0.75rem 1.25rem !important;
+      padding: 0.75rem !important;
+    }
+    .reserve-table-filters-grid-secondary {
+      grid-template-columns: 1fr !important;
+    }
+    .reserve-table-grid {
+      margin: 0 0.75rem !important;
+      gap: 0.75rem !important;
+    }
+    .reserve-table-card-content {
+      padding: 1rem !important;
+    }
+    .reserve-table-card-title {
+      font-size: 1rem !important;
+    }
+    .reserve-table-card-description {
+      font-size: 0.8rem !important;
+    }
+    .reserve-table-badge {
+      padding: 0.25rem 0.5rem !important;
+      font-size: 0.7rem !important;
+    }
+    .reserve-table-feature {
+      font-size: 0.75rem !important;
+      padding: 0.25rem !important;
+    }
+    .reserve-table-button {
+      padding: 0.5rem 0.75rem !important;
+      font-size: 0.8rem !important;
+    }
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = responsiveStyles;
+  document.head.appendChild(styleElement);
+}
 
 const ReserveTable = () => {
   const navigate = useNavigate();
@@ -33,19 +148,7 @@ const ReserveTable = () => {
   const queryParams = new URLSearchParams(location.search);
   const editReservationId = queryParams.get('edit');
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "/images/placeholder-table.jpg";
-    try {
-      if (imagePath.startsWith("http")) return imagePath;
-      const cleanPath = imagePath.replace(/^\/+/, "");
-      return cleanPath.includes("uploads")
-        ? `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`
-        : `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
-    } catch (error) {
-      console.error("Error formatting image URL:", error);
-      return "/images/placeholder-table.jpg";
-    }
-  };
+
 
   useEffect(() => {
     fetchTables();
@@ -81,7 +184,8 @@ const ReserveTable = () => {
     // Check availability for specific date/time
     if (reservationData.date && reservationData.time && filters.availability) {
       try {
-        const response = await axios.get(`https://hrms-ai-integrated-system-production.up.railway.app/api/tables/availability`, {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/tables/availability`, {
           params: {
             reservationDate: reservationData.date,
             time: reservationData.time,
@@ -112,7 +216,8 @@ const ReserveTable = () => {
 
   const fetchTables = async () => {
     try {
-      const response = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/tables");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/tables`);
       setTables(response.data);
     } catch (error) {
       setError("Failed to load tables. Please try again later.");
@@ -197,7 +302,8 @@ const ReserveTable = () => {
 
     // Check for double booking
     try {
-      const response = await axios.get(`https://hrms-ai-integrated-system-production.up.railway.app/api/tables/availability`, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/tables/availability`, {
         params: {
           reservationDate: reservationData.date,
           time: reservationData.time,
@@ -223,7 +329,7 @@ const ReserveTable = () => {
     const reservationDetails = {
       tableId: table._id,
       tableName: table.tableName,
-      tableImage: getImageUrl(table.image),
+      tableImage: tableUtils.getImageUrl(table.image),
       tableCapacity: table.capacity,
       tableDescription: table.description,
       date: reservationData.date,
@@ -331,7 +437,7 @@ const ReserveTable = () => {
               gap: '1.5rem',
               marginBottom: '2rem'
             }}>
-              {Array(6).fill().map((_, index) => (
+              {Array(8).fill().map((_, index) => (
                 <div
                   key={index}
                   style={{
@@ -376,12 +482,12 @@ const ReserveTable = () => {
           padding: '60px 1.5rem 1.5rem'
         }}>
           {/* Hero Section */}
-          <div style={{
+          <div className="reserve-table-hero" style={{
             textAlign: 'center',
             marginBottom: '2rem',
             padding: '1rem 0'
           }}>
-            <h1 style={{
+            <h1 className="reserve-table-title" style={{
               fontSize: '2.5rem',
               fontWeight: '700',
               background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 30%, #bb86fc 70%, #ff6b9d 100%)',
@@ -395,7 +501,7 @@ const ReserveTable = () => {
             }}>
               Reserve a Table
             </h1>
-            <p style={{
+            <p className="reserve-table-subtitle" style={{
               fontSize: '1rem',
               color: 'rgba(255, 255, 255, 0.8)',
               margin: '0',
@@ -413,13 +519,14 @@ const ReserveTable = () => {
             marginBottom: '2rem'
           }}>
             {/* Tab Navigation */}
-            <div style={{
+            <div className="reserve-table-tabs" style={{
               display: 'flex',
               gap: '0.5rem',
               marginBottom: '2rem',
               justifyContent: 'center'
             }}>
               <button
+                className="reserve-table-tab-button"
                 onClick={() => setActiveTab('recommendations')}
                 style={{
                   padding: '0.75rem 1.5rem',
@@ -441,6 +548,7 @@ const ReserveTable = () => {
                 💝 RECOMMENDED FOR YOU
               </button>
               <button
+                className="reserve-table-tab-button"
                 onClick={() => setActiveTab('all')}
                 style={{
                   padding: '0.75rem 1.5rem',
@@ -475,7 +583,7 @@ const ReserveTable = () => {
             ) : (
               <div>
                 {/* Booking Form Container - Same style as Recommendations */}
-                <div style={{
+                <div className="reserve-table-filters" style={{
                   background: 'rgba(100, 255, 218, 0.05)',
                   borderRadius: '1rem',
                   padding: '1.2rem',
@@ -492,7 +600,7 @@ const ReserveTable = () => {
                     🍽️ Find Your Perfect Table
                   </h3>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                  <div className="reserve-table-filters-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
                     <div>
                       <label style={{ display: 'block', color: '#fff', fontSize: '0.75rem', fontWeight: '500', marginBottom: '0.4rem' }}>
                         📅 Date *
@@ -572,7 +680,7 @@ const ReserveTable = () => {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
+                  <div className="reserve-table-filters-grid-secondary" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
                     <div>
                       <label style={{ display: 'block', color: '#fff', fontSize: '0.75rem', fontWeight: '500', marginBottom: '0.4rem' }}>
                         📍 Location
@@ -699,15 +807,16 @@ const ReserveTable = () => {
             </div>
           )}
 
-          {/* Tables Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-            gap: '1.5rem',
-            marginBottom: '2rem'
-          }}>
+          {/* Tables Grid - Only show when not on recommendations tab */}
+          {activeTab !== 'recommendations' && (
+            <div className="reserve-table-grid" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+              gap: '1.5rem',
+              marginBottom: '2rem'
+            }}>
             {loading ? (
-              Array(6).fill().map((_, index) => (
+              Array(8).fill().map((_, index) => (
                 <div
                   key={index}
                   style={{
@@ -744,6 +853,7 @@ const ReserveTable = () => {
               filteredTables.map((table) => (
                 <div
                   key={table._id}
+                  className="reserve-table-card"
                   style={{
                     background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.8) 0%, rgba(26, 35, 50, 0.6) 100%)',
                     backdropFilter: 'blur(20px)',
@@ -767,7 +877,7 @@ const ReserveTable = () => {
                   {/* Table Image */}
                   <div style={{ position: 'relative', paddingTop: '60%', overflow: 'hidden' }}>
                     <img
-                      src={getImageUrl(table.image)}
+                      src={tableUtils.getImageUrl(table.image)}
                       alt={table.tableName}
                       style={{
                         position: 'absolute',
@@ -785,7 +895,7 @@ const ReserveTable = () => {
                     />
 
                     {/* Capacity Badge */}
-                    <div style={{
+                    <div className="reserve-table-badge" style={{
                       position: 'absolute',
                       top: '1rem',
                       right: '1rem',
@@ -806,7 +916,7 @@ const ReserveTable = () => {
 
                     {/* Rating Badge */}
                     {table.avgRating && (
-                      <div style={{
+                      <div className="reserve-table-badge" style={{
                         position: 'absolute',
                         top: '1rem',
                         left: '1rem',
@@ -828,10 +938,10 @@ const ReserveTable = () => {
                   </div>
 
                   {/* Card Content */}
-                  <div style={{ padding: '1.5rem' }}>
+                  <div className="reserve-table-card-content" style={{ padding: '1.5rem' }}>
                     {/* Header with Title and Favorite */}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-                      <h3 style={{
+                      <h3 className="reserve-table-card-title" style={{
                         color: '#64ffda',
                         fontSize: '1.25rem',
                         fontWeight: '600',
@@ -860,7 +970,7 @@ const ReserveTable = () => {
                     </div>
 
                     {/* Description */}
-                    <p style={{
+                    <p className="reserve-table-card-description" style={{
                       color: 'rgba(255, 255, 255, 0.8)',
                       fontSize: '0.9rem',
                       lineHeight: '1.4',
@@ -889,7 +999,7 @@ const ReserveTable = () => {
 
                     {/* Features */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                      <div style={{
+                      <div className="reserve-table-feature" style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.5rem',
@@ -902,7 +1012,7 @@ const ReserveTable = () => {
                         <FiClock size={16} style={{ color: '#64ffda' }} />
                         <span>Available for booking</span>
                       </div>
-                      <div style={{
+                      <div className="reserve-table-feature" style={{
                         display: 'flex',
                         alignItems: 'center',
                         gap: '0.5rem',
@@ -919,6 +1029,7 @@ const ReserveTable = () => {
 
                     {/* Reserve Button */}
                     <button
+                      className="reserve-table-button"
                       onClick={() => handleReserveClick(table)}
                       style={{
                         width: '100%',
@@ -941,6 +1052,7 @@ const ReserveTable = () => {
               ))
             )}
           </div>
+          )}
         </div>
       </div>
     </>

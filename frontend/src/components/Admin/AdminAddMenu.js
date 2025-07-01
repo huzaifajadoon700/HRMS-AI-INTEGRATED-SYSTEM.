@@ -8,11 +8,13 @@ import {
   FiToggleLeft, FiToggleRight, FiPackage, FiStar
 } from "react-icons/fi";
 import "./AdminManageRooms.css";
+import "./AdminAddMenu.css";
 
 const AdminAddMenu = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -83,11 +85,17 @@ const AdminAddMenu = () => {
       }
     });
 
+    // Add image URL if provided
+    if (imageUrl.trim()) {
+      submitData.append('imageUrl', imageUrl.trim());
+    }
+
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       await axios.post(
-        "http://localhost:8080/api/menus",
+        `${apiUrl}/menus`,
         submitData,
         {
           headers: {
@@ -107,6 +115,7 @@ const AdminAddMenu = () => {
         image: null,
       });
       setImagePreview(null);
+      setImageUrl("");
       
       const fileInput = document.querySelector('input[type="file"]');
       if (fileInput) {
@@ -277,30 +286,54 @@ const AdminAddMenu = () => {
                     </div>
                   </div>
 
-                  {/* Image Upload Section */}
+                  {/* Image Section */}
                   <div className="form-section-divider">
                     <h3 className="section-title">Menu Item Image</h3>
-                    <p className="section-subtitle">Upload an appetizing image of the dish</p>
+                    <p className="section-subtitle">Add an appetizing image of the dish</p>
                   </div>
 
-                  <div className="image-upload-section">
-                    <div className="upload-area">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        className="file-input"
-                        id="menu-image"
-                      />
-                      <label htmlFor="menu-image" className="upload-label">
-                        <div className="upload-content">
-                          <FiUpload className="upload-icon" />
-                          <div className="upload-text">
-                            <span className="upload-title">Click to upload image</span>
-                            <span className="upload-subtitle">PNG, JPG, GIF up to 5MB</span>
-                          </div>
-                        </div>
+                  <div className="form-group full-width">
+                    {/* Image URL Input */}
+                    <div className="form-group">
+                      <label className="form-label">
+                        <FiImage className="label-icon" />
+                        Image URL (Recommended)
                       </label>
+                      <input
+                        type="url"
+                        value={imageUrl}
+                        onChange={(e) => {
+                          setImageUrl(e.target.value);
+                          if (e.target.value) {
+                            setImagePreview(e.target.value);
+                          }
+                        }}
+                        className="enhanced-input"
+                        placeholder="https://images.unsplash.com/... or any food image URL"
+                      />
+                      <small className="form-text">Paste an image URL for instant preview</small>
+                    </div>
+
+                    {/* OR File Upload */}
+                    <div className="image-upload-section">
+                      <div className="upload-area">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="file-input"
+                          id="menu-image"
+                        />
+                        <label htmlFor="menu-image" className="upload-label">
+                          <div className="upload-content">
+                            <FiUpload className="upload-icon" />
+                            <div className="upload-text">
+                              <span className="upload-title">OR Upload File</span>
+                              <span className="upload-subtitle">PNG, JPG, GIF up to 5MB (development only)</span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
                     </div>
                   </div>
 

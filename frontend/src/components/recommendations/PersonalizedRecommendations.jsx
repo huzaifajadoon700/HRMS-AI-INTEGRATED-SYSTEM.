@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Spinner, Badge } from 'react-bootstrap';
-import { FiRefreshCw, FiUser, FiTrendingUp, FiStar, FiZap } from 'react-icons/fi';
+import { FiRefreshCw, FiUser, FiStar, FiZap } from 'react-icons/fi';
 import RecommendationCard from './RecommendationCard';
 import { recommendationAPI, recommendationHelpers } from '../../api/recommendations';
+import { apiConfig } from '../../config/api';
 import './PersonalizedRecommendations.css';
 
-const PersonalizedRecommendations = ({ 
-  userId = null, 
-  showHeader = true, 
-  maxItems = 8,
+const PersonalizedRecommendations = ({
+  userId = null,
+  showHeader = true,
   className = '',
   onAddToCart,
-  onRate 
+  onRate,
+  filteredItems = null,
+  searchTerm = '',
+  selectedCategory = ''
 }) => {
   const [recommendations, setRecommendations] = useState([]);
+  const [originalRecommendations, setOriginalRecommendations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('personalized');
@@ -28,51 +32,235 @@ const PersonalizedRecommendations = ({
     loadRecommendations();
   }, [currentUserId, activeTab]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Apply external filtering when search/category filters are provided
+  useEffect(() => {
+    if (originalRecommendations.length > 0) {
+      // Apply search and category filtering to the original recommendations for both tabs
+      let filtered = originalRecommendations;
+
+      if (searchTerm) {
+        filtered = filtered.filter(item =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (item.description && item.description.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+      }
+
+      if (selectedCategory && selectedCategory !== 'all' && selectedCategory !== '') {
+        filtered = filtered.filter(item => item.category === selectedCategory);
+      }
+
+      // Update recommendations with filtered results
+      setRecommendations(filtered);
+    }
+  }, [searchTerm, selectedCategory, activeTab, originalRecommendations]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Custom function to get limited popular items for recommendations
+  const getPopularItemsForRecommendations = async (count) => {
+    try {
+      // Try the popular items endpoint first
+      const response = await recommendationAPI.getPopularItems(count);
+      if (response && response.success && response.recommendations && response.recommendations.length > 0) {
+        return response;
+      }
+      throw new Error('No popular items returned from API');
+    } catch (error) {
+      console.log('Popular items endpoint failed, creating limited popular items from menu:', error);
+
+      // Fallback: Get menu items and create a limited popular selection
+      try {
+        console.log('🔄 Fetching all menu items as fallback...');
+        const menuResponse = await fetch(apiConfig.endpoints.menus);
+        const menuData = await menuResponse.json();
+
+        console.log('📊 Fetched menu data:', menuData?.length || 0, 'items');
+
+        if (!menuData || menuData.length === 0) {
+          console.log('⚠️ No menu items found in database');
+          // Create some dummy items for testing
+          const dummyItems = [
+            {
+              _id: 'dummy1',
+              name: 'Chicken Biryani',
+              description: 'Delicious aromatic rice with chicken',
+              price: 450,
+              category: 'Main Course',
+              image: '/images/biryani.jpg',
+              availability: true,
+              averageRating: 4.5,
+              score: 4.5,
+              reason: 'dummy_data',
+              confidence: 'medium'
+            },
+            {
+              _id: 'dummy2',
+              name: 'Beef Karahi',
+              description: 'Spicy beef curry with traditional spices',
+              price: 550,
+              category: 'Main Course',
+              image: '/images/karahi.jpg',
+              availability: true,
+              averageRating: 4.3,
+              score: 4.3,
+              reason: 'dummy_data',
+              confidence: 'medium'
+            },
+            {
+              _id: 'dummy3',
+              name: 'Chicken Tikka',
+              description: 'Grilled chicken with special marinade',
+              price: 350,
+              category: 'Appetizer',
+              image: '/images/tikka.jpg',
+              availability: true,
+              averageRating: 4.7,
+              score: 4.7,
+              reason: 'dummy_data',
+              confidence: 'medium'
+            }
+          ].slice(0, count);
+
+          console.log('🎭 Using dummy data:', dummyItems.length, 'items');
+          return {
+            success: true,
+            recommendations: dummyItems,
+            popularItems: dummyItems,
+            message: `Showing ${dummyItems.length} sample menu items (database empty)`
+          };
+        }
+
+        const popularItems = menuData
+          .filter(item => item.availability !== false)
+          .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
+          .slice(0, count) // Limit to requested count
+          .map(item => ({
+            ...item,
+            score: item.averageRating || 4.5,
+            reason: 'popularity',
+            confidence: 'medium'
+          }));
+
+
+
+        return {
+          success: true,
+          recommendations: popularItems,
+          popularItems: popularItems,
+          message: `Showing ${popularItems.length} popular menu items`
+        };
+      } catch (fallbackError) {
+        console.error('❌ All fallbacks failed:', fallbackError);
+
+        // Last resort: return dummy data
+        const emergencyItems = [
+          {
+            _id: 'emergency1',
+            name: 'Special Dish',
+            description: 'Our chef special recommendation',
+            price: 400,
+            category: 'Special',
+            image: '/images/special.jpg',
+            availability: true,
+            averageRating: 4.5,
+            score: 4.5,
+            reason: 'emergency_fallback',
+            confidence: 'medium'
+          }
+        ];
+
+        return {
+          success: true,
+          recommendations: emergencyItems,
+          popularItems: emergencyItems,
+          message: 'Emergency fallback items'
+        };
+      }
+    }
+  };
+
   const loadRecommendations = async () => {
     try {
       setLoading(true);
       setError(null);
 
       let response;
-      
+
       switch (activeTab) {
         case 'personalized':
+          // For "Recommended" tab, load actual personalized recommendations
+          const recommendationCount = 12;
           if (isLoggedIn && currentUserId) {
             try {
-              response = await recommendationAPI.getRecommendations(currentUserId, maxItems);
-            } catch (personalizedError) {
-              console.log('Personalized recommendations failed, using popular items:', personalizedError);
-              response = await recommendationAPI.getPopularItems(maxItems);
+              response = await recommendationAPI.getRecommendations(currentUserId, recommendationCount);
+
+              // Check if we got valid recommendations with sufficient count
+              if (!response || !response.success || !response.recommendations || response.recommendations.length < 6) {
+                console.log(`⚠️ Got only ${response?.recommendations?.length || 0} personalized recommendations, supplementing with popular items`);
+
+                // Get popular items to supplement
+                const popularResponse = await getPopularItemsForRecommendations(recommendationCount);
+
+                if (response && response.recommendations && response.recommendations.length > 0) {
+                  // Combine personalized + popular items
+                  const personalizedItems = response.recommendations;
+                  const popularItems = popularResponse.recommendations || [];
+
+                  // Remove duplicates and combine
+                  const seenIds = new Set(personalizedItems.map(item => item._id));
+                  const additionalItems = popularItems.filter(item => !seenIds.has(item._id));
+
+                  const combinedItems = [...personalizedItems, ...additionalItems].slice(0, recommendationCount);
+
+                  response = {
+                    success: true,
+                    recommendations: combinedItems,
+                    message: `Showing ${personalizedItems.length} personalized + ${combinedItems.length - personalizedItems.length} popular items`
+                  };
+                } else {
+                  // No personalized items, use popular items
+                  response = popularResponse;
+                }
+              }
+            } catch (recommendationError) {
+              console.log('❌ Personalized recommendations failed, using popular items:', recommendationError);
+              response = await getPopularItemsForRecommendations(recommendationCount);
             }
           } else {
-            response = await recommendationAPI.getPopularItems(maxItems);
+            // For non-logged in users, show popular items as recommendations
+            console.log('👤 User not logged in, showing popular items as recommendations');
+            response = await getPopularItemsForRecommendations(recommendationCount);
           }
           break;
-          
 
-        case 'popular':
-          response = await recommendationAPI.getPopularItems(maxItems);
-          break;
-
-        case 'pakistani':
-          if (isLoggedIn && currentUserId) {
-            try {
-              response = await recommendationAPI.getPakistaniRecommendations(currentUserId, maxItems);
-            } catch (pakistaniError) {
-              console.log('Pakistani recommendations failed, using popular items:', pakistaniError);
-              response = await recommendationAPI.getPopularItems(maxItems);
-            }
-          } else {
-            response = await recommendationAPI.getPakistaniRecommendations('guest', maxItems);
+        case 'allmenu':
+          // For "All Menu" tab, load ALL menu items
+          try {
+            console.log('Loading all menu items...');
+            const menuResponse = await fetch(apiConfig.endpoints.menus);
+            const menuData = await menuResponse.json();
+            console.log('Menu items loaded:', menuData.length);
+            response = {
+              success: true,
+              recommendations: menuData.map(item => ({
+                ...item,
+                score: item.rating || item.averageRating || 4.5,
+                reason: 'menu_item',
+                confidence: 'high'
+              }))
+            };
+          } catch (menuError) {
+            console.log('Failed to load menu items, using popular items:', menuError);
+            response = await recommendationAPI.getPopularItems(50); // Show more items for "All Menu"
           }
           break;
 
         default:
-          response = await recommendationAPI.getPopularItems(maxItems);
+          response = await getPopularItemsForRecommendations(12);
       }
 
       if (response && response.success) {
         const items = response.recommendations || response.popularItems || [];
+        console.log('Setting recommendations:', items.length, 'items');
+        setOriginalRecommendations(items);
         setRecommendations(items);
 
         // Store algorithm info for display
@@ -84,22 +272,65 @@ const PersonalizedRecommendations = ({
         if (response.userStats) {
           setUserStats(response.userStats);
         }
+
+        // Clear any previous errors
+        setError(null);
       } else {
         throw new Error(response?.message || 'Failed to load recommendations');
       }
     } catch (err) {
-      console.error('Error loading recommendations:', err);
+      console.error('❌ Error loading recommendations:', err);
       setError(err.message || 'Failed to load recommendations');
-      
+
       // Fallback to popular items
       try {
-        const fallbackResponse = await recommendationAPI.getPopularItems(maxItems);
-        if (fallbackResponse.success) {
-          setRecommendations(fallbackResponse.popularItems || []);
+        console.log('🔄 Attempting fallback to popular items...');
+        const fallbackResponse = await getPopularItemsForRecommendations(12);
+        if (fallbackResponse.success && fallbackResponse.recommendations && fallbackResponse.recommendations.length > 0) {
+          const fallbackItems = fallbackResponse.recommendations || fallbackResponse.popularItems || [];
+          console.log('✅ Fallback successful:', fallbackItems.length, 'items');
+          setOriginalRecommendations(fallbackItems);
+          setRecommendations(fallbackItems);
           setError('Showing popular items instead');
+        } else {
+          console.log('⚠️ Fallback returned no items, using emergency data');
+          // Emergency fallback with dummy data
+          const emergencyItems = [
+            {
+              _id: 'emergency1',
+              name: 'Chicken Biryani',
+              description: 'Traditional aromatic rice dish',
+              price: 450,
+              category: 'Main Course',
+              image: '/images/biryani.jpg',
+              availability: true,
+              averageRating: 4.5,
+              score: 4.5,
+              reason: 'emergency_data',
+              confidence: 'medium'
+            },
+            {
+              _id: 'emergency2',
+              name: 'Beef Karahi',
+              description: 'Spicy traditional curry',
+              price: 550,
+              category: 'Main Course',
+              image: '/images/karahi.jpg',
+              availability: true,
+              averageRating: 4.3,
+              score: 4.3,
+              reason: 'emergency_data',
+              confidence: 'medium'
+            }
+          ];
+          setOriginalRecommendations(emergencyItems);
+          setRecommendations(emergencyItems);
+          setError('Showing sample items (connection issue)');
         }
       } catch (fallbackErr) {
-        console.error('Fallback also failed:', fallbackErr);
+        console.error('❌ Fallback also failed:', fallbackErr);
+        // Set empty but don't leave user with nothing
+        setError('Unable to load menu items. Please refresh the page.');
       }
     } finally {
       setLoading(false);
@@ -144,9 +375,8 @@ const PersonalizedRecommendations = ({
 
   const getTabIcon = (tab) => {
     switch (tab) {
-      case 'personalized': return <FiUser />;
-      case 'popular': return <FiTrendingUp />;
-      case 'pakistani': return <span style={{ fontSize: '16px' }}>🇵🇰</span>;
+      case 'personalized': return <FiZap />;
+      case 'allmenu': return <FiStar />;
       default: return <FiStar />;
     }
   };
@@ -154,11 +384,9 @@ const PersonalizedRecommendations = ({
   const getTabTitle = () => {
     switch (activeTab) {
       case 'personalized':
-        return isLoggedIn ? 'Recommended for You' : 'Popular Items';
-      case 'popular':
-        return 'Most Popular Items';
-      case 'pakistani':
-        return 'Pakistani Cuisine';
+        return 'Recommended';
+      case 'allmenu':
+        return 'All Menu';
       default:
         return 'Recommendations';
     }
@@ -167,13 +395,9 @@ const PersonalizedRecommendations = ({
   const getTabSubtitle = () => {
     switch (activeTab) {
       case 'personalized':
-        return isLoggedIn
-          ? 'AI-powered recommendations based on your preferences'
-          : 'Discover our most loved dishes';
-      case 'popular':
-        return 'Customer favorites and trending dishes';
-      case 'pakistani':
-        return 'Authentic Pakistani dishes with traditional spices and flavors';
+        return 'Personalized recommendations based on your preferences';
+      case 'allmenu':
+        return 'Browse our complete menu collection';
       default:
         return 'Discover delicious food recommendations';
     }
@@ -266,21 +490,19 @@ const PersonalizedRecommendations = ({
                 }
               }}
             >
-              <FiUser size={16} />
-              {isLoggedIn ? 'For You' : 'Popular'}
+              <FiZap size={16} />
+              Recommended
             </button>
 
-
-
             <button
-              onClick={() => setActiveTab('popular')}
+              onClick={() => setActiveTab('allmenu')}
               style={{
                 padding: '0.6rem 1.2rem',
-                background: activeTab === 'popular'
+                background: activeTab === 'allmenu'
                   ? 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)'
                   : 'rgba(255, 255, 255, 0.1)',
-                color: activeTab === 'popular' ? '#0a192f' : '#64ffda',
-                border: activeTab === 'popular' ? 'none' : '1px solid rgba(100, 255, 218, 0.3)',
+                color: activeTab === 'allmenu' ? '#0a192f' : '#64ffda',
+                border: activeTab === 'allmenu' ? 'none' : '1px solid rgba(100, 255, 218, 0.3)',
                 borderRadius: '1.5rem',
                 fontSize: '0.85rem',
                 fontWeight: '600',
@@ -289,59 +511,23 @@ const PersonalizedRecommendations = ({
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                boxShadow: activeTab === 'popular' ? '0 4px 12px rgba(100, 255, 218, 0.3)' : 'none'
+                boxShadow: activeTab === 'allmenu' ? '0 4px 12px rgba(100, 255, 218, 0.3)' : 'none'
               }}
               onMouseEnter={(e) => {
-                if (activeTab !== 'popular') {
+                if (activeTab !== 'allmenu') {
                   e.target.style.background = 'rgba(100, 255, 218, 0.2)';
                   e.target.style.borderColor = 'rgba(100, 255, 218, 0.5)';
                 }
               }}
               onMouseLeave={(e) => {
-                if (activeTab !== 'popular') {
+                if (activeTab !== 'allmenu') {
                   e.target.style.background = 'rgba(255, 255, 255, 0.1)';
                   e.target.style.borderColor = 'rgba(100, 255, 218, 0.3)';
                 }
               }}
             >
-              <FiTrendingUp size={16} />
-              Trending
-            </button>
-
-            <button
-              onClick={() => setActiveTab('pakistani')}
-              style={{
-                padding: '0.6rem 1.2rem',
-                background: activeTab === 'pakistani'
-                  ? 'linear-gradient(135deg, #00ff88 0%, #00dd77 100%)'
-                  : 'rgba(255, 255, 255, 0.1)',
-                color: activeTab === 'pakistani' ? '#0a192f' : '#00ff88',
-                border: activeTab === 'pakistani' ? 'none' : '1px solid rgba(0, 255, 136, 0.3)',
-                borderRadius: '1.5rem',
-                fontSize: '0.85rem',
-                fontWeight: '600',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.5rem',
-                boxShadow: activeTab === 'pakistani' ? '0 4px 12px rgba(0, 255, 136, 0.3)' : 'none'
-              }}
-              onMouseEnter={(e) => {
-                if (activeTab !== 'pakistani') {
-                  e.target.style.background = 'rgba(0, 255, 136, 0.2)';
-                  e.target.style.borderColor = 'rgba(0, 255, 136, 0.5)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (activeTab !== 'pakistani') {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.borderColor = 'rgba(0, 255, 136, 0.3)';
-                }
-              }}
-            >
-              🇵🇰
-              Pakistani
+              <FiStar size={16} />
+              All Menu
             </button>
 
             {/* Refresh Button */}
@@ -386,83 +572,14 @@ const PersonalizedRecommendations = ({
             </button>
           </div>
 
-          {/* Algorithm Info Display */}
-          {algorithmInfo && activeTab === 'personalized' && isLoggedIn && (
-            <div style={{
-              background: 'rgba(100, 255, 218, 0.1)',
-              border: '1px solid rgba(100, 255, 218, 0.2)',
-              borderRadius: '0.75rem',
-              padding: '1rem',
-              marginTop: '1rem',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '0.5rem'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FiZap style={{ color: '#64ffda' }} />
-                <span style={{ color: '#fff', fontSize: '0.9rem', fontWeight: '600' }}>
-                  AI Algorithm Mix:
-                </span>
-              </div>
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                {algorithmInfo.svd > 0 && (
-                  <Badge style={{ background: '#64ffda', color: '#0a192f' }}>
-                    SVD ML: {algorithmInfo.svd}
-                  </Badge>
-                )}
-                {algorithmInfo.collaborative > 0 && (
-                  <Badge style={{ background: '#bb86fc', color: '#0a192f' }}>
-                    Similar Users: {algorithmInfo.collaborative}
-                  </Badge>
-                )}
-                {algorithmInfo.contentBased > 0 && (
-                  <Badge style={{ background: '#00ff88', color: '#0a192f' }}>
-                    Your Taste: {algorithmInfo.contentBased}
-                  </Badge>
-                )}
-                {algorithmInfo.popularity > 0 && (
-                  <Badge style={{ background: '#ff8800', color: '#0a192f' }}>
-                    Trending: {algorithmInfo.popularity}
-                  </Badge>
-                )}
-              </div>
-            </div>
-          )}
+         
 
           {/* User Stats Display */}
-          {userStats && activeTab === 'personalized' && isLoggedIn && (
-            <div style={{
-              background: 'rgba(187, 134, 252, 0.1)',
-              border: '1px solid rgba(187, 134, 252, 0.2)',
-              borderRadius: '0.75rem',
-              padding: '1rem',
-              marginTop: '0.5rem',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '0.5rem'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <FiUser style={{ color: '#bb86fc' }} />
-                <span style={{ color: '#fff', fontSize: '0.9rem', fontWeight: '600' }}>
-                  Your Activity:
-                </span>
-              </div>
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <Badge style={{ background: '#bb86fc', color: '#0a192f' }}>
-                  {userStats.totalInteractions} interactions
-                </Badge>
-                <Badge style={{ background: '#ff6b9d', color: '#0a192f' }}>
-                  {userStats.recentRatings} recent ratings
-                </Badge>
-              </div>
-            </div>
-          )}
+          
         </div>
       )}
+
+
 
       {error && (
         <div style={{
@@ -517,23 +634,56 @@ const PersonalizedRecommendations = ({
       ) : (
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 350px))',
-          gap: '1rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+          gap: '1.5rem',
           maxWidth: '100%',
-          justifyContent: 'center'
+          justifyContent: 'start',
+          alignItems: 'start'
         }}>
-          {recommendations.map((recommendation, index) => (
-            <div key={recommendation._id || recommendation.menuItemId || index}>
-              <RecommendationCard
-                recommendation={recommendation}
-                onAddToCart={handleAddToCart}
-                onRate={handleRate}
-                showReason={activeTab === 'personalized' && isLoggedIn}
-                showConfidence={activeTab === 'personalized' && isLoggedIn}
-                className="new"
-              />
-            </div>
-          ))}
+          {recommendations.map((recommendation, index) => {
+            // Extract menu item data - handle both flat and nested structures
+            const menuItemData = recommendation.menuItemId && typeof recommendation.menuItemId === 'object'
+              ? recommendation.menuItemId  // Nested structure (new users)
+              : recommendation;            // Flat structure (existing users)
+
+            // Ensure the recommendation has the required structure
+            const normalizedRecommendation = {
+              // Copy all properties from the menu item data
+              ...menuItemData,
+              // Ensure we have the basic required properties
+              _id: menuItemData._id || recommendation._id || recommendation.menuItemId,
+              name: menuItemData.name || recommendation.name || 'Unknown Item',
+              description: menuItemData.description || recommendation.description || 'Delicious food item',
+              price: menuItemData.price || recommendation.price || 0,
+              category: menuItemData.category || recommendation.category || 'Food',
+              image: menuItemData.image || recommendation.image || '/placeholder-food.jpg',
+              availability: menuItemData.availability !== false,
+              averageRating: menuItemData.averageRating || recommendation.averageRating || recommendation.score || 4.5,
+              totalRatings: menuItemData.totalRatings || recommendation.totalRatings || 0,
+              cuisine: menuItemData.cuisine || recommendation.cuisine || 'Pakistani',
+              spiceLevel: menuItemData.spiceLevel || recommendation.spiceLevel,
+              dietaryTags: menuItemData.dietaryTags || recommendation.dietaryTags || [],
+              preparationTime: menuItemData.preparationTime || recommendation.preparationTime,
+
+              // Recommendation-specific properties
+              reason: recommendation.reason || 'recommended',
+              confidence: recommendation.confidence || 'medium',
+              score: recommendation.score || menuItemData.averageRating || 4.5
+            };
+
+            return (
+              <div key={normalizedRecommendation._id || index}>
+                <RecommendationCard
+                  recommendation={normalizedRecommendation}
+                  onAddToCart={handleAddToCart}
+                  onRate={handleRate}
+                  showReason={true}
+                  showConfidence={true}
+                  className="new"
+                />
+              </div>
+            );
+          })}
         </div>
       )}
 

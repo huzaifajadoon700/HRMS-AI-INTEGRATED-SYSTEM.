@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FiStar, FiWifi, FiCoffee, FiTv, FiHeart, FiTrendingUp, FiShoppingCart, FiEye } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { getRoomImageUrl, handleImageError } from "../../utils/imageUtils";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const Rooms = () => {
@@ -14,19 +15,7 @@ const Rooms = () => {
   const [user, setUser] = useState(null);
   const [hoveredRoom, setHoveredRoom] = useState(null);
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "/images/placeholder-room.jpg";
-    try {
-      if (imagePath.startsWith("http")) return imagePath;
-      const cleanPath = imagePath.replace(/^\/+/, "");
-      return cleanPath.includes("uploads")
-        ? `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`
-        : `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
-    } catch (error) {
-      console.error("Error formatting image URL:", error);
-      return "/images/placeholder-room.jpg";
-    }
-  };
+
 
   // Check if user is logged in
   useEffect(() => {
@@ -46,7 +35,8 @@ const Rooms = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/rooms");
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/rooms`);
 
         setRooms(response.data);
       } catch (error) {
@@ -64,8 +54,10 @@ const Rooms = () => {
   useEffect(() => {
     const fetchPopularRooms = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/rooms/popular?count=6');
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/rooms/popular?count=6`);
         if (response.data.success) {
+          console.log('Fetched popular rooms:', response.data.popularRooms.length, response.data.popularRooms);
           setPopularRooms(response.data.popularRooms);
         }
       } catch (error) {
@@ -82,15 +74,18 @@ const Rooms = () => {
       if (!user?.id || !user?.token) return;
 
       try {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
         const response = await axios.get(
-          `http://localhost:8080/api/rooms/recommendations/${user.id}?count=6`,
+          `${apiUrl}/rooms/recommendations/${user.id}?count=6`,
           {
             headers: { Authorization: `Bearer ${user.token}` }
           }
         );
 
         if (response.data.success) {
-          setRecommendedRooms(response.data.recommendations || response.data.rooms || []);
+          const recommendations = response.data.recommendations || response.data.rooms || [];
+          console.log('Fetched recommendations:', recommendations.length, recommendations);
+          setRecommendedRooms(recommendations);
         }
       } catch (error) {
         console.error('Error fetching recommendations:', error);
@@ -104,13 +99,39 @@ const Rooms = () => {
 
   // Get current rooms to display - always show only 3 recommended rooms
   const getCurrentRooms = () => {
+    console.log('Home Rooms Debug:', {
+      recommendedRooms: recommendedRooms.length,
+      popularRooms: popularRooms.length,
+      allRooms: rooms.length,
+      user: !!user
+    });
+
+    let selectedRooms = [];
+
     // Always prioritize recommended rooms, limit to 3
     if (recommendedRooms.length > 0) {
-      return recommendedRooms.slice(0, 3);
+      selectedRooms = recommendedRooms.slice(0, 3);
+      console.log('Using recommended rooms:', selectedRooms.length);
     } else if (popularRooms.length > 0) {
-      return popularRooms.slice(0, 3);
+      selectedRooms = popularRooms.slice(0, 3);
+      console.log('Using popular rooms:', selectedRooms.length);
+    } else {
+      selectedRooms = rooms.slice(0, 3);
+      console.log('Using all rooms:', selectedRooms.length);
     }
-    return rooms.slice(0, 3);
+
+    // Fallback: if we still don't have 3 rooms, try to get more from other sources
+    if (selectedRooms.length < 3) {
+      console.log('Not enough rooms, trying fallback...');
+      const allAvailableRooms = [...recommendedRooms, ...popularRooms, ...rooms];
+      const uniqueRooms = allAvailableRooms.filter((room, index, self) =>
+        index === self.findIndex(r => (r._id || r.roomId) === (room._id || room.roomId))
+      );
+      selectedRooms = uniqueRooms.slice(0, 3);
+      console.log('Fallback result:', selectedRooms.length);
+    }
+
+    return selectedRooms;
   };
 
   // Removed slider functions since we're showing only 3 rooms
@@ -172,6 +193,53 @@ const Rooms = () => {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
           }
+
+          /* Responsive Styles */
+          @media (max-width: 768px) {
+            .rooms-grid {
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
+              gap: 1rem !important;
+              padding: 0 0.5rem !important;
+            }
+            .room-card {
+              max-width: 100% !important;
+              min-width: 250px !important;
+            }
+            .room-image {
+              height: 160px !important;
+            }
+            .room-title {
+              font-size: 1rem !important;
+            }
+            .room-description {
+              font-size: 0.8rem !important;
+            }
+            .facility-grid {
+              grid-template-columns: repeat(2, 1fr) !important;
+              gap: 0.5rem !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .rooms-grid {
+              grid-template-columns: 1fr !important;
+              gap: 0.75rem !important;
+              padding: 0 !important;
+            }
+            .room-card {
+              margin: 0 0.5rem !important;
+              min-width: auto !important;
+            }
+            .room-image {
+              height: 140px !important;
+            }
+            .room-content {
+              padding: 1rem !important;
+            }
+            .facility-grid {
+              grid-template-columns: 1fr !important;
+            }
+          }
         `}
       </style>
       <section style={{
@@ -230,11 +298,41 @@ const Rooms = () => {
           }}>
             Featured Rooms
           </h2>
+          <Link
+            to="/rooms"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              padding: '0.75rem 1.5rem',
+              background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(29, 78, 216, 0.8))',
+              color: '#ffffff',
+              textDecoration: 'none',
+              borderRadius: '0.75rem',
+              fontWeight: '600',
+              fontSize: '0.9rem',
+              transition: 'all 0.3s ease',
+              border: '1px solid rgba(30, 64, 175, 0.6)',
+              boxShadow: '0 4px 15px rgba(30, 64, 175, 0.3)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(30, 64, 175, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(30, 64, 175, 0.3)';
+            }}
+          >
+            View All Rooms
+          </Link>
         </div>
 
-        <div style={{
+        <div className="rooms-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           gap: '1rem',
           width: '100%',
           maxWidth: '1000px',
@@ -247,6 +345,7 @@ const Rooms = () => {
             return (
             <div
               key={room._id || roomItem.roomId}
+              className="room-card"
               style={{
                 background: hoveredRoom === room._id
                   ? 'linear-gradient(145deg, rgba(100, 255, 218, 0.12) 0%, rgba(187, 134, 252, 0.08) 50%, rgba(255, 107, 157, 0.06) 100%)'
@@ -282,7 +381,7 @@ const Rooms = () => {
                 background: 'linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.6) 100%)',
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
-                backgroundImage: `url(${getImageUrl(room.image)})`,
+                backgroundImage: `url(${getRoomImageUrl(room.image)})`,
                 transform: hoveredRoom === room._id ? 'scale(1.05)' : 'scale(1)',
                 transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
               }}>
@@ -556,7 +655,7 @@ const Rooms = () => {
                   marginTop: '0.5rem'
                 }}>
                   <Link
-                    to="/book-room"
+                    to="/rooms"
                     style={{
                       flex: 1,
                       display: 'flex',

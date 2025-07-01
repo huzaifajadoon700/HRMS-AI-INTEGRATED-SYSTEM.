@@ -1,7 +1,8 @@
-// src/api/rooms.ts
+import { apiConfig } from '../config/api';
+
 export const fetchRooms = async () => {
     try {
-      const response = await fetch("https://hrms-ai-integrated-system-production.up.railway.app/api/rooms");
+      const response = await fetch(apiConfig.endpoints.rooms);
       return await response.json();
     } catch (error) {
       console.error("Error fetching rooms:", error);

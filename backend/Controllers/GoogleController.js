@@ -7,7 +7,7 @@ const User = require('../Models/User');
 const verifyGoogleToken = async (token) => {
   const ticket = await client.verifyIdToken({
     idToken: token,
-    audience: '985359243899-vgjcmnu5921lk7ginjn9lvkoqib7t5po.apps.googleusercontent.com',  // Ensure the correct Client ID
+    audience: process.env.GOOGLE_CLIENT_ID,  // Use environment variable for Client ID
   });
 
   const payload = ticket.getPayload();
@@ -17,7 +17,11 @@ const verifyGoogleToken = async (token) => {
 module.exports = {
   googleAuth: async (req, res) => {
     const { token } = req.body;
-    
+
+    if (!token) {
+      return res.status(400).json({ message: 'Token is required' });
+    }
+
     try {
       const googleUser = await verifyGoogleToken(token);
 
@@ -38,11 +42,18 @@ module.exports = {
       // Generate JWT Token
       const jwtToken = jwt.sign(
         { id: user._id, email: user.email, role: user.role },
-        'secretkey',  // Your JWT secret key
-        { expiresIn: '1h' }
+        process.env.JWT_SECRET,  // Use environment variable for JWT secret
+        { expiresIn: '24h' }
       );
 
-      res.json({ jwtToken, role: user.role, name: user.name });
+      res.json({
+        jwtToken,
+        role: user.role,
+        name: user.name,
+        email: user.email,
+        userId: user._id,
+        phone: user.phone || null
+      });
     } catch (err) {
       console.log(err);
       res.status(500).send('Server Error');

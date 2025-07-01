@@ -13,7 +13,8 @@ const MenuList = ({ addToCart }) => {
   useEffect(() => {
     const fetchMenu = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/menu");
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/menu`);
         setMenu(response.data);
         setLoading(false);
       } catch (err) {

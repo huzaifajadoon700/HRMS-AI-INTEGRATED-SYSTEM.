@@ -1,12 +1,4 @@
-/**
- * Contact Page Component for HRMS Frontend
- * Contact form, location info, and customer support details
- *
- * @description Contact page with interactive form and business information
- * @version 1.0.0
- */
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 import {
   FaPhone,
@@ -20,7 +12,12 @@ import {
   FaInstagram,
   FaPaperPlane,
   FaCheckCircle,
+  FaGlobe
 } from "react-icons/fa";
+import { useHotelInfo, useContactInfo } from "../hooks/useHotelInfo";
+import { useHotelSettings } from "../contexts/HotelSettingsContext";
+import hotelSettingsService from "../services/hotelSettingsService";
+import { clearHotelCache } from "../utils/clearCache";
 import "./ContactPage.css";
 
 export default function Contact() {
@@ -30,16 +27,50 @@ export default function Contact() {
     phone: "",
     subject: "",
     message: "",
-    priority: "medium",
+    priority: "medium"
   });
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
+
+  // Get dynamic hotel information
+  const hotelInfo = useHotelInfo();
+  const contactInfo = useContactInfo();
+  const { loadSettings } = useHotelSettings();
+
+  // Clear cache and force refresh on component mount
+  useEffect(() => {
+    // Clear cached settings to ensure fresh data
+    hotelSettingsService.clearCache();
+    // Force reload settings
+    loadSettings(true);
+  }, [loadSettings]);
+
+  // Force re-render when hotel settings change
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      setForceUpdate(prev => prev + 1);
+    };
+
+    window.addEventListener('hotelSettingsChanged', handleSettingsChange);
+
+    return () => {
+      window.removeEventListener('hotelSettingsChanged', handleSettingsChange);
+    };
+  }, []);
+
+  // Also listen for contactInfo changes
+  useEffect(() => {
+    // Debug logging (remove in production)
+    // console.log('ContactPage - Contact Info Updated:', contactInfo);
+    // console.log('ContactPage - Hotel Info Updated:', hotelInfo);
+  }, [contactInfo.phone, contactInfo.email, contactInfo.address, contactInfo.whatsapp, hotelInfo.hotelName]);
 
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
-      [id]: value,
+      [id]: value
     }));
   };
 
@@ -48,12 +79,7 @@ export default function Contact() {
     setLoading(true);
 
     // Basic validation
-    if (
-      !formData.name ||
-      !formData.email ||
-      !formData.subject ||
-      !formData.message
-    ) {
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
       toast.error("Please fill in all fields");
       setLoading(false);
       return;
@@ -69,13 +95,13 @@ export default function Contact() {
 
     try {
       // Here you would typically make an API call to send the message
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1000));
       toast.success("Message sent successfully! We'll get back to you soon.");
       setFormData({
         name: "",
         email: "",
         subject: "",
-        message: "",
+        message: ""
       });
     } catch (error) {
       toast.error("Failed to send message. Please try again later.");
@@ -88,47 +114,80 @@ export default function Contact() {
     {
       icon: <FaPhone />,
       title: "Call Us",
-      content: "+92 123 456 7890",
-      description: "Available 24/7 for your convenience",
-      link: "tel:+921234567890",
-      color: "#4CAF50",
+      content: contactInfo.phone,
+      description: `Available ${hotelInfo.businessHours} for your convenience`,
+      link: `tel:${contactInfo.phone.replace(/\s+/g, '')}`,
+      color: "#4CAF50"
     },
     {
       icon: <FaEnvelope />,
       title: "Email Us",
-      content: "info@hotelmanagement.com",
+      content: contactInfo.email,
       description: "We'll respond within 24 hours",
-      link: "mailto:info@hotelmanagement.com",
-      color: "#2196F3",
+      link: `mailto:${contactInfo.email}`,
+      color: "#2196F3"
     },
     {
       icon: <FaWhatsapp />,
       title: "WhatsApp",
-      content: "+92 123 456 7890",
+      content: contactInfo.whatsapp,
       description: "Quick support via WhatsApp",
-      link: "https://wa.me/921234567890",
-      color: "#25D366",
+      link: `https://wa.me/${contactInfo.whatsapp.replace(/\s+/g, '').replace('+', '')}`,
+      color: "#25D366"
     },
     {
       icon: <FaMapMarkerAlt />,
       title: "Visit Us",
-      content: "123 Main Street, Islamabad",
-      description: "Pakistan - Open 24/7",
-      link: "https://goo.gl/maps/your-location",
-      color: "#FF5722",
-    },
+      content: contactInfo.address,
+      description: `${hotelInfo.businessHours}`,
+      link: `https://maps.google.com/?q=${encodeURIComponent(contactInfo.address)}`,
+      color: "#FF5722"
+    }
   ];
+
+  // Additional contact methods (show if data exists)
+  const additionalContactMethods = [
+    // Website
+    {
+      icon: <FaGlobe />,
+      title: "Website",
+      content: contactInfo.website ? contactInfo.website.replace(/^https?:\/\//, '') : 'hotelroyal.com',
+      description: "Visit our official website",
+      link: contactInfo.website || 'https://hotelroyal.com',
+      color: "#9C27B0"
+    },
+    // Support Email
+    {
+      icon: <FaHeadset />,
+      title: "Support Email",
+      content: contactInfo.emailSupport || 'support@hotelroyal.com',
+      description: "Technical support and assistance",
+      link: `mailto:${contactInfo.emailSupport || 'support@hotelroyal.com'}`,
+      color: "#FF9800"
+    },
+    // Secondary Phone
+    {
+      icon: <FaPhone />,
+      title: "Secondary Phone",
+      content: contactInfo.phoneSecondary || '+92 123 456 7890',
+      description: "Alternative contact number",
+      link: `tel:${(contactInfo.phoneSecondary || '+92 123 456 7890').replace(/\s+/g, '')}`,
+      color: "#607D8B"
+    }
+  ];
+
+
 
   const businessHours = [
     { day: "Monday - Friday", hours: "24/7 Available" },
     { day: "Saturday - Sunday", hours: "24/7 Available" },
-    { day: "Emergency Support", hours: "Always Available" },
+    { day: "Emergency Support", hours: "Always Available" }
   ];
 
   const socialLinks = [
     { icon: <FaLinkedin />, url: "#", color: "#0077B5" },
     { icon: <FaTwitter />, url: "#", color: "#1DA1F2" },
-    { icon: <FaInstagram />, url: "#", color: "#E4405F" },
+    { icon: <FaInstagram />, url: "#", color: "#E4405F" }
   ];
 
   if (submitted) {
@@ -139,9 +198,7 @@ export default function Contact() {
             <FaCheckCircle className="success-icon" />
           </div>
           <h1>Message Sent Successfully!</h1>
-          <p>
-            Thank you for reaching out. We'll get back to you within 24 hours.
-          </p>
+          <p>Thank you for reaching out. We'll get back to you within 24 hours.</p>
           <div className="success-actions">
             <button onClick={() => setSubmitted(false)} className="btn-primary">
               Send Another Message
@@ -153,7 +210,7 @@ export default function Contact() {
   }
 
   return (
-    <div className="modern-contact-page">
+    <div key={`${contactInfo.phone}-${contactInfo.email}-${forceUpdate}`} className="modern-contact-page">
       {/* Hero Section */}
       <section className="contact-hero">
         <div className="hero-background">
@@ -162,9 +219,10 @@ export default function Contact() {
         <div className="hero-content">
           <h1 className="hero-title">Get in Touch</h1>
           <p className="hero-subtitle">
-            We're here to help and answer any questions you might have. We look
-            forward to hearing from you.
+            We're here to help and answer any questions you might have.
+            We look forward to hearing from you.
           </p>
+
         </div>
       </section>
 
@@ -177,19 +235,53 @@ export default function Contact() {
                 key={index}
                 href={method.link}
                 className="contact-method-card"
-                target={method.link.startsWith("http") ? "_blank" : "_self"}
-                rel={
-                  method.link.startsWith("http") ? "noopener noreferrer" : ""
-                }
-                style={{ "--accent-color": method.color }}
+                target={method.link.startsWith('http') ? '_blank' : '_self'}
+                rel={method.link.startsWith('http') ? 'noopener noreferrer' : ''}
+                style={{ '--accent-color': method.color }}
               >
-                <div className="method-icon">{method.icon}</div>
+                <div className="method-icon">
+                  {method.icon}
+                </div>
                 <h3 className="method-title">{method.title}</h3>
                 <p className="method-content">{method.content}</p>
                 <span className="method-description">{method.description}</span>
               </a>
             ))}
           </div>
+
+          {/* Additional Contact Methods */}
+          {additionalContactMethods.length > 0 && (
+            <div className="additional-contact-methods" style={{ marginTop: '2rem' }}>
+              <h3 style={{
+                textAlign: 'center',
+                marginBottom: '1.5rem',
+                color: '#333',
+                fontSize: '1.5rem',
+                fontWeight: '600'
+              }}>
+                More Ways to Reach Us
+              </h3>
+              <div className="contact-methods-grid">
+                {additionalContactMethods.map((method, index) => (
+                  <a
+                    key={`additional-${index}`}
+                    href={method.link}
+                    className="contact-method-card"
+                    target={method.link.startsWith('http') ? '_blank' : '_self'}
+                    rel={method.link.startsWith('http') ? 'noopener noreferrer' : ''}
+                    style={{ '--accent-color': method.color }}
+                  >
+                    <div className="method-icon">
+                      {method.icon}
+                    </div>
+                    <h3 className="method-title">{method.title}</h3>
+                    <p className="method-content">{method.content}</p>
+                    <span className="method-description">{method.description}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -201,10 +293,7 @@ export default function Contact() {
             <div className="contact-form-section">
               <div className="form-header">
                 <h2>Send us a Message</h2>
-                <p>
-                  Fill out the form below and we'll get back to you as soon as
-                  possible.
-                </p>
+                <p>Fill out the form below and we'll get back to you as soon as possible.</p>
               </div>
 
               <form onSubmit={handleSubmit} className="modern-contact-form">
@@ -289,7 +378,11 @@ export default function Contact() {
                   />
                 </div>
 
-                <button type="submit" className="submit-btn" disabled={loading}>
+                <button
+                  type="submit"
+                  className="submit-btn"
+                  disabled={loading}
+                >
                   <FaPaperPlane className="btn-icon" />
                   {loading ? "Sending..." : "Send Message"}
                 </button>
@@ -320,17 +413,14 @@ export default function Contact() {
                   <FaHeadset className="info-icon" />
                   <h3>24/7 Support</h3>
                 </div>
-                <p>
-                  Our dedicated support team is available around the clock to
-                  assist you with any questions or concerns.
-                </p>
+                <p>Our dedicated support team is available around the clock to assist you with any questions or concerns.</p>
                 <div className="social-links">
                   {socialLinks.map((social, index) => (
                     <a
                       key={index}
                       href={social.url}
                       className="social-link"
-                      style={{ "--social-color": social.color }}
+                      style={{ '--social-color': social.color }}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

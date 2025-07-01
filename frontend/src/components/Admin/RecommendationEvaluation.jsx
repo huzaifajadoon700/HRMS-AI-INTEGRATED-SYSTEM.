@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { apiConfig } from '../../config/api';
 
 const RecommendationEvaluation = () => {
     const [evaluation, setEvaluation] = useState(null);
@@ -23,7 +24,7 @@ const RecommendationEvaluation = () => {
                 }
             };
 
-            const response = await axios.get(`https://hrms-ai-integrated-system-production.up.railway.app/api/food-recommendations/evaluation/system?testPeriodDays=${selectedPeriod}`, config);
+            const response = await axios.get(`${apiConfig.endpoints.foodRecommendations}/evaluation/system?testPeriodDays=${selectedPeriod}`, config);
             if (response.data.success) {
                 setEvaluation(response.data.systemEvaluation);
             } else {

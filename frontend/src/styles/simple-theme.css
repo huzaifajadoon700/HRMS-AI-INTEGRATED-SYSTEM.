@@ -133,6 +133,7 @@ html, body {
   width: 100% !important;
   max-width: none !important;
   overflow-x: hidden;
+  scroll-behavior: smooth; /* Enable smooth scrolling globally */
 }
 
 #root {

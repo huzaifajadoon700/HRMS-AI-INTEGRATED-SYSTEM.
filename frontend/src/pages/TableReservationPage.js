@@ -6,6 +6,7 @@ import axios from 'axios';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import PageLayout from '../components/layout/PageLayout';
+import { tableUtils } from '../services/tableRecommendationService';
 import './TableReservationPage.css';
 
 // Initialize Stripe
@@ -107,19 +108,20 @@ const TableReservationPage = () => {
   });
   const [showPaymentForm, setShowPaymentForm] = useState(false);
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "/images/placeholder-table.jpg";
-    try {
-      if (imagePath.startsWith("http")) return imagePath;
-      const cleanPath = imagePath.replace(/^\/+/, "");
-      return cleanPath.includes("uploads")
-        ? `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`
-        : `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
-    } catch (error) {
-      console.error("Error formatting image URL:", error);
-      return "/images/placeholder-table.jpg";
-    }
+  // Scroll to top utility function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
+
+  // Scroll to top when payment form is shown
+  useEffect(() => {
+    if (showPaymentForm) {
+      scrollToTop();
+    }
+  }, [showPaymentForm]);
 
   useEffect(() => {
     const storedDetails = localStorage.getItem('reservationDetails');
@@ -203,7 +205,8 @@ const TableReservationPage = () => {
       
       setAvailability({ ...availability, isChecking: true });
       
-      const response = await axios.get(`https://hrms-ai-integrated-system-production.up.railway.app/api/tables/availability`, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/tables/availability`, {
         params: {
           reservationDate: formData.date,
           time: formData.time,
@@ -291,13 +294,34 @@ const TableReservationPage = () => {
 
       console.log("Sending reservation data:", reservationData);
 
-      const response = await axios.post('https://hrms-ai-integrated-system-production.up.railway.app/api/reservations', reservationData, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.post(`${apiUrl}/reservations`, reservationData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
 
       if (response.data) {
+        // Track the table reservation from recommendations
+        try {
+          const userId = localStorage.getItem('userId');
+          if (userId && tableDetails.tableId) {
+            await axios.post(`${apiUrl}/tables/track-reservation`, {
+              tableId: tableDetails.tableId,
+              reservationId: response.data.reservation._id,
+              userId: userId
+            }, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            console.log('✅ Table reservation tracked successfully');
+          }
+        } catch (trackingError) {
+          console.warn('⚠️ Failed to track table reservation:', trackingError);
+          // Don't fail the reservation if tracking fails
+        }
+
         toast.success('Table reservation created successfully!');
         localStorage.removeItem('reservationDetails');
         navigate('/table-confirmation', { state: { reservation: response.data.reservation } });
@@ -322,7 +346,7 @@ const TableReservationPage = () => {
               <div className="reservation-form h-100">
                 <div className="table-image-container">
                   <img 
-                    src={getImageUrl(tableDetails.tableImage)}
+                    src={tableUtils.getImageUrl(tableDetails.tableImage)}
                     alt={tableDetails.tableName}
                     className="img-fluid rounded"
                     onError={(e) => {

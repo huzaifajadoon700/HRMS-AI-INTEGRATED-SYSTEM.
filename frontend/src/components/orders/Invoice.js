@@ -83,8 +83,9 @@ export default function Invoice() {
       console.log("Authorization token present:", !!token);
       console.log("Token:", token.substring(0, 15) + "...");
       
-      const response = await axios.get(`https://hrms-ai-integrated-system-production.up.railway.app/api/orders/${currentOrderId}`, {
-        headers: { 
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/orders/${currentOrderId}`, {
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
@@ -109,7 +110,7 @@ export default function Invoice() {
       else if (response.data && response.data.user) {
         try {
           console.log("Fetching user details for user ID:", response.data.user);
-          const userResponse = await axios.get(`http://localhost:8080/api/user/${response.data.user}`, {
+          const userResponse = await axios.get(`${apiUrl}/user/${response.data.user}`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           console.log("User details:", userResponse.data);
@@ -118,7 +119,7 @@ export default function Invoice() {
           console.error("Error fetching user details:", userError);
           // Try to get the current user's data as a last resort
           try {
-            const userResponse = await axios.get(`http://localhost:8080/api/user/profile`, {
+            const userResponse = await axios.get(`${apiUrl}/user/profile`, {
               headers: { Authorization: `Bearer ${token}` }
             });
             setUserData(userResponse.data);

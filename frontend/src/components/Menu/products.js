@@ -189,7 +189,7 @@ const Products = () => {
       image: "https://via.placeholder.com/100x100",
     },
     {
-      title: "The Grand Hotel",
+      title: "Premium Dining",
       subtitle: "324 reservations",
       buttonText: "View",
       image: "https://via.placeholder.com/100x100",

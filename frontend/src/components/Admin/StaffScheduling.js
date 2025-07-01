@@ -24,7 +24,8 @@ const StaffScheduling = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get('http://localhost:8080/api/staff');
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/staff`);
       setStaff(response.data);
     } catch (error) {
       setError('Error fetching staff.');
@@ -37,7 +38,8 @@ const StaffScheduling = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get('http://localhost:8080/api/shift');
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/shift`);
       setShifts(response.data);
     } catch (error) {
       setError('Error fetching shifts.');
@@ -54,7 +56,8 @@ const StaffScheduling = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post('http://localhost:8080/api/staff/add', newStaff);
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.post(`${apiUrl}/staff/add`, newStaff);
       setStaff([...staff, response.data]);
       setNewStaff({ name: '', position: '' });
       setFeedback({ type: 'success', message: 'Staff added successfully!' });
@@ -78,7 +81,8 @@ const StaffScheduling = () => {
         setFeedback({ type: 'danger', message: 'A shift for this staff member on this date already exists.' });
         return;
       }
-      const response = await axios.post('http://localhost:8080/api/shift/add', newShift);
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.post(`${apiUrl}/shift/add`, newShift);
       setShifts([...shifts, response.data]);
       setNewShift({ staffId: '', date: '', time: '', duration: '' });
       setFeedback({ type: 'success', message: 'Shift added successfully!' });
@@ -92,7 +96,8 @@ const StaffScheduling = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.put(`http://localhost:8080/api/shift/${id}/toggle`);
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.put(`${apiUrl}/shift/${id}/toggle`);
       setShifts(shifts.map(shift => (shift._id === id ? response.data : shift)));
     } catch (error) {
       setError('Error toggling attendance.');
@@ -106,7 +111,8 @@ const StaffScheduling = () => {
       setLoading(true);
       setError('');
       try {
-        await axios.delete(`http://localhost:8080/api/shift/${id}`);
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        await axios.delete(`${apiUrl}/shift/${id}`);
         setShifts(shifts.filter(shift => shift._id !== id));
         setFeedback({ type: 'success', message: 'Shift deleted successfully!' });
       } catch (error) {
@@ -122,7 +128,8 @@ const StaffScheduling = () => {
       setLoading(true);
       setError('');
       try {
-        await axios.delete(`http://localhost:8080/api/staff/${id}`);
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        await axios.delete(`${apiUrl}/staff/${id}`);
         setStaff(staff.filter(s => s._id !== id));
         await fetchShifts();
         setFeedback({ type: 'success', message: 'Staff and associated shifts deleted successfully!' });
@@ -142,9 +149,10 @@ const StaffScheduling = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.put(`http://localhost:8080/api/staff/${selectedStaff._id}`, selectedStaff);
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.put(`${apiUrl}/staff/${selectedStaff._id}`, selectedStaff);
       setStaff(staff.map(s => (s._id === selectedStaff._id ? response.data : s)));
-      setShifts(shifts.map(shift => 
+      setShifts(shifts.map(shift =>
         shift.staffId._id === selectedStaff._id 
           ? { ...shift, staffId: { ...shift.staffId, name: response.data.name } } 
           : shift

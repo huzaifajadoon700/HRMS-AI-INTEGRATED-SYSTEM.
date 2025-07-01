@@ -8,6 +8,7 @@ import {
   FiImage, FiCheck, FiX, FiGrid, FiList, FiSearch
 } from "react-icons/fi";
 import "./AdminManageRooms.css";
+import "./AdminUpdateTable.css";
 
 const AdminUpdateTable = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const AdminUpdateTable = () => {
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
   const [image, setImage] = useState(null);
+  const [imageUrl, setImageUrl] = useState("");
   const [formData, setFormData] = useState({
     tableName: "",
     tableType: "",
@@ -28,7 +30,8 @@ const AdminUpdateTable = () => {
 
   const fetchTables = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/tables");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/tables`);
       setTables(response.data);
     } catch (error) {
       console.error("Error fetching tables:", error);
@@ -42,6 +45,8 @@ const AdminUpdateTable = () => {
 
   const handleSelectTable = (table) => {
     setSelectedTable(table);
+    setImage(null);
+    setImageUrl(table.image || ""); // Pre-fill with current image URL
     setFormData({
       tableName: table.tableName,
       tableType: table.tableType,
@@ -65,17 +70,20 @@ const AdminUpdateTable = () => {
     data.append("status", formData.status);
     if (image) {
       data.append("image", image);
+    } else if (imageUrl.trim()) {
+      data.append("imageUrl", imageUrl.trim());
     }
 
     try {
       const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const response = await axios.put(
-        `http://localhost:8080/api/tables/${selectedTable._id}`,
+        `${apiUrl}/tables/${selectedTable._id}`,
         data,
         {
-          headers: { 
+          headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data" 
+            "Content-Type": "multipart/form-data"
           },
         }
       );
@@ -89,6 +97,7 @@ const AdminUpdateTable = () => {
         status: "Available",
       });
       setImage(null);
+      setImageUrl("");
       
       // Reset file input
       const fileInput = document.getElementById("table-image");
@@ -222,8 +231,20 @@ const AdminUpdateTable = () => {
                   </Form.Select>
                 </Form.Group>
 
+                <Form.Group className="mb-3">
+                  <Form.Label>Image URL</Form.Label>
+                  <Form.Control
+                    type="url"
+                    value={imageUrl}
+                    onChange={(e) => setImageUrl(e.target.value)}
+                    className="cosmic-input"
+                    placeholder="https://images.unsplash.com/... or any table image URL"
+                  />
+                  <small className="text-muted">Paste an image URL for instant update</small>
+                </Form.Group>
+
                 <Form.Group className="mb-4">
-                  <Form.Label>Update Image (Optional)</Form.Label>
+                  <Form.Label>OR Upload File</Form.Label>
                   <Form.Control
                     type="file"
                     className="cosmic-input"
@@ -231,6 +252,7 @@ const AdminUpdateTable = () => {
                     accept="image/jpeg, image/png"
                     onChange={handleImageChange}
                   />
+                  <small className="text-muted">File upload (works in development only)</small>
                 </Form.Group>
 
                 <div className="text-center">

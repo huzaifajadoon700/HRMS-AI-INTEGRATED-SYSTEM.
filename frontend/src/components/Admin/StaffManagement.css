@@ -360,4 +360,127 @@
   .btn {
     width: 100%;
   }
-} 
+
+  /* CRITICAL MOBILE OVERRIDE - HIGHEST SPECIFICITY */
+  .enhanced-staff-management-module-container {
+    position: fixed !important;
+    top: 70px !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 70px) !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: none !important;
+    z-index: 99999 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    background: #0A192F !important;
+    box-sizing: border-box !important;
+  }
+
+  /* FORCE OVERRIDE ANY PARENT CONTAINER STYLES */
+  body .enhanced-staff-management-module-container,
+  html .enhanced-staff-management-module-container,
+  #root .enhanced-staff-management-module-container,
+  .app .enhanced-staff-management-module-container,
+  .main-content .enhanced-staff-management-module-container,
+  .content-wrapper .enhanced-staff-management-module-container {
+    position: fixed !important;
+    top: 70px !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 70px) !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    transform: none !important;
+    z-index: 99999 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    background: #0A192F !important;
+    box-sizing: border-box !important;
+  }
+
+  /* CONTENT CONTAINER MOBILE */
+  .enhanced-staff-header {
+    width: 100% !important;
+    max-width: 100vw !important;
+    padding: 1rem !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .staff-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    width: 100% !important;
+    padding: 1rem !important;
+  }
+
+  .staff-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 0 1rem 0 !important;
+  }
+
+  /* Stats Cards Mobile */
+  .stats-cards {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  .stat-card {
+    padding: 1rem !important;
+    width: 100% !important;
+  }
+
+  /* Action Buttons Mobile */
+  .action-btn {
+    width: 100% !important;
+    padding: 1rem !important;
+    font-size: 1rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .header-actions {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  /* Modal Mobile */
+  .modal-overlay {
+    padding: 1rem !important;
+  }
+
+  .modal-content {
+    width: 100% !important;
+    max-width: calc(100vw - 2rem) !important;
+    margin: 0 !important;
+    max-height: calc(100vh - 2rem) !important;
+    overflow-y: auto !important;
+  }
+
+  .form-actions {
+    flex-direction: column !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  .form-actions .btn {
+    width: 100% !important;
+    padding: 1rem !important;
+  }
+}

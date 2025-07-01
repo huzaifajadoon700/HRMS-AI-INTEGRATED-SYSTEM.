@@ -9,6 +9,7 @@ import {
   FiXCircle, FiAlertCircle, FiDownload, FiMail, FiPhone
 } from "react-icons/fi";
 import "./AdminManageRooms.css";
+import "./AdminManageReservations.css";
 
 const AdminManageReservations = () => {
   const [reservations, setReservations] = useState([]);
@@ -79,8 +80,9 @@ const AdminManageReservations = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/api/reservations", {
-        headers: { 
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/reservations`, {
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
@@ -115,8 +117,9 @@ const AdminManageReservations = () => {
       
       const deleteToast = toast.loading("Deleting reservation...");
       
-      const response = await axios.delete(`http://localhost:8080/api/reservations/${reservationId}`, {
-        headers: { 
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.delete(`${apiUrl}/reservations/${reservationId}`, {
+        headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }

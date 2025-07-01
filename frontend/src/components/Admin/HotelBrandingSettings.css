@@ -1,0 +1,434 @@
+/* Hotel Branding Settings - Following AdminViewRooms Pattern */
+
+/* Ensure CSS Variables are Available */
+:root {
+  --primary-bg: #0A192F;
+  --secondary-bg: #112240;
+  --accent-primary: #64ffda;
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --bg-primary: #0A192F;
+}
+
+/* Ensure body can scroll */
+body {
+  overflow-y: auto !important;
+  height: auto !important;
+}
+
+/* Main Container - NATURAL SCROLLING */
+.enhanced-admin-settings-module-container {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  padding-left: 280px;
+  padding-bottom: 100px;
+  box-sizing: border-box;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Header Section - Following AdminViewRooms pattern */
+.enhanced-admin-settings-module-container .enhanced-settings-header {
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-color);
+  padding: 2rem;
+}
+
+.enhanced-admin-settings-module-container .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.enhanced-admin-settings-module-container .title-section {
+  flex: 1;
+}
+
+.enhanced-admin-settings-module-container .title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.enhanced-admin-settings-module-container .title-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--accent-primary), #4ecdc4);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg-primary);
+  font-size: 1.5rem;
+}
+
+.enhanced-admin-settings-module-container .title-text h1 {
+  color: var(--text-primary);
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.enhanced-admin-settings-module-container .title-text p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin: 0.5rem 0 0 0;
+  line-height: 1.5;
+}
+
+.enhanced-admin-settings-module-container .header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Content Section */
+.enhanced-admin-settings-module-container .enhanced-settings-content {
+  padding: 0;
+  width: 100%;
+}
+
+/* Navigation Section */
+.enhanced-admin-settings-module-container .settings-nav {
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--border-color);
+  padding: 2rem;
+}
+
+.enhanced-admin-settings-module-container .nav-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.enhanced-admin-settings-module-container .nav-header h3 {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.enhanced-admin-settings-module-container .nav-items {
+  display: flex;
+  gap: 0;
+  width: 100%;
+}
+
+.enhanced-admin-settings-module-container .nav-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-right: none;
+  color: var(--text-secondary);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.enhanced-admin-settings-module-container .nav-item:last-child {
+  border-right: 1px solid var(--border-color);
+}
+
+.enhanced-admin-settings-module-container .nav-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+.enhanced-admin-settings-module-container .nav-item.active {
+  background: var(--accent-primary);
+  color: var(--bg-primary);
+  border-color: var(--accent-primary);
+}
+
+.enhanced-admin-settings-module-container .nav-item .nav-icon {
+  font-size: 1rem;
+}
+
+/* Settings Content */
+.enhanced-admin-settings-module-container .settings-content {
+  padding: 2rem;
+  padding-bottom: 4rem;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.enhanced-admin-settings-module-container .settings-section {
+  width: 100%;
+}
+
+.enhanced-admin-settings-module-container .section-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.enhanced-admin-settings-module-container .section-header h2 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.enhanced-admin-settings-module-container .section-header p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.enhanced-admin-settings-module-container .settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.enhanced-admin-settings-module-container .setting-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.enhanced-admin-settings-module-container .setting-group.full-width {
+  grid-column: 1 / -1;
+  min-height: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.enhanced-admin-settings-module-container .setting-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.enhanced-admin-settings-module-container .label-icon {
+  color: var(--accent-primary);
+  font-size: 1rem;
+}
+
+.enhanced-admin-settings-module-container .enhanced-input,
+.enhanced-admin-settings-module-container .enhanced-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.enhanced-admin-settings-module-container .enhanced-input:focus,
+.enhanced-admin-settings-module-container .enhanced-textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
+}
+
+.enhanced-admin-settings-module-container .enhanced-textarea {
+  resize: vertical;
+  min-height: 120px;
+  height: auto;
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Professional styling for all full-width fields */
+.enhanced-admin-settings-module-container .setting-group.full-width .enhanced-textarea,
+.enhanced-admin-settings-module-container .setting-group.full-width .enhanced-input,
+.enhanced-admin-settings-module-container textarea.enhanced-textarea,
+.enhanced-admin-settings-module-container input.enhanced-input {
+  display: block !important;
+  width: 100% !important;
+  max-width: 800px !important;
+  box-sizing: border-box !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 0.5rem !important;
+  color: var(--text-primary) !important;
+  font-size: 0.9rem !important;
+  padding: 0.75rem 1rem !important;
+  font-family: inherit !important;
+  line-height: 1.5 !important;
+  margin: 0 auto !important;
+}
+
+/* Specific textarea styling */
+.enhanced-admin-settings-module-container .setting-group.full-width .enhanced-textarea,
+.enhanced-admin-settings-module-container textarea.enhanced-textarea {
+  min-height: 120px !important;
+  height: auto !important;
+  resize: vertical !important;
+}
+
+/* Changes Indicator */
+.enhanced-admin-settings-module-container .changes-indicator {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ffc107;
+  font-size: 0.9rem;
+}
+
+/* Button Styles */
+.enhanced-admin-settings-module-container .enhanced-btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.enhanced-admin-settings-module-container .enhanced-btn-primary {
+  background: linear-gradient(135deg, var(--accent-primary), #4ecdc4);
+  color: var(--bg-primary);
+}
+
+.enhanced-admin-settings-module-container .enhanced-btn-primary:hover {
+  background: linear-gradient(135deg, #4ecdc4, var(--accent-primary));
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(100, 255, 218, 0.3);
+}
+
+.enhanced-admin-settings-module-container .enhanced-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Animations */
+.enhanced-admin-settings-module-container .pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(100, 255, 218, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(100, 255, 218, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(100, 255, 218, 0);
+  }
+}
+
+.enhanced-admin-settings-module-container .spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Ensure section actions are visible */
+.enhanced-admin-settings-module-container .section-actions {
+  margin-top: 2rem !important;
+  margin-bottom: 2rem !important;
+  padding: 1rem !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 1rem !important;
+  border-top: 1px solid var(--border-color) !important;
+}
+
+/* Collapsed Sidebar Support */
+.enhanced-sidebar.collapsed ~ .enhanced-main-content .enhanced-admin-settings-module-container {
+  padding-left: 80px !important;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .enhanced-admin-settings-module-container {
+    padding-left: 80px;
+  }
+
+  .enhanced-admin-settings-module-container .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-admin-settings-module-container {
+    padding-left: 0;
+  }
+
+  .enhanced-admin-settings-module-container .enhanced-settings-header {
+    padding: 1rem;
+  }
+
+  .enhanced-admin-settings-module-container .title-text h1 {
+    font-size: 1.25rem;
+  }
+
+  .enhanced-admin-settings-module-container .title-text p {
+    font-size: 0.875rem;
+  }
+
+  .enhanced-admin-settings-module-container .settings-nav {
+    padding: 1rem;
+  }
+
+  .enhanced-admin-settings-module-container .settings-content {
+    padding: 1rem;
+  }
+
+  .enhanced-admin-settings-module-container .nav-items {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .enhanced-admin-settings-module-container .nav-item {
+    flex: none;
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .enhanced-admin-settings-module-container .nav-item:last-child {
+    border-right: 1px solid var(--border-color);
+  }
+
+  .enhanced-admin-settings-module-container .enhanced-input,
+  .enhanced-admin-settings-module-container .enhanced-textarea {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+}

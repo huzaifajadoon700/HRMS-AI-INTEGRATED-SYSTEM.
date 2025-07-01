@@ -1,7 +1,6 @@
 {
-  "name": "hrms-frontend",
+  "name": "practice",
   "version": "0.1.0",
-  "description": "HRMS AI Integrated System - Frontend Application",
   "private": true,
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
@@ -50,6 +49,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "build:prod": "set CI=false && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

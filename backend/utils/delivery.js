@@ -1,17 +1,8 @@
-/**
- * Delivery Service for HRMS System
- * Location tracking, distance calculation, and delivery management
- *
- * @description Delivery utilities with geolocation and route optimization
- * @version 1.0.0
- */
+const axios = require('axios');
 
-const axios = require("axios");
-
-// Restaurant location configuration
 const RESTAURANT_COORDS = {
   lat: 34.1463, // Abbottabad coordinates
-  lng: 73.2117,
+  lng: 73.2117
 };
 
 const DELIVERY_RADIUS_KM = 10; // Maximum delivery radius in kilometers
@@ -20,18 +11,16 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371; // Earth's radius in kilometers
   const dLat = toRad(lat2 - lat1);
   const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
   return R * c;
 }
 
 function toRad(value) {
-  return (value * Math.PI) / 180;
+  return value * Math.PI / 180;
 }
 
 async function validateDeliveryZone(deliveryLocation) {
@@ -44,10 +33,9 @@ async function validateDeliveryZone(deliveryLocation) {
 
   return {
     isValid: distance <= DELIVERY_RADIUS_KM,
-    message:
-      distance <= DELIVERY_RADIUS_KM
-        ? "Delivery location is within service area"
-        : "Delivery location is outside service area",
+    message: distance <= DELIVERY_RADIUS_KM 
+      ? "Delivery location is within service area"
+      : "Delivery location is outside service area"
   };
 }
 
@@ -75,7 +63,7 @@ async function estimateDeliveryTime(deliveryLocation) {
       `https://maps.googleapis.com/maps/api/distancematrix/json?origins=${RESTAURANT_COORDS.lat},${RESTAURANT_COORDS.lng}&destinations=${deliveryLocation.lat},${deliveryLocation.lng}&key=${process.env.GOOGLE_MAPS_API_KEY}`
     );
 
-    if (response.data.status === "OK") {
+    if (response.data.status === 'OK') {
       const duration = response.data.rows[0].elements[0].duration.value;
       // Add 15 minutes for preparation time
       return duration + 900; // duration in seconds + 15 minutes
@@ -88,12 +76,12 @@ async function estimateDeliveryTime(deliveryLocation) {
       deliveryLocation.lat,
       deliveryLocation.lng
     );
-
+    
     // Assume average speed of 30 km/h
     const estimatedTime = (distance / 30) * 3600; // Convert to seconds
     return estimatedTime + 900; // Add 15 minutes preparation time
   } catch (error) {
-    console.error("Error estimating delivery time:", error);
+    console.error('Error estimating delivery time:', error);
     // Fallback to simple estimation
     const distance = calculateDistance(
       RESTAURANT_COORDS.lat,
@@ -124,21 +112,9 @@ async function optimizeDeliveryRoute(orders) {
   });
 }
 
-// Utility function to format distance in a user-friendly way
-function formatDistance(km) {
-  return `${km.toFixed(2)} km`;
-}
-
-// Utility function to format delivery fee in PKR (for demonstration)
-function formatDeliveryFee(fee) {
-  return `Rs. ${fee}`;
-}
-
 module.exports = {
-  calculateDistance,
   validateDeliveryZone,
   calculateDeliveryFee,
   estimateDeliveryTime,
-  formatDistance,
-  formatDeliveryFee,
-};
+  optimizeDeliveryRoute
+}; 

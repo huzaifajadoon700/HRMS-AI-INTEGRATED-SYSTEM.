@@ -8,6 +8,8 @@ import {
   FiDollarSign, FiCalendar, FiUser, FiPackage, FiTrendingUp,
   FiDownload, FiMail, FiPhone, FiMapPin, FiCreditCard
 } from 'react-icons/fi';
+import { apiConfig } from '../../config/api';
+import "./AdminManageRooms.css";
 import "./AdminOrders.css";
 
 const AdminOrders = () => {
@@ -50,8 +52,8 @@ const AdminOrders = () => {
         return;
       }
 
-      console.log('Making request to:', 'http://localhost:8080/api/orders');
-      const response = await axios.get('http://localhost:8080/api/orders', {
+      console.log('Making request to:', apiConfig.endpoints.orders);
+      const response = await axios.get(apiConfig.endpoints.orders, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -159,7 +161,7 @@ const AdminOrders = () => {
       }
 
       const response = await axios.put(
-        `http://localhost:8080/api/orders/${orderId}/status`,
+        `${apiConfig.endpoints.orders}/${orderId}/status`,
         { status: newStatus },
         {
           headers: {

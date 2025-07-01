@@ -210,6 +210,10 @@
         padding: 4rem 0;
     }
 
+    .container {
+        padding: 0 1rem;
+    }
+
     .services-grid {
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 1.5rem;
@@ -232,6 +236,15 @@
 
     .service-description {
         font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+    }
+
+    .section-subtitle {
+        font-size: 1rem;
     }
 }
 

@@ -35,8 +35,9 @@ const RoomRecommendationAnalytics = () => {
   const fetchAnalytics = async () => {
     try {
       const token = localStorage.getItem('token');
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       // Use the correct admin analytics endpoint
-      const response = await axios.get('http://localhost:8080/api/admin/dashboard/analytics', {
+      const response = await axios.get(`${apiUrl}/admin/dashboard/analytics`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -73,12 +74,13 @@ const RoomRecommendationAnalytics = () => {
 
   const fetchPopularRooms = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/rooms/popular?count=10');
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms/popular?count=10`);
       if (response.data.success) {
         setPopularRooms(response.data.popularRooms);
       } else {
         // Fallback to regular rooms if popular endpoint doesn't work
-        const roomsResponse = await axios.get('http://localhost:8080/api/rooms');
+        const roomsResponse = await axios.get(`${apiUrl}/rooms`);
         if (roomsResponse.data) {
           const mockPopularRooms = roomsResponse.data.slice(0, 10).map((room, index) => ({
             ...room,
@@ -92,7 +94,8 @@ const RoomRecommendationAnalytics = () => {
       console.error('Error fetching popular rooms:', error);
       // Try to fetch regular rooms as fallback
       try {
-        const roomsResponse = await axios.get('http://localhost:8080/api/rooms');
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const roomsResponse = await axios.get(`${apiUrl}/rooms`);
         if (roomsResponse.data) {
           const mockPopularRooms = roomsResponse.data.slice(0, 10).map((room, index) => ({
             ...room,
@@ -126,7 +129,8 @@ const RoomRecommendationAnalytics = () => {
 
   const fetchMLMetrics = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/rooms/ml/accuracy');
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms/ml/accuracy`);
       if (response.data.success) {
         setMlMetrics(response.data);
       }
@@ -142,7 +146,8 @@ const RoomRecommendationAnalytics = () => {
 
   const fetchConfusionMatrix = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/rooms/ml/confusion-matrix');
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms/ml/confusion-matrix`);
       if (response.data.success) {
         setConfusionMatrix(response.data);
       }
@@ -157,7 +162,8 @@ const RoomRecommendationAnalytics = () => {
 
   const fetchMLServiceStatus = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/rooms/ml/status');
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms/ml/status`);
       if (response.data.success) {
         setMlServiceStatus(response.data);
       }

@@ -4,8 +4,9 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaStar } from 'react-icons/fa';
 import { FiHeart, FiThumbsUp, FiMessageSquare } from 'react-icons/fi';
+import { apiConfig } from '../../config/api';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = apiConfig.serverURL;
 
 // Enhanced sentiment word lists with weights
 const sentimentWords = {

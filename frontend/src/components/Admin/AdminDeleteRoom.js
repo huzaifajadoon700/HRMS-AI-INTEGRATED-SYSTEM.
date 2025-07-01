@@ -27,7 +27,8 @@ const AdminDeleteRoom = () => {
   const fetchRooms = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:8080/api/rooms");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms`);
       setRooms(response.data);
     } catch (error) {
       console.error("Error fetching rooms:", error);
@@ -42,10 +43,11 @@ const AdminDeleteRoom = () => {
     try {
       if (imagePath.startsWith('http')) return imagePath;
       const cleanPath = imagePath.replace(/^\/+/, '');
+      const serverURL = process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app';
       if (cleanPath.includes('uploads')) {
-        return `http://localhost:8080/${cleanPath}`;
+        return `${serverURL}/${cleanPath}`;
       }
-      return `http://localhost:8080/uploads/${cleanPath}`;
+      return `${serverURL}/uploads/${cleanPath}`;
     } catch (error) {
       console.error('Error formatting image URL:', error);
       return '/images/placeholder-room.jpg';
@@ -60,12 +62,13 @@ const AdminDeleteRoom = () => {
     setDeletingRoomId(roomId);
     try {
       const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       await axios.delete(
-        `http://localhost:8080/api/rooms/${roomId}`,
+        `${apiUrl}/rooms/${roomId}`,
         {
-          headers: { 
+          headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json" 
+            "Content-Type": "application/json"
           },
         }
       );

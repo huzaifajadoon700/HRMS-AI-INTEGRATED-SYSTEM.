@@ -189,6 +189,11 @@
 @media (max-width: 768px) {
   .about-page {
     padding: 3rem 0;
+    margin-top: -60px;
+  }
+
+  .container {
+    padding: 0 1rem;
   }
 
   .page-header {
@@ -210,19 +215,40 @@
   .feature-card {
     padding: 1.25rem;
   }
+
+  .about-text {
+    padding: 1.5rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
 }
 
 @media (max-width: 576px) {
   .about-page {
     padding: 2rem 0;
+    margin-top: -40px;
+  }
+
+  .container {
+    padding: 0 0.75rem;
   }
 
   .page-header {
     margin-bottom: 2rem;
   }
 
+  .page-title {
+    font-size: 1.75rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem;
+  }
+
   .about-text {
-    padding: 1.5rem;
+    padding: 1.25rem;
   }
 
   .section-title {
@@ -231,5 +257,18 @@
 
   .section-description {
     font-size: var(--font-size-sm);
+    line-height: 1.6;
   }
-} 
+
+  .feature-card {
+    padding: 1rem;
+  }
+
+  .feature-title {
+    font-size: 1rem;
+  }
+
+  .feature-description {
+    font-size: 0.85rem;
+  }
+}

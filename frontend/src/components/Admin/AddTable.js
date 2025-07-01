@@ -21,7 +21,8 @@ const AdminManageTables = () => {
 
   const fetchTables = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/tables");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/tables`);
       setTables(response.data);
     } catch (error) {
       console.error("Error fetching tables:", error);
@@ -55,7 +56,8 @@ const AdminManageTables = () => {
       data.append("image", image);
     }
     try {
-      await axios.post("http://localhost:8080/api/tables/add", data, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      await axios.post(`${apiUrl}/tables/add`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("Table added successfully!");
@@ -94,8 +96,9 @@ const AdminManageTables = () => {
       data.append("image", image);
     }
     try {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       await axios.put(
-        `http://localhost:8080/api/tables/${selectedTable._id}`,
+        `${apiUrl}/tables/${selectedTable._id}`,
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -111,7 +114,8 @@ const AdminManageTables = () => {
   const handleDeleteTable = async (id) => {
     if (window.confirm("Are you sure you want to delete this table?")) {
       try {
-        await axios.delete(`http://localhost:8080/api/tables/${id}`);
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        await axios.delete(`${apiUrl}/tables/${id}`);
         fetchTables();
       } catch (error) {
         console.error("Error deleting table:", error);
@@ -265,7 +269,7 @@ const AdminManageTables = () => {
                 <td>
                   {table.image && (
                     <img
-                      src={`http://localhost:8080${table.image}`}
+                      src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${table.image}`}
                       alt={table.tableName}
                       className="cosmic-table-image"
                     />
@@ -320,7 +324,7 @@ const AdminManageTables = () => {
                 <strong>Image:</strong>
                 {selectedTable.image && (
                   <img
-                    src={`http://localhost:8080${selectedTable.image}`}
+                    src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${selectedTable.image}`}
                     alt="Table"
                     className="img-fluid cosmic-modal-img mt-2 rounded"
                   />

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FiUser, FiUsers, FiMail, FiLock, FiEdit2, FiTrash2, FiSearch, FiFilter, FiToggleLeft, FiToggleRight, FiUserPlus, FiUserCheck, FiUserX } from "react-icons/fi";
 import { toast } from "react-toastify";
+import "./AdminManageRooms.css";
 import "./UserProfileTable.css";
 
 const UserProfileManagement = () => {
@@ -30,7 +31,8 @@ const UserProfileManagement = () => {
         }, 2000);
         return;
       }
-      const response = await axios.get("http://localhost:8080/api/admin/users", {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(response.data);
@@ -72,8 +74,9 @@ const UserProfileManagement = () => {
   const handleUpdateUser = async () => {
     try {
       const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const response = await axios.put(
-        `http://localhost:8080/api/admin/users/${editUser._id}`,
+        `${apiUrl}/admin/users/${editUser._id}`,
         editUser,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -90,8 +93,9 @@ const UserProfileManagement = () => {
     if (window.confirm("Are you sure you want to delete this user? This action cannot be undone.")) {
       try {
         const token = localStorage.getItem("token");
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
         const response = await axios.delete(
-          `http://localhost:8080/api/admin/users/${userId}`,
+          `${apiUrl}/admin/users/${userId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         toast.success(response.data.message || "User deleted successfully");
@@ -105,8 +109,9 @@ const UserProfileManagement = () => {
   const handleToggleStatus = async (userId, currentStatus) => {
     try {
       const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const response = await axios.patch(
-        `http://localhost:8080/api/admin/users/${userId}/toggle-status`,
+        `${apiUrl}/admin/users/${userId}/toggle-status`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

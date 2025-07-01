@@ -595,6 +595,17 @@
   font-weight: 500;
 }
 
+/* Action Section */
+.action-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 0;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+}
+
 /* Action Buttons */
 .confirmation-actions {
   display: flex;
@@ -602,6 +613,24 @@
   padding: 2rem;
   background: rgba(255, 255, 255, 0.02);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  min-width: 200px;
+  justify-content: center;
+  text-decoration: none;
+  min-height: 48px;
+  white-space: nowrap;
 }
 
 .action-button {
@@ -617,6 +646,31 @@
   cursor: pointer;
   border: none;
   min-width: 200px;
+  min-height: 48px;
+  white-space: nowrap;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #64ffda 0%, #bb86fc 100%);
+  color: #0A192F;
+  box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+}
+
+.action-btn.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(100, 255, 218, 0.4);
+}
+
+.action-btn.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.action-btn.secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  border-color: rgba(100, 255, 218, 0.3);
 }
 
 .action-button:first-child {
@@ -714,10 +768,18 @@
 
   .hero-title {
     font-size: 2.2rem;
+    line-height: 1.2;
   }
 
   .hero-subtitle {
     font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .booking-id-badge {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    margin-top: 1rem;
   }
 
   .content-container {
@@ -727,16 +789,34 @@
   .summary-cards {
     grid-template-columns: 1fr;
     gap: 1rem;
+    margin-bottom: 2rem;
   }
 
   .summary-card {
-    padding: 1rem;
+    padding: 1.25rem;
+    min-height: 80px;
   }
 
   .card-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.25rem;
+    width: 45px;
+    height: 45px;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .card-content h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-content p {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+    margin-bottom: 1.25rem;
   }
 
   .details-grid {
@@ -744,43 +824,239 @@
     gap: 1rem;
   }
 
+  .detail-card {
+    margin-bottom: 1rem;
+  }
+
+  .detail-header {
+    padding: 1rem 1.25rem;
+  }
+
+  .detail-body {
+    padding: 1.25rem;
+  }
+
+  .detail-row {
+    padding: 0.75rem 0;
+  }
+
   .action-section {
     flex-direction: column;
     gap: 1rem;
+    padding: 2rem 0 1rem;
   }
 
   .action-btn {
     width: 100%;
     min-width: auto;
+    padding: 1.25rem 2rem;
+    font-size: 1.05rem;
+  }
+
+  /* Invoice mobile styles */
+  .invoice-page {
+    padding: 1rem;
+  }
+
+  .invoice-actions {
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 0 1rem;
+  }
+
+  .action-button {
+    width: 100%;
+    justify-content: center;
+    padding: 1rem 1.5rem;
+  }
+
+  .invoice-container {
+    padding: 1.5rem;
+    margin: 0 0.5rem;
+  }
+
+  .invoice-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .invoice-details {
+    text-align: center;
+  }
+
+  .hotel-info h1 {
+    font-size: 1.5rem;
+  }
+
+  .invoice-details h2 {
+    font-size: 1.3rem;
   }
 }
 
 @media (max-width: 480px) {
+  .booking-confirmation-page {
+    padding-top: 70px;
+  }
+
+  .confirmation-hero {
+    padding: 1.5rem 0.75rem;
+  }
+
   .hero-title {
     font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.25rem;
   }
 
   .booking-id-badge {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+  }
+
+  .content-container {
+    padding: 0 0.75rem;
   }
 
   .section-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
   }
 
   .summary-card {
     flex-direction: column;
     text-align: center;
     gap: 0.75rem;
+    padding: 1rem;
+    min-height: 70px;
+  }
+
+  .card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    margin: 0 auto;
   }
 
   .card-content h3 {
     font-size: 1rem;
+    margin-bottom: 0.25rem;
   }
 
   .card-content p {
     font-size: 0.85rem;
+  }
+
+  .detail-card {
+    margin-bottom: 0.75rem;
+  }
+
+  .detail-header {
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+  }
+
+  .detail-body {
+    padding: 1rem;
+  }
+
+  .detail-row {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+
+  .action-btn {
+    padding: 1rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* Invoice mobile improvements */
+  .invoice-container {
+    padding: 1rem;
+    margin: 0 0.25rem;
+  }
+
+  .hotel-info h1 {
+    font-size: 1.3rem;
+  }
+
+  .invoice-details h2 {
+    font-size: 1.2rem;
+  }
+
+  .action-button {
+    padding: 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Additional mobile enhancements */
+@media (max-width: 768px) {
+  /* Improve touch targets */
+  .summary-card {
+    cursor: pointer;
+    -webkit-tap-highlight-color: rgba(100, 255, 218, 0.1);
+  }
+
+  .summary-card:active {
+    transform: scale(0.98);
+  }
+
+  /* Better spacing for mobile */
+  .confirmation-content {
+    padding: 1.5rem 0;
+  }
+
+  /* Ensure proper scrolling */
+  .booking-confirmation-page {
+    overflow-x: hidden;
+  }
+
+  /* Better button spacing */
+  .action-section {
+    padding: 1.5rem 0;
+  }
+
+  /* Invoice table improvements */
+  .invoice-items {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .invoice-items table {
+    min-width: 500px;
+  }
+}
+
+/* Tablet specific adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+  }
+
+  .content-container {
+    padding: 0 1.5rem;
+  }
+
+  .action-section {
+    gap: 1.25rem;
+  }
+
+  .action-btn {
+    min-width: 180px;
+  }
+
+  .invoice-actions {
+    justify-content: center;
+    gap: 1.25rem;
   }
 }
 

@@ -1,20 +1,7 @@
-/**
- * HRMS AI Integrated System - Enhanced User Controller
- * Hotel and Restaurant Management System with AI-powered features
- *
- * @description Enhanced user controller with improved error handling and standardized responses
- * @version 1.1.0
- * @author HRMS Development Team
- * @updated 2025-07-01 - Enhanced error handling and response standardization
- */
-
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
-const { Logger, ErrorHandler, asyncHandler } = require("../utils/errorHandler");
-const ApiResponse = require("../utils/apiResponse");
-const Joi = require("joi");
 
-// Controller to get the authenticated user's profile
+// ✅ Get User Profile
 exports.getProfile = async (req, res) => {
   try {
     const userId = req.user._id; // Get user ID from the authenticated request
@@ -24,13 +11,11 @@ exports.getProfile = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching profile", error: error.message });
+    res.status(500).json({ message: "Error fetching profile", error: error.message });
   }
 };
 
-// Controller to get a user by their ID
+// ✅ Get User by ID
 exports.getUserById = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -40,13 +25,11 @@ exports.getUserById = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching user", error: error.message });
+    res.status(500).json({ message: "Error fetching user", error: error.message });
   }
 };
 
-// Controller to update the authenticated user's profile
+// ✅ Update User Profile
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user._id; // Get user ID from the authenticated request
@@ -65,43 +48,36 @@ exports.updateProfile = async (req, res) => {
     await user.save();
     res.status(200).json({ message: "Profile updated successfully", user });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating profile", error: error.message });
+    res.status(500).json({ message: "Error updating profile", error: error.message });
   }
 };
 
-// Controller to update the authenticated user's password
-// This endpoint allows users to securely change their password after verifying the current one.
+// ✅ Update User Password
 exports.updatePassword = async (req, res) => {
-  try {
-    console.log("Update Password Request Body:", req.body);
-    const userId = req.user._id; // From authentication middleware
-    const { currentPassword, newPassword } = req.body;
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    try {
+      console.log("Update Password Request Body:", req.body);
+      const userId = req.user._id; // From authentication middleware
+      const { currentPassword, newPassword } = req.body;
+  
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Verify current password
+      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+  
+      // Hash and update new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword;
+  
+      await user.save();
+      res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Error updating password", error: error.message });
     }
-
-    // Verify current password
-    const isPasswordValid = await bcrypt.compare(
-      currentPassword,
-      user.password
-    );
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: "Current password is incorrect" });
-    }
-
-    // Hash and update new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-
-    await user.save();
-    res.status(200).json({ message: "Password updated successfully" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating password", error: error.message });
-  }
-};
+  };
+  

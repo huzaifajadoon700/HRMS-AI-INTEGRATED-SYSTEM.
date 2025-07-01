@@ -176,8 +176,9 @@ const OrderTracking = () => {
         console.log("Fetching order data for ID:", validOrderId);
         console.log("Using token:", token ? "Yes (Token exists)" : "No (Token missing)");
         
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
         const response = await axios.get(
-          `https://hrms-ai-integrated-system-production.up.railway.app/api/orders/${validOrderId}`,
+          `${apiUrl}/orders/${validOrderId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -550,7 +551,7 @@ const OrderTracking = () => {
                 </div>
                 <div className="socket-info-row">
                   <span className="socket-label">Server:</span>
-                  <span className="socket-value">https://hrms-ai-integrated-system-production.up.railway.app</span>
+                  <span className="socket-value">{process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}</span>
                 </div>
               </div>
               

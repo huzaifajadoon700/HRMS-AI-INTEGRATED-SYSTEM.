@@ -1,23 +1,18 @@
 {
   "name": "hrms-backend",
   "version": "1.0.0",
-  "description": "Hotel and Restaurant Management System Backend with AI Integration",
+  "description": "Hotel and Restaurant Management System Backend",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "serverless": "node index.serverless.js",
+    "build": "echo 'Build completed successfully'",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "vercel-build": "echo 'Vercel build completed'"
   },
-  "keywords": [
-    "hrms",
-    "hotel-management",
-    "restaurant-management",
-    "ai-integration",
-    "nodejs",
-    "express",
-    "mongodb"
-  ],
-  "author": "HRMS Development Team",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "@stripe/react-stripe-js": "^3.7.0",

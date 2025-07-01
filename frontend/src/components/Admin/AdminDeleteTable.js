@@ -3,7 +3,8 @@ import { Card, Button, Spinner, Table } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./AdminManageTables.css";
+import "./AdminManageRooms.css";
+import "./AdminDeleteTable.css";
 
 const AdminDeleteTable = () => {
   const navigate = useNavigate();
@@ -16,7 +17,8 @@ const AdminDeleteTable = () => {
 
   const fetchTables = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/tables");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/tables`);
       setTables(response.data);
     } catch (error) {
       console.error("Error fetching tables:", error);
@@ -32,12 +34,13 @@ const AdminDeleteTable = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const response = await axios.delete(
-        `http://localhost:8080/api/tables/${tableId}`,
+        `${apiUrl}/tables/${tableId}`,
         {
-          headers: { 
+          headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json" 
+            "Content-Type": "application/json"
           },
         }
       );
@@ -108,7 +111,7 @@ const AdminDeleteTable = () => {
                     <td>
                       {table.image && (
                         <img
-                          src={`http://localhost:8080${table.image}`}
+                          src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${table.image}`}
                           alt={table.tableName}
                           className="cosmic-table-image"
                         />

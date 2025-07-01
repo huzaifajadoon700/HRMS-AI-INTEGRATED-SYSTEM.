@@ -19,6 +19,7 @@ import {
   FiTruck,
   FiClock
 } from "react-icons/fi";
+import { apiConfig } from "../../config/api";
 import "./ModernCart.css";
 
 // Initialize Stripe with your publishable key
@@ -65,7 +66,7 @@ const PaymentForm = ({ onPaymentSuccess, totalPrice, onCancel, cart }) => {
 
       // Send the payment method ID to your server
       const response = await axios.post(
-        'http://localhost:8080/api/payment/menu-payment',
+        `${apiConfig.endpoints.payment}/menu-payment`,
         {
           amount: totalPrice,
           currency: 'pkr',
@@ -205,10 +206,33 @@ export default function Cart() {
   const navigate = useNavigate();
   const [showPayment, setShowPayment] = useState(false);
 
+  // Scroll to top utility function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCart(storedCart);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Scroll to top when payment form is shown and manage body scroll
+  useEffect(() => {
+    if (showPayment) {
+      scrollToTop();
+      document.body.classList.add('payment-open');
+    } else {
+      document.body.classList.remove('payment-open');
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('payment-open');
+    };
+  }, [showPayment]);
 
   useEffect(() => {
     if (!mapContainer.current || cart.length === 0) return;
@@ -416,7 +440,7 @@ export default function Cart() {
       console.log('Sending order data:', orderData); // Debug log
 
       const response = await axios.post(
-        "http://localhost:8080/api/orders",
+        apiConfig.endpoints.orders,
         orderData,
         { 
           headers: { 
@@ -447,7 +471,7 @@ export default function Cart() {
     } catch (error) {
       console.error("Error placing order:", error.response?.data || error);
       let errorMessage = "Failed to place order. Please try again.";
-      
+
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
       } else if (error.response?.data?.error) {
@@ -455,14 +479,28 @@ export default function Cart() {
       } else if (error.message.includes('card')) {
         errorMessage = error.message;
       }
-      
+
+      // Handle Socket.io specific error
+      if (error.response?.data?.error === "Socket.io not initialized") {
+        errorMessage = "Order placed successfully, but real-time updates may not work. You can check your order status in 'My Orders'.";
+        toast.success(errorMessage);
+
+        // Still navigate to confirmation even if socket fails
+        localStorage.removeItem("cart");
+        setCart([]);
+        window.dispatchEvent(new Event("cartUpdated"));
+
+        navigate('/my-orders');
+        return;
+      }
+
       // Show detailed error for debugging
       console.log('Full error details:', {
         status: error.response?.status,
         data: error.response?.data,
         message: error.message
       });
-      
+
       setError(errorMessage);
       toast.error(errorMessage);
       setShowPayment(true); // Keep payment form visible on error
@@ -482,15 +520,42 @@ export default function Cart() {
 
   if (showPayment) {
     return (
-      <div className="cart-container">
-        <Elements stripe={stripePromise} options={stripeElementsOptions}>
-          <PaymentForm 
-            onPaymentSuccess={handlePaymentSuccess}
-            totalPrice={(cart.reduce((sum, item) => sum + item.price * item.quantity, 0) + deliveryFee).toFixed(2)}
-            onCancel={() => setShowPayment(false)}
-            cart={cart}
-          />
-        </Elements>
+      <div style={{
+        background: '#0A192F',
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        paddingTop: '80px',
+        paddingBottom: '50px',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 1000,
+        overflowY: 'auto'
+      }}>
+        <div style={{
+          background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(100, 255, 218, 0.1)',
+          borderRadius: '1rem',
+          padding: '2rem',
+          maxWidth: '500px',
+          width: '100%',
+          margin: '2rem 1rem',
+          position: 'relative'
+        }}>
+          <Elements stripe={stripePromise} options={stripeElementsOptions}>
+            <PaymentForm
+              onPaymentSuccess={handlePaymentSuccess}
+              totalPrice={(cart.reduce((sum, item) => sum + item.price * item.quantity, 0) + deliveryFee).toFixed(2)}
+              onCancel={() => setShowPayment(false)}
+              cart={cart}
+            />
+          </Elements>
+        </div>
       </div>
     );
   }

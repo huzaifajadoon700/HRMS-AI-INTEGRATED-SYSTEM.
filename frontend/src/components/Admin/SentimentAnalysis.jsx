@@ -23,7 +23,7 @@ ChartJS.register(
   ArcElement
 );
 
-const API_URL = 'https://hrms-ai-integrated-system-production.up.railway.app';
+const API_URL = process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app';
 
 const SentimentAnalysis = () => {
   const [analytics, setAnalytics] = useState(null);

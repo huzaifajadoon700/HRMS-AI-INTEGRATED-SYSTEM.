@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
-import { FiMail, FiLock, FiUser, FiEye, FiEyeOff,  FiShield, FiCheckCircle } from "react-icons/fi";
+import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiShield, FiCheckCircle, FiHome, FiUsers, FiStar, FiArrowRight } from "react-icons/fi";
+import { apiConfig } from "../../config/api";
+import { useHotelInfo, useLogos } from "../../hooks/useHotelInfo";
 import "./Login.css";
 
 const AuthPage = () => {
@@ -11,15 +13,45 @@ const AuthPage = () => {
   const [showToast, setShowToast] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, text: '', checks: {} });
   const navigate = useNavigate();
+
+  // Get dynamic hotel information and logos
+  const hotelInfo = useHotelInfo();
+  const logos = useLogos();
 
   const handleToggle = () => {
     setIsLogin(!isLogin);
     setFormData({ name: "", email: "", password: "" });
   };
 
+  const calculatePasswordStrength = (password) => {
+    const checks = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    const score = Object.values(checks).filter(Boolean).length;
+    let text = '';
+
+    if (score === 0) text = '';
+    else if (score === 1) text = 'Weak';
+    else if (score === 2) text = 'Fair';
+    else if (score === 3) text = 'Good';
+    else if (score === 4) text = 'Strong';
+
+    return { score, text: text.toLowerCase(), checks };
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === 'password' && !isLogin) {
+      setPasswordStrength(calculatePasswordStrength(value));
+    }
   };
 
   const validateInputs = () => {
@@ -59,7 +91,7 @@ const AuthPage = () => {
         ? { email: formData.email, password: formData.password }
         : { name: formData.name, email: formData.email, password: formData.password };
 
-      const response = await fetch(`https://hrms-ai-integrated-system-production.up.railway.app/auth${endpoint}`, {
+      const response = await fetch(`${apiConfig.serverURL}/auth${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(requestBody),
@@ -96,7 +128,7 @@ const AuthPage = () => {
       // Clear previous user data before logging in
       localStorage.clear();
       
-      const res = await fetch("https://hrms-ai-integrated-system-production.up.railway.app/auth/google", {
+      const res = await fetch(`${apiConfig.serverURL}/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: googleToken }),
@@ -137,30 +169,50 @@ const AuthPage = () => {
       {/* Left Side - Branding */}
       <div className="login-branding">
         <div className="branding-content">
-         
+          <div className="brand-logo">
+            {logos.loginLogo && logos.loginLogo !== '/images/logo-login.png' ? (
+              <img
+                src={logos.loginLogo}
+                alt={`${hotelInfo.hotelName} Logo`}
+                className="login-logo-image"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+            ) : null}
+            <div className="professional-logo" style={{ display: logos.loginLogo && logos.loginLogo !== '/images/logo-login.png' ? 'none' : 'flex' }}>
+              <span className="logo-text">{hotelInfo.hotelName.substring(0, 2).toUpperCase()}</span>
+              <span className="logo-accent">MS</span>
+            </div>
+          </div>
+          <h1 className="brand-title">{hotelInfo.hotelName} Portal</h1>
+          <p className="brand-subtitle">
+            {hotelInfo.hotelSubtitle || 'Hotel & Restaurant Management System'}
+          </p>
 
           <div className="features-list">
             <div className="feature-item">
-              <FiCheckCircle className="feature-icon" />
-              <span>Exquisite Cuisine</span>
+              <FiUsers className="feature-icon" />
+              <span>Easy Account Management</span>
+            </div>
+            <div className="feature-item">
+              <FiStar className="feature-icon" />
+              <span>Quick Room Booking</span>
+            </div>
+            <div className="feature-item">
+              <FiShield className="feature-icon" />
+              <span>Secure Payments</span>
             </div>
             <div className="feature-item">
               <FiCheckCircle className="feature-icon" />
-              <span>Premium Service</span>
-            </div>
-            <div className="feature-item">
-              <FiCheckCircle className="feature-icon" />
-              <span>Elegant Ambiance</span>
-            </div>
-            <div className="feature-item">
-              <FiCheckCircle className="feature-icon" />
-              <span>Memorable Experiences</span>
+              <span>Restaurant Ordering</span>
             </div>
           </div>
 
           <div className="testimonial">
-            <p>"An unforgettable dining experience that exceeds all expectations."</p>
-            <span>- Satisfied Customer</span>
+            <p>"Amazing experience! Easy booking and excellent service."</p>
+            <span>- Satisfied Guest</span>
           </div>
         </div>
       </div>
@@ -170,12 +222,12 @@ const AuthPage = () => {
         <div className="form-container">
           <div className="form-header">
             <h2 className="form-title">
-              {isLogin ? "Welcome Back" : "Join Us Today"}
+              {isLogin ? "Welcome Back" : "Create Account"}
             </h2>
             <p className="form-subtitle">
               {isLogin
-                ? "Sign in to access your account and continue your culinary journey"
-                : "Create your account and discover amazing dining experiences"
+                ? "Sign in to access your account and enjoy our hotel & restaurant services"
+                : "Create your account to book rooms, make reservations, and enjoy our services"
               }
             </p>
           </div>
@@ -225,15 +277,45 @@ const AuthPage = () => {
                 Password
               </label>
               <div className="input-wrapper password-wrapper">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter your password"
-                  className="form-input"
-                />
+                <div className="password-strength-container">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter your password"
+                    className={`form-input ${!isLogin && formData.password ? 'password-input-enhanced' : ''}`}
+                  />
+
+                  {!isLogin && formData.password && (
+                    <>
+                      <div className="password-security-indicators">
+                        <div className={`security-icon length-check ${passwordStrength.checks.length ? 'active' : ''}`}>
+                          8
+                        </div>
+                        <div className={`security-icon uppercase-check ${passwordStrength.checks.uppercase ? 'active' : ''}`}>
+                          A
+                        </div>
+                        <div className={`security-icon number-check ${passwordStrength.checks.number ? 'active' : ''}`}>
+                          #
+                        </div>
+                        <div className={`security-icon special-check ${passwordStrength.checks.special ? 'active' : ''}`}>
+                          !
+                        </div>
+                      </div>
+
+                      <div className="password-strength-bar">
+                        <div className={`password-strength-fill password-strength-${passwordStrength.text}`}></div>
+                      </div>
+
+                      <div className={`password-strength-text ${passwordStrength.text} ${passwordStrength.text ? 'show' : ''}`}>
+                        {passwordStrength.text && `Password strength: ${passwordStrength.text.charAt(0).toUpperCase() + passwordStrength.text.slice(1)}`}
+                      </div>
+                    </>
+                  )}
+                </div>
+
                 <button
                   type="button"
                   className="password-toggle"
@@ -251,13 +333,18 @@ const AuthPage = () => {
             >
               {isLoading ? (
                 <>
-                  <div className="loading-spinner"></div>
-                  Processing...
+                  <div className="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  {isLogin ? "Signing In..." : "Creating Account..."}
                 </>
               ) : (
                 <>
                   <FiShield className="btn-icon" />
-                  {isLogin ? "Sign In" : "Create Account"}
+                  {isLogin ? "Sign In to HRMS" : "Create HRMS Account"}
+                  <FiArrowRight className="btn-arrow" />
                 </>
               )}
             </button>
@@ -282,11 +369,12 @@ const AuthPage = () => {
 
           <div className="auth-toggle">
             <p>
-              {isLogin ? "New to Night Elegance?" : "Already have an account?"}{" "}
+              {isLogin ? "New to our organization?" : "Already have an account?"}{" "}
               <button
                 type="button"
                 className="toggle-btn"
                 onClick={handleToggle}
+                disabled={isLoading}
               >
                 {isLogin ? "Create Account" : "Sign In"}
               </button>

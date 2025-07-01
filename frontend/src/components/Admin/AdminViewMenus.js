@@ -8,7 +8,9 @@ import {
   FiEye, FiEdit, FiTrash, FiToggleLeft, FiToggleRight, FiPlus,
   FiDollarSign, FiStar, FiClock, FiCheck, FiX, FiTrendingUp
 } from "react-icons/fi";
+import { getMenuImageUrl, handleImageError } from "../../utils/imageUtils";
 import "./AdminManageRooms.css";
+import "./AdminViewMenus.css";
 
 const AdminViewMenus = () => {
   const [menuItems, setMenuItems] = useState([]);
@@ -27,9 +29,10 @@ const AdminViewMenus = () => {
   const fetchMenuItems = async () => {
     setLoading(true);
     try {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const url = selectedCategory === "all"
-        ? "http://localhost:8080/api/menus"
-        : `http://localhost:8080/api/menus/category/${selectedCategory}`;
+        ? `${apiUrl}/menus`
+        : `${apiUrl}/menus/category/${selectedCategory}`;
       
       const response = await axios.get(url);
       setMenuItems(response.data);
@@ -42,7 +45,8 @@ const AdminViewMenus = () => {
 
   const handleDeleteItem = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/menus/${id}`);
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      await axios.delete(`${apiUrl}/menus/${id}`);
       setMenuItems(menuItems.filter(item => item._id !== id));
       toast.success("Menu item deleted successfully");
       setShowDeleteModal(false);
@@ -53,7 +57,8 @@ const AdminViewMenus = () => {
 
   const handleAvailabilityToggle = async (id, currentStatus) => {
     try {
-      const response = await axios.patch(`http://localhost:8080/api/menus/${id}/toggle-availability`);
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.patch(`${apiUrl}/menus/${id}/toggle-availability`);
       setMenuItems(menuItems.map(item => item._id === id ? response.data : item));
       toast.success("Availability updated successfully");
     } catch (error) {
@@ -61,24 +66,7 @@ const AdminViewMenus = () => {
     }
   };
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return '/images/placeholder-menu.jpg';
-    try {
-      // If it's already a full URL (Unsplash, etc.), return as is
-      if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-        return imagePath;
-      }
-      // If it's a local upload path
-      const cleanPath = imagePath.replace(/^\/+/, '');
-      if (cleanPath.includes('uploads')) {
-        return `http://localhost:8080/${cleanPath}`;
-      }
-      return `http://localhost:8080/uploads/${cleanPath}`;
-    } catch (error) {
-      console.error('Error formatting image URL:', error);
-      return '/images/placeholder-menu.jpg';
-    }
-  };
+
 
   // Filter and sort menu items
   const filteredMenuItems = menuItems.filter(item => {
@@ -125,7 +113,7 @@ const AdminViewMenus = () => {
                   <FiCheck />
                 </div>
                 <div className="stat-content">
-                  <span className="stat-value">{menuItems.filter(item => item.availability).length}</span>
+                  <span className="stat-value">{menuItems.filter(item => item.availability === true).length}</span>
                   <span className="stat-label">Available</span>
                 </div>
               </div>
@@ -220,13 +208,10 @@ const AdminViewMenus = () => {
                 <div key={item._id} className={`enhanced-menu-card ${viewMode}-card`}>
                   <div className="menu-image-container">
                     <img
-                      src={getImageUrl(item.image)}
+                      src={getMenuImageUrl(item.image)}
                       alt={item.name}
                       className="menu-image"
-                      onError={(e) => {
-                        e.target.src = "/images/placeholder-menu.jpg";
-                        e.target.onerror = null;
-                      }}
+                      onError={(e) => handleImageError(e, "/images/placeholder-menu.jpg")}
                     />
                     <div className="image-overlay">
                       <div className="overlay-actions">
@@ -252,8 +237,8 @@ const AdminViewMenus = () => {
                     </div>
 
                     <div className="menu-badges">
-                      <span className={`status-badge ${item.availability ? 'available' : 'unavailable'}`}>
-                        {item.availability ? 'Available' : 'Unavailable'}
+                      <span className={`status-badge ${item.availability === true ? 'available' : 'unavailable'}`}>
+                        {item.availability === true ? 'Available' : 'Unavailable'}
                       </span>
                       <span className="category-badge">
                         {item.category}
@@ -276,11 +261,11 @@ const AdminViewMenus = () => {
 
                     <div className="menu-actions">
                       <button
-                        className={`availability-toggle ${item.availability ? 'available' : 'unavailable'}`}
+                        className={`availability-toggle ${item.availability === true ? 'available' : 'unavailable'}`}
                         onClick={() => handleAvailabilityToggle(item._id, item.availability)}
                       >
-                        {item.availability ? <FiToggleRight /> : <FiToggleLeft />}
-                        <span>{item.availability ? 'Available' : 'Unavailable'}</span>
+                        {item.availability === true ? <FiToggleRight /> : <FiToggleLeft />}
+                        <span>{item.availability === true ? 'Available' : 'Unavailable'}</span>
                       </button>
                     </div>
                   </div>

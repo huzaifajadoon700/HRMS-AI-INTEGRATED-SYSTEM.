@@ -18,7 +18,6 @@ import {
   FiActivity,
   FiTrendingUp,
   FiAward,
-  FiBookmark,
   FiClock,
   FiDollarSign,
   FiBarChart2,
@@ -79,7 +78,7 @@ const Profile = () => {
       avgPartySize: 0
     }
   });
-  const [recentActivity, setRecentActivity] = useState({
+  const [, setRecentActivity] = useState({
     bookings: [],
     orders: [],
     reservations: []
@@ -98,7 +97,8 @@ const Profile = () => {
       }
 
       try {
-        const response = await axios.get("http://localhost:8080/api/user/profile", {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/user/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(response.data);
@@ -120,20 +120,21 @@ const Profile = () => {
       setStatsLoading(true);
 
       // Fetch reservations
-      const reservationsResponse = await axios.get("http://localhost:8080/api/reservations/user", {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const reservationsResponse = await axios.get(`${apiUrl}/reservations/user`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const reservations = reservationsResponse.data || [];
 
       // Fetch orders
-      const ordersResponse = await axios.get("http://localhost:8080/api/orders", {
+      const ordersResponse = await axios.get(`${apiUrl}/orders`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { limit: 100 }
       });
       const orders = ordersResponse.data?.orders || [];
 
       // Fetch bookings
-      const bookingsResponse = await axios.get("http://localhost:8080/api/bookings/user", {
+      const bookingsResponse = await axios.get(`${apiUrl}/bookings/user`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const bookings = bookingsResponse.data || [];
@@ -183,12 +184,13 @@ const Profile = () => {
       const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
       // Fetch food history and interactions
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const [foodHistoryResponse, foodInteractionsResponse] = await Promise.allSettled([
-        axios.get(`http://localhost:8080/api/food-recommendations/history/${userId}`, {
+        axios.get(`${apiUrl}/food-recommendations/history/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
           params: { days: 30 }
         }),
-        axios.get("http://localhost:8080/api/orders", {
+        axios.get(`${apiUrl}/orders`, {
           headers: { Authorization: `Bearer ${token}` },
           params: { limit: 100 }
         })
@@ -196,22 +198,22 @@ const Profile = () => {
 
       // Fetch room history and interactions
       const [roomHistoryResponse, roomBookingsResponse] = await Promise.allSettled([
-        axios.get(`http://localhost:8080/api/rooms/history/${userId}`, {
+        axios.get(`${apiUrl}/rooms/history/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
           params: { days: 30 }
         }),
-        axios.get("http://localhost:8080/api/bookings/user", {
+        axios.get(`${apiUrl}/bookings/user`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
 
       // Fetch table history and interactions
       const [tableHistoryResponse, tableReservationsResponse] = await Promise.allSettled([
-        axios.get(`http://localhost:8080/api/tables/history/${userId}`, {
+        axios.get(`${apiUrl}/tables/history/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
           params: { days: 30 }
         }),
-        axios.get("http://localhost:8080/api/reservations/user", {
+        axios.get(`${apiUrl}/reservations/user`, {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);
@@ -310,8 +312,9 @@ const Profile = () => {
     }
 
     try {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       await axios.put(
-        "http://localhost:8080/api/user/profile",
+        `${apiUrl}/user/profile`,
         { name: user.name, email: user.email, phone: user.phone },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -341,8 +344,9 @@ const Profile = () => {
     }
 
     try {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       await axios.put(
-        "http://localhost:8080/api/user/password",
+        `${apiUrl}/user/password`,
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );

@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { apiConfig } from '../config/api';
 
-const API_BASE_URL = 'https://hrms-ai-integrated-system-production.up.railway.app/api';
+const API_BASE_URL = apiConfig.baseURL;
 
 // Create axios instance with default config
 const api = axios.create({
@@ -222,9 +223,10 @@ export const tableUtils = {
     try {
       if (imagePath.startsWith("http")) return imagePath;
       const cleanPath = imagePath.replace(/^\/+/, "");
+      const serverURL = process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app';
       return cleanPath.includes("uploads")
-        ? `http://localhost:8080/${cleanPath}`
-        : `http://localhost:8080/uploads/${cleanPath}`;
+        ? `${serverURL}/${cleanPath}`
+        : `${serverURL}/uploads/${cleanPath}`;
     } catch (error) {
       console.error("Error formatting image URL:", error);
       return "/images/placeholder-table.jpg";

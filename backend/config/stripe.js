@@ -1,17 +1,15 @@
-/**
- * Stripe Configuration for HRMS System
- * Payment gateway setup and environment validation
- *
- * @description Stripe API configuration with security checks
- * @version 1.0.0
- */
+// Graceful Stripe initialization for serverless
+let stripe = null;
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-
-// Environment validation for security
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.error("STRIPE_SECRET_KEY is not set in environment variables!");
-  process.exit(1);
+if (process.env.STRIPE_SECRET_KEY) {
+    try {
+        stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+        console.log('✅ Stripe initialized successfully');
+    } catch (error) {
+        console.error('❌ Failed to initialize Stripe:', error.message);
+    }
+} else {
+    console.warn('⚠️ STRIPE_SECRET_KEY not set - Stripe features will be disabled');
 }
 
 module.exports = stripe;

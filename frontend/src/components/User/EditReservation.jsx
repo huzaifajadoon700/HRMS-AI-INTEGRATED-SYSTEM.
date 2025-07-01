@@ -36,7 +36,8 @@ const EditReservation = ({ reservationId, onClose, onSuccess }) => {
         
         console.log("Fetching reservation with ID:", reservationId);
         
-        const response = await axios.get(`http://localhost:8080/api/reservations/${reservationId}`, {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/reservations/${reservationId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -154,7 +155,8 @@ const EditReservation = ({ reservationId, onClose, onSuccess }) => {
       setAvailability({ ...availability, isChecking: true });
       
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:8080/api/tables/availability`, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/tables/availability`, {
         params: {
           reservationDate: formData.reservationDate,
           time: formData.time,
@@ -225,8 +227,9 @@ const EditReservation = ({ reservationId, onClose, onSuccess }) => {
         return;
       }
       
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const response = await axios.put(
-        `http://localhost:8080/api/reservations/${reservationId}`,
+        `${apiUrl}/reservations/${reservationId}`,
         {
           reservationDate: formData.reservationDate,
           time: formData.time,

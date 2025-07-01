@@ -287,50 +287,175 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  .modern-hero-section {
+    margin-bottom: 2rem;
+  }
+
+  .hero-background {
+    padding: 3rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
   .modern-hero-title {
     font-size: 2.5rem;
   }
-  
+
   .modern-hero-subtitle {
     font-size: 1.1rem;
+    margin-bottom: 2rem;
   }
-  
+
   .hero-stats {
-    gap: 2rem;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
   }
-  
+
+  .stat-item {
+    min-width: 100px;
+  }
+
   .stat-number {
     font-size: 1.5rem;
   }
-  
+
   .section-title {
     font-size: 2rem;
   }
-  
+
   .service-image-container {
     height: 200px;
   }
-  
+
   .service-content {
     padding: 1.5rem;
   }
-  
+
   .modern-service-card:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-6px) scale(1.01);
+  }
+
+  .service-features {
+    gap: 0.4rem;
+  }
+
+  .feature-tag {
+    font-size: 0.7rem;
+    padding: 0.2rem 0.6rem;
   }
 }
 
 @media (max-width: 576px) {
+  .modern-hero-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-background {
+    padding: 2rem 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 15px;
+  }
+
   .hero-stats {
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+    margin-top: 1.5rem;
   }
-  
+
+  .stat-item {
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    min-width: 120px;
+  }
+
   .modern-hero-title {
     font-size: 2rem;
+    margin-bottom: 1rem;
   }
-  
+
+  .modern-hero-subtitle {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
   .section-title {
     font-size: 1.75rem;
+  }
+
+  .section-subtitle {
+    font-size: 1rem;
+  }
+
+  .service-image-container {
+    height: 180px;
+  }
+
+  .service-content {
+    padding: 1.25rem;
+  }
+
+  .service-title {
+    font-size: 1.25rem;
+  }
+
+  .service-description {
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .service-btn {
+    padding: 0.875rem 1.5rem;
+    font-size: 0.85rem;
+  }
+
+  .modern-service-card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .recommendations-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .hero-background {
+    padding: 1.5rem 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .modern-hero-title {
+    font-size: 1.75rem;
+  }
+
+  .modern-hero-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .service-content {
+    padding: 1rem;
+  }
+
+  .service-title {
+    font-size: 1.1rem;
+  }
+
+  .service-description {
+    font-size: 0.85rem;
+  }
+
+  .service-btn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.8rem;
+  }
+
+  .feature-tag {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.5rem;
   }
 }

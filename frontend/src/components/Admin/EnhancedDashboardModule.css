@@ -21,16 +21,41 @@
   box-sizing: border-box;
 }
 
+/* Critical Mobile Override - Force Dashboard to Break Out */
+@media (max-width: 768px) {
+  .enhanced-dash-module-container {
+    position: fixed !important;
+    top: 70px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 70px) !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-left: 0 !important;
+    z-index: 999 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .enhanced-dash-module-container {
+    top: 56px !important;
+    height: calc(100vh - 56px) !important;
+  }
+}
+
 /* COMPLETE LAYOUT OVERRIDE - BREAK OUT OF SIDEBAR CONSTRAINTS */
 .enhanced-dash-module-container {
   /* Force full viewport width */
   position: fixed !important;
-  top: 80px !important; /* Account for navbar */
+  top: 70px !important; /* Account for navbar */
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
   width: 100vw !important;
-  height: calc(100vh - 80px) !important;
+  height: calc(100vh - 70px) !important;
   max-width: 100vw !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -55,16 +80,25 @@
 .content-container .enhanced-dash-module-container,
 .enhanced-main-content .enhanced-dash-module-container {
   position: fixed !important;
-  top: 80px !important;
+  top: 70px !important;
   left: 0 !important;
   right: 0 !important;
   bottom: 0 !important;
   width: 100vw !important;
-  height: calc(100vh - 80px) !important;
+  height: calc(100vh - 70px) !important;
   max-width: 100vw !important;
   margin: 0 !important;
   padding: 0 !important;
   padding-left: 280px !important;
+}
+
+/* Mobile Override - Remove sidebar padding */
+@media (max-width: 768px) {
+  .enhanced-content-wrapper .enhanced-dash-module-container,
+  .content-container .enhanced-dash-module-container,
+  .enhanced-main-content .enhanced-dash-module-container {
+    padding-left: 0 !important;
+  }
 }
 
 /* Loading & Error States */
@@ -162,19 +196,27 @@
 }
 
 .title-icon-wrapper {
-  width: 40px;
-  height: 40px;
-  background: var(--accent-primary);
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+  transition: all 0.3s ease;
+}
+
+.title-icon-wrapper:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(100, 255, 218, 0.4);
 }
 
 .title-icon {
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   color: var(--primary-bg);
+  font-weight: 600;
 }
 
 .title-text {
@@ -362,7 +404,7 @@
 /* Quick Stats Bar */
 .quick-stats-bar {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   padding: 1.5rem 2rem;
   margin: 0;
@@ -457,7 +499,7 @@
 /* Metrics Grid - Full Width with Header Spacing */
 .dash-metrics-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 1.5rem;
   padding: 2rem;
   width: 100%;
@@ -1494,4 +1536,1686 @@
   font-weight: 500;
 }
 
-/* Clean Layout - No Additional Fixes Needed */
+/* Enhanced Mobile Responsive Design */
+@media (max-width: 768px) {
+  /* Container Adjustments for Mobile */
+  .enhanced-dash-module-container {
+    padding-left: 0 !important;
+    top: 0 !important;
+    height: auto !important;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+  }
+
+  /* Override ALL parent constraints for mobile */
+  .enhanced-content-wrapper .enhanced-dash-module-container,
+  .content-container .enhanced-dash-module-container,
+  .enhanced-main-content .enhanced-dash-module-container {
+    position: relative !important;
+    top: 0 !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  /* Header Mobile Optimizations */
+  .enhanced-dash-header {
+    padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .title-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .title-wrapper {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .title-icon-wrapper {
+    width: 35px;
+    height: 35px;
+  }
+
+  .title-icon {
+    font-size: 1rem;
+  }
+
+  .dash-title-enhanced {
+    font-size: 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .live-indicator {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.65rem;
+  }
+
+  .live-dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .dash-subtitle-enhanced {
+    font-size: 0.8rem;
+  }
+
+  /* Stats Summary Mobile */
+  .stats-summary {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .summary-item {
+    flex: 1;
+    min-width: 100px;
+    padding: 0.625rem 0.75rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .summary-icon {
+    font-size: 1rem;
+  }
+
+  .summary-value {
+    font-size: 1rem;
+  }
+
+  .summary-label {
+    font-size: 0.65rem;
+  }
+
+  /* Filter Section Mobile */
+  .enhanced-filter-section {
+    justify-content: flex-start;
+    margin-top: 1rem;
+  }
+
+  .filter-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .enhanced-filter-select {
+    width: 100%;
+    padding: 0.625rem;
+    font-size: 0.8rem;
+  }
+
+  .refresh-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.625rem;
+    font-size: 0.8rem;
+  }
+
+  /* Quick Stats Bar Mobile */
+  .quick-stats-bar {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    margin: 1rem;
+  }
+
+  .quick-stat {
+    padding: 0.875rem;
+    gap: 0.75rem;
+  }
+
+  .quick-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .quick-icon {
+    font-size: 1.25rem;
+  }
+
+  .quick-value {
+    font-size: 1.1rem;
+  }
+
+  .quick-label {
+    font-size: 0.75rem;
+  }
+
+  .quick-trend {
+    font-size: 0.7rem;
+  }
+
+  /* Metrics Grid Mobile */
+  .dash-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    margin-top: 0.5rem;
+  }
+
+  .dash-metric-card {
+    height: auto;
+    min-height: 300px;
+  }
+
+  .card-header {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .card-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  /* Revenue Card Mobile */
+  .main-metric {
+    margin-bottom: 1rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+
+  .metric-label {
+    font-size: 0.75rem;
+  }
+
+  .revenue-breakdown {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .breakdown-item {
+    padding: 0.75rem;
+  }
+
+  .breakdown-value {
+    font-size: 1rem;
+  }
+
+  .breakdown-label {
+    font-size: 0.7rem;
+  }
+
+  /* Room Stats Mobile */
+  .room-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  .stat-item {
+    padding: 0.75rem;
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .stat-number {
+    font-size: 1.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  /* Order Stats Mobile */
+  .order-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+
+  /* Charts Grid Mobile */
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .chart-container {
+    width: 100%;
+  }
+
+  .chart-card {
+    padding: 1rem;
+  }
+
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .chart-title {
+    font-size: 1rem;
+  }
+
+  .chart-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .chart-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .chart-body {
+    height: 250px;
+  }
+
+  /* Filter Buttons Mobile */
+  .filter-buttons {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .filter-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  /* Profile Metrics Mobile */
+  .profile-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .profile-metric {
+    padding: 0.875rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+
+  .metric-title {
+    font-size: 0.75rem;
+  }
+
+  .metric-detail {
+    font-size: 0.7rem;
+  }
+
+  /* User Behavior Trends Mobile */
+  .user-behavior-trends {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .trend-item {
+    padding: 0.75rem;
+  }
+
+  .trend-label {
+    font-size: 0.75rem;
+  }
+
+  .trend-value {
+    font-size: 0.9rem;
+  }
+
+  .trend-percentage {
+    font-size: 0.7rem;
+  }
+}
+
+/* Ultra Mobile Responsive - Small Phones */
+@media (max-width: 480px) {
+  /* Container Ultra Mobile */
+  .enhanced-dash-module-container {
+    padding-left: 0 !important;
+    top: 0 !important;
+    height: auto !important;
+    position: relative !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+  }
+
+  /* Override ALL parent constraints for ultra mobile */
+  .enhanced-content-wrapper .enhanced-dash-module-container,
+  .content-container .enhanced-dash-module-container,
+  .enhanced-main-content .enhanced-dash-module-container {
+    position: relative !important;
+    top: 0 !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-left: 0 !important;
+  }
+
+  /* Header Ultra Mobile */
+  .enhanced-dash-header {
+    padding: 0.75rem;
+    position: relative;
+    top: 0;
+  }
+
+  .title-icon-wrapper {
+    width: 30px;
+    height: 30px;
+  }
+
+  .title-icon {
+    font-size: 0.9rem;
+  }
+
+  .dash-title-enhanced {
+    font-size: 1.1rem;
+  }
+
+  .live-indicator {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .live-dot {
+    width: 4px;
+    height: 4px;
+  }
+
+  .dash-subtitle-enhanced {
+    font-size: 0.75rem;
+  }
+
+  /* Stats Summary Ultra Mobile */
+  .stats-summary {
+    gap: 0.375rem;
+  }
+
+  .summary-item {
+    padding: 0.5rem;
+    min-width: 90px;
+  }
+
+  .summary-icon {
+    font-size: 0.9rem;
+  }
+
+  .summary-value {
+    font-size: 0.9rem;
+  }
+
+  .summary-label {
+    font-size: 0.6rem;
+  }
+
+  /* Filter Controls Ultra Mobile */
+  .filter-controls {
+    gap: 0.5rem;
+  }
+
+  .enhanced-filter-select {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .refresh-btn {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* Quick Stats Ultra Mobile */
+  .quick-stats-bar {
+    gap: 0.75rem;
+    padding: 0.75rem;
+    margin: 0.75rem;
+  }
+
+  .quick-stat {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .quick-icon-wrapper {
+    width: 35px;
+    height: 35px;
+  }
+
+  .quick-icon {
+    font-size: 1.1rem;
+  }
+
+  .quick-value {
+    font-size: 1rem;
+  }
+
+  .quick-label {
+    font-size: 0.7rem;
+  }
+
+  .quick-trend {
+    font-size: 0.65rem;
+  }
+
+  /* Metrics Grid Ultra Mobile */
+  .dash-metrics-grid {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .dash-metric-card {
+    min-height: 250px;
+  }
+
+  .card-header {
+    padding: 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .card-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .card-body {
+    padding: 0.875rem;
+  }
+
+  /* Revenue Metrics Ultra Mobile */
+  .metric-value {
+    font-size: 1.25rem;
+  }
+
+  .metric-label {
+    font-size: 0.7rem;
+  }
+
+  .revenue-breakdown {
+    gap: 0.5rem;
+  }
+
+  .breakdown-item {
+    padding: 0.625rem;
+  }
+
+  .breakdown-value {
+    font-size: 0.9rem;
+  }
+
+  .breakdown-label {
+    font-size: 0.65rem;
+  }
+
+  /* Room & Order Stats Ultra Mobile */
+  .room-stats,
+  .order-stats {
+    gap: 0.5rem;
+  }
+
+  .stat-item {
+    padding: 0.625rem;
+    gap: 0.375rem;
+  }
+
+  .stat-number {
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+  }
+
+  /* Charts Ultra Mobile */
+  .charts-grid {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .chart-card {
+    padding: 0.875rem;
+  }
+
+  .chart-header {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .chart-title {
+    font-size: 0.9rem;
+  }
+
+  .chart-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .chart-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .chart-body {
+    height: 200px;
+  }
+
+  /* Filter Buttons Ultra Mobile */
+  .filter-buttons {
+    gap: 0.375rem;
+  }
+
+  .filter-btn {
+    min-width: 70px;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.7rem;
+  }
+
+  /* Profile Metrics Ultra Mobile */
+  .profile-metrics-grid {
+    gap: 0.5rem;
+  }
+
+  .profile-metric {
+    padding: 0.75rem;
+  }
+
+  .metric-value {
+    font-size: 1.25rem;
+  }
+
+  .metric-title {
+    font-size: 0.7rem;
+  }
+
+  .metric-detail {
+    font-size: 0.65rem;
+  }
+
+  /* Trends Ultra Mobile */
+  .user-behavior-trends {
+    gap: 0.5rem;
+  }
+
+  .trend-item {
+    padding: 0.625rem;
+  }
+
+  .trend-label {
+    font-size: 0.7rem;
+  }
+
+  .trend-value {
+    font-size: 0.85rem;
+  }
+
+  .trend-percentage {
+    font-size: 0.65rem;
+  }
+
+  /* Badges and Indicators Ultra Mobile */
+  .growth-badge,
+  .occupancy-badge,
+  .success-badge,
+  .today-badge,
+  .stats-badge,
+  .activity-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .occupancy-rate,
+  .success-rate,
+  .today-count,
+  .stats-count,
+  .activity-count {
+    font-size: 0.8rem;
+  }
+
+  .occupancy-label,
+  .success-label,
+  .today-label,
+  .stats-label,
+  .activity-label {
+    font-size: 0.6rem;
+  }
+}
+
+/* Ultra Mobile Responsive - Small Phones */
+@media (max-width: 480px) {
+  /* Container Ultra Mobile */
+  .enhanced-dash-module-container {
+    top: 60px !important;
+    height: calc(100vh - 60px) !important;
+  }
+
+  /* Header Ultra Mobile */
+  .enhanced-dash-header {
+    padding: 0.75rem;
+  }
+
+  .title-icon-wrapper {
+    width: 30px;
+    height: 30px;
+  }
+
+  .title-icon {
+    font-size: 0.9rem;
+  }
+
+  .dash-title-enhanced {
+    font-size: 1.1rem;
+  }
+
+  .live-indicator {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.6rem;
+  }
+
+  .live-dot {
+    width: 4px;
+    height: 4px;
+  }
+
+  .dash-subtitle-enhanced {
+    font-size: 0.75rem;
+  }
+
+  /* Stats Summary Ultra Mobile */
+  .stats-summary {
+    gap: 0.375rem;
+  }
+
+  .summary-item {
+    padding: 0.5rem;
+    min-width: 90px;
+  }
+
+  .summary-icon {
+    font-size: 0.9rem;
+  }
+
+  .summary-value {
+    font-size: 0.9rem;
+  }
+
+  .summary-label {
+    font-size: 0.6rem;
+  }
+
+  /* Filter Controls Ultra Mobile */
+  .filter-controls {
+    gap: 0.5rem;
+  }
+
+  .enhanced-filter-select {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  .refresh-btn {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+  }
+
+  /* Quick Stats Ultra Mobile */
+  .quick-stats-bar {
+    gap: 0.75rem;
+    padding: 0.75rem;
+    margin: 0.75rem;
+  }
+
+  .quick-stat {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .quick-icon-wrapper {
+    width: 35px;
+    height: 35px;
+  }
+
+  .quick-icon {
+    font-size: 1.1rem;
+  }
+
+  .quick-value {
+    font-size: 1rem;
+  }
+
+  .quick-label {
+    font-size: 0.7rem;
+  }
+
+  .quick-trend {
+    font-size: 0.65rem;
+  }
+
+  /* Metrics Grid Ultra Mobile */
+  .dash-metrics-grid {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .dash-metric-card {
+    min-height: 250px;
+  }
+
+  .card-header {
+    padding: 0.875rem;
+    gap: 0.5rem;
+  }
+
+  .card-icon {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .card-body {
+    padding: 0.875rem;
+  }
+
+  /* Revenue Metrics Ultra Mobile */
+  .metric-value {
+    font-size: 1.25rem;
+  }
+
+  .metric-label {
+    font-size: 0.7rem;
+  }
+
+  .revenue-breakdown {
+    gap: 0.5rem;
+  }
+
+  .breakdown-item {
+    padding: 0.625rem;
+  }
+
+  .breakdown-value {
+    font-size: 0.9rem;
+  }
+
+  .breakdown-label {
+    font-size: 0.65rem;
+  }
+
+  /* Room & Order Stats Ultra Mobile */
+  .room-stats,
+  .order-stats {
+    gap: 0.5rem;
+  }
+
+  .stat-item {
+    padding: 0.625rem;
+    gap: 0.375rem;
+  }
+
+  .stat-number {
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.65rem;
+  }
+
+  /* Charts Ultra Mobile */
+  .charts-grid {
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .chart-card {
+    padding: 0.875rem;
+  }
+
+  .chart-header {
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .chart-title {
+    font-size: 0.9rem;
+  }
+
+  .chart-subtitle {
+    font-size: 0.7rem;
+  }
+
+  .chart-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .chart-body {
+    height: 200px;
+  }
+
+  /* Filter Buttons Ultra Mobile */
+  .filter-buttons {
+    gap: 0.375rem;
+  }
+
+  .filter-btn {
+    min-width: 70px;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.7rem;
+  }
+
+  /* Profile Metrics Ultra Mobile */
+  .profile-metrics-grid {
+    gap: 0.5rem;
+  }
+
+  .profile-metric {
+    padding: 0.75rem;
+  }
+
+  .metric-value {
+    font-size: 1.25rem;
+  }
+
+  .metric-title {
+    font-size: 0.7rem;
+  }
+
+  .metric-detail {
+    font-size: 0.65rem;
+  }
+
+  /* Trends Ultra Mobile */
+  .user-behavior-trends {
+    gap: 0.5rem;
+  }
+
+  .trend-item {
+    padding: 0.625rem;
+  }
+
+  .trend-label {
+    font-size: 0.7rem;
+  }
+
+  .trend-value {
+    font-size: 0.85rem;
+  }
+
+  .trend-percentage {
+    font-size: 0.65rem;
+  }
+
+  /* Badges and Indicators Ultra Mobile */
+  .growth-badge,
+  .occupancy-badge,
+  .success-badge,
+  .today-badge,
+  .stats-badge,
+  .activity-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  .occupancy-rate,
+  .success-rate,
+  .today-count,
+  .stats-count,
+  .activity-count {
+    font-size: 0.8rem;
+  }
+
+  .occupancy-label,
+  .success-label,
+  .today-label,
+  .stats-label,
+  .activity-label {
+    font-size: 0.6rem;
+  }
+}
+
+/* ===== COMPREHENSIVE MOBILE RESPONSIVENESS ===== */
+
+/* Tablet Responsiveness (768px and below) */
+@media (max-width: 768px) {
+  .enhanced-dash-module-container {
+    padding-left: 0 !important;
+    top: 70px !important;
+    height: calc(100vh - 70px) !important;
+  }
+
+  /* Header Mobile Adjustments */
+  .enhanced-dash-header {
+    padding: 1rem;
+  }
+
+  .title-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .title-wrapper {
+    width: 100%;
+  }
+
+  .dash-title-enhanced {
+    font-size: 1.25rem;
+  }
+
+  .dash-subtitle-enhanced {
+    font-size: 0.8rem;
+  }
+
+  .stats-summary {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .summary-item {
+    flex: 1;
+    min-width: auto;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .summary-value {
+    font-size: 1rem;
+  }
+
+  .summary-label {
+    font-size: 0.65rem;
+  }
+
+  /* Filter Section Mobile */
+  .enhanced-filter-section {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .filter-controls {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .filter-group {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .enhanced-filter-select {
+    width: 100%;
+    min-width: auto;
+  }
+
+  /* Quick Stats Bar Mobile */
+  .quick-stats-bar {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .quick-stat {
+    padding: 0.75rem;
+  }
+
+  .quick-icon-wrapper {
+    width: 40px;
+    height: 40px;
+  }
+
+  .quick-icon {
+    font-size: 1.25rem;
+  }
+
+  .quick-value {
+    font-size: 1.1rem;
+  }
+
+  .quick-label {
+    font-size: 0.75rem;
+  }
+
+  /* Metrics Grid Mobile */
+  .dash-metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .dash-metric-card {
+    height: auto;
+    min-height: 300px;
+  }
+
+  .card-header {
+    padding: 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .card-info {
+    width: 100%;
+  }
+
+  .card-title {
+    font-size: 1rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.8rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  /* Revenue Breakdown Mobile */
+  .revenue-breakdown-mini {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .breakdown-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+  }
+
+  /* Stats Items Mobile */
+  .room-stats,
+  .order-stats,
+  .reservation-stats {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .stat-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+  }
+
+  .stat-info {
+    text-align: right;
+  }
+
+  .stat-number {
+    font-size: 1.25rem;
+  }
+
+  .stat-label {
+    font-size: 0.75rem;
+  }
+
+  /* Analytics Info Mobile */
+  .analytics-info,
+  .room-analytics {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .analytics-item {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+  }
+
+  .analytics-value {
+    font-weight: 600;
+  }
+}
+
+/* Mobile Phone Responsiveness (480px and below) */
+@media (max-width: 480px) {
+  .enhanced-dash-module-container {
+    top: 56px !important;
+    height: calc(100vh - 56px) !important;
+  }
+
+  /* Header Ultra Mobile */
+  .enhanced-dash-header {
+    padding: 0.75rem;
+  }
+
+  .title-icon-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+
+  .title-icon {
+    font-size: 1rem;
+  }
+
+  .dash-title-enhanced {
+    font-size: 1.1rem;
+  }
+
+  .live-indicator {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.6rem;
+  }
+
+  .live-dot {
+    width: 4px;
+    height: 4px;
+  }
+
+  .dash-subtitle-enhanced {
+    font-size: 0.75rem;
+  }
+
+  /* Stats Summary Ultra Mobile */
+  .stats-summary {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .summary-item {
+    width: 100%;
+    padding: 0.5rem;
+  }
+
+  .summary-icon {
+    font-size: 1rem;
+  }
+
+  .summary-value {
+    font-size: 0.9rem;
+  }
+
+  .summary-label {
+    font-size: 0.6rem;
+  }
+
+  /* Filter Controls Ultra Mobile */
+  .filter-controls {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
+  .refresh-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem;
+  }
+
+  /* Quick Stats Ultra Mobile */
+  .quick-stats-bar {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .quick-stat {
+    padding: 0.625rem;
+    gap: 0.75rem;
+  }
+
+  .quick-icon-wrapper {
+    width: 36px;
+    height: 36px;
+  }
+
+  .quick-icon {
+    font-size: 1.1rem;
+  }
+
+  .quick-value {
+    font-size: 1rem;
+  }
+
+  .quick-label {
+    font-size: 0.7rem;
+  }
+
+  .quick-trend {
+    font-size: 0.65rem;
+  }
+
+  /* Metrics Grid Ultra Mobile */
+  .dash-metrics-grid {
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
+
+  .dash-metric-card {
+    min-height: 280px;
+  }
+
+  .card-header {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .card-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .card-title {
+    font-size: 0.9rem;
+  }
+
+  .card-subtitle {
+    font-size: 0.75rem;
+  }
+
+  .card-body {
+    padding: 0.75rem;
+  }
+
+  /* Main Metrics Ultra Mobile */
+  .main-metric {
+    margin-bottom: 1rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+
+  .metric-period {
+    font-size: 0.7rem;
+  }
+
+  /* Sub Metrics Ultra Mobile */
+  .sub-metrics {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .sub-metric {
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    text-align: center;
+  }
+
+  .sub-label {
+    font-size: 0.65rem;
+  }
+
+  .sub-value {
+    font-size: 0.8rem;
+  }
+
+  /* Revenue Breakdown Ultra Mobile */
+  .revenue-breakdown-mini {
+    gap: 0.5rem;
+  }
+
+  .breakdown-item {
+    padding: 0.4rem;
+  }
+
+  .breakdown-label {
+    font-size: 0.7rem;
+  }
+
+  .breakdown-value {
+    font-size: 0.75rem;
+  }
+
+  .breakdown-percentage {
+    font-size: 0.65rem;
+  }
+
+  /* Stats Ultra Mobile */
+  .room-stats,
+  .order-stats,
+  .reservation-stats {
+    gap: 0.5rem;
+  }
+
+  .stat-item {
+    padding: 0.5rem;
+  }
+
+  .stat-icon {
+    font-size: 1rem;
+  }
+
+  .stat-number {
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  /* Revenue Info Ultra Mobile */
+  .revenue-info {
+    margin-top: 0.75rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+  }
+
+  .revenue-label {
+    font-size: 0.7rem;
+  }
+
+  .revenue-amount {
+    font-size: 0.9rem;
+  }
+
+  /* Analytics Ultra Mobile */
+  .analytics-info,
+  .room-analytics {
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+  }
+
+  .analytics-item {
+    padding: 0.4rem;
+  }
+
+  .analytics-label {
+    font-size: 0.65rem;
+  }
+
+  .analytics-value {
+    font-size: 0.75rem;
+  }
+
+  /* Customer Insights Ultra Mobile */
+  .customer-insights-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .insight-item {
+    padding: 0.75rem;
+  }
+
+  .insight-icon {
+    font-size: 1.25rem;
+  }
+
+  .insight-number {
+    font-size: 1.1rem;
+  }
+
+  .insight-label {
+    font-size: 0.75rem;
+  }
+
+  .insight-detail {
+    font-size: 0.65rem;
+  }
+
+  /* Behavior Summary Ultra Mobile */
+  .customer-behavior-summary {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .behavior-item {
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .behavior-label {
+    font-size: 0.7rem;
+  }
+
+  .behavior-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  /* Overview Grid Ultra Mobile */
+  .overview-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .overview-item {
+    padding: 0.75rem;
+  }
+
+  .overview-icon {
+    font-size: 1.25rem;
+  }
+
+  .overview-number {
+    font-size: 1.1rem;
+  }
+
+  .overview-label {
+    font-size: 0.75rem;
+  }
+
+  .overview-detail {
+    font-size: 0.65rem;
+  }
+
+  /* Badges Ultra Mobile */
+  .growth-badge,
+  .occupancy-badge,
+  .success-badge,
+  .today-badge,
+  .revenue-badge,
+  .stats-badge,
+  .engagement-badge,
+  .activity-badge {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.65rem;
+    min-width: auto;
+  }
+
+  .growth-badge span,
+  .occupancy-rate,
+  .success-rate,
+  .today-count,
+  .revenue-amount,
+  .stats-count,
+  .engagement-rate,
+  .activity-count {
+    font-size: 0.75rem;
+  }
+
+  .occupancy-label,
+  .success-label,
+  .today-label,
+  .revenue-label,
+  .stats-label,
+  .engagement-label,
+  .activity-label {
+    font-size: 0.6rem;
+  }
+
+  /* Chart Container Ultra Mobile */
+  .chart-container {
+    height: 250px;
+    margin-top: 1rem;
+  }
+
+  /* Loading and Error States Ultra Mobile */
+  .loading-container,
+  .error-container {
+    padding: 1rem;
+    min-height: calc(100vh - 56px);
+  }
+
+  .loading-text,
+  .error-title {
+    font-size: 1rem;
+  }
+
+  .loading-subtitle,
+  .error-message {
+    font-size: 0.8rem;
+  }
+
+  .retry-button {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* ===== CRITICAL MOBILE OVERRIDE - HIGHEST PRIORITY ===== */
+@media screen and (max-width: 768px) {
+  /* Force dashboard to break out of all containers */
+  .enhanced-dash-module-container,
+  .enhanced-content-wrapper .enhanced-dash-module-container,
+  .content-container .enhanced-dash-module-container,
+  .enhanced-main-content .enhanced-dash-module-container,
+  div[class*="enhanced-dash-module-container"] {
+    position: fixed !important;
+    top: 70px !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 70px) !important;
+    max-width: 100vw !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    background: var(--primary-bg) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    z-index: 999 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Force grid to single column */
+  .dash-metrics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Force header to be mobile-friendly */
+  .enhanced-dash-header {
+    padding: 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Force quick stats to single column */
+  .quick-stats-bar {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Force cards to be mobile-friendly */
+  .dash-metric-card {
+    height: auto !important;
+    min-height: 300px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* Ultra mobile override */
+  .enhanced-dash-module-container,
+  .enhanced-content-wrapper .enhanced-dash-module-container,
+  .content-container .enhanced-dash-module-container,
+  .enhanced-main-content .enhanced-dash-module-container,
+  div[class*="enhanced-dash-module-container"] {
+    top: 56px !important;
+    height: calc(100vh - 56px) !important;
+  }
+
+  .enhanced-dash-header {
+    padding: 0.75rem !important;
+  }
+
+  .dash-metrics-grid {
+    padding: 0.75rem !important;
+    gap: 0.75rem !important;
+  }
+
+  .quick-stats-bar {
+    padding: 0.75rem !important;
+    gap: 0.75rem !important;
+  }
+}

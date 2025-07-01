@@ -8,6 +8,7 @@ import {
   FiStar, FiMessageCircle, FiGrid, FiList
 } from "react-icons/fi";
 import "./AdminManageRooms.css";
+import "./AdminCustomerManagement.css";
 
 const AdminCustomerManagement = () => {
   const navigate = useNavigate();

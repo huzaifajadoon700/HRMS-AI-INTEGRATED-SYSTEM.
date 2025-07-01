@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiUsers, FiCalendar, FiShoppingBag, FiDollarSign } from 'react-icons/fi';
 import PageLayout from '../components/layout/PageLayout';
+import { useHotelInfo } from '../hooks/useHotelInfo';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -10,6 +11,7 @@ const Dashboard = () => {
     totalRevenue: 0,
   });
   const [loading, setLoading] = useState(true);
+  const hotelInfo = useHotelInfo();
 
   useEffect(() => {
     // Add your data fetching logic here
@@ -30,7 +32,7 @@ const Dashboard = () => {
     <PageLayout>
       <div className="page-header">
         <h1 className="page-title">Dashboard</h1>
-        <p className="page-subtitle">Overview of your hotel management system</p>
+        <p className="page-subtitle">Overview of {hotelInfo.hotelName} management system</p>
       </div>
 
       <div className="content-grid">

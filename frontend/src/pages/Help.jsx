@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FiHelpCircle,
   FiMail,
@@ -18,6 +18,7 @@ import {
   FiVideo,
   FiFileText
 } from 'react-icons/fi';
+import { useHotelInfo, useContactInfo } from '../hooks/useHotelInfo';
 import '../styles/simple-theme.css';
 import './Help.css';
 
@@ -25,6 +26,24 @@ const Help = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [expandedFaq, setExpandedFaq] = useState(null);
+  const [forceUpdate, setForceUpdate] = useState(0);
+
+  // Get dynamic hotel information
+  const hotelInfo = useHotelInfo();
+  const contactInfo = useContactInfo();
+
+  // Force re-render when hotel settings change
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      setForceUpdate(prev => prev + 1);
+    };
+
+    window.addEventListener('hotelSettingsChanged', handleSettingsChange);
+
+    return () => {
+      window.removeEventListener('hotelSettingsChanged', handleSettingsChange);
+    };
+  }, []);
 
   const helpCategories = [
     { id: 'all', name: 'All Topics', icon: <FiHelpCircle />, color: '#64ffda' },
@@ -133,19 +152,21 @@ const Help = () => {
     },
     {
       title: 'Phone Support',
-      description: '+92 123 456 7890',
+      description: contactInfo.phone,
       icon: <FiPhone />,
       action: 'Call Now',
       color: '#2196F3',
-      available: true
+      available: true,
+      link: `tel:${contactInfo.phone.replace(/\s+/g, '')}`
     },
     {
       title: 'Email Support',
-      description: 'support@hotelmanagement.com',
+      description: contactInfo.emailSupport || contactInfo.email,
       icon: <FiMail />,
       action: 'Send Email',
       color: '#FF9800',
-      available: true
+      available: true,
+      link: `mailto:${contactInfo.emailSupport || contactInfo.email}`
     },
     {
       title: 'Video Call',
@@ -178,7 +199,7 @@ const Help = () => {
   };
 
   return (
-    <div className="modern-help-page">
+    <div key={`${contactInfo.phone}-${contactInfo.email}-${forceUpdate}`} className="modern-help-page">
       {/* Hero Section */}
       <section className="help-hero">
         <div className="hero-background">

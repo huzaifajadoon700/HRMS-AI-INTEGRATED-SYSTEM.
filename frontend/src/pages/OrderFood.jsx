@@ -2,14 +2,15 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { FiSearch, FiShoppingCart } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 import PersonalizedRecommendations from '../components/recommendations/PersonalizedRecommendations';
-import RecommendationCard from '../components/recommendations/RecommendationCard';
 import { recommendationAPI, recommendationHelpers } from '../api/recommendations';
 import Header from "../components/common/Header";
 import '../styles/simple-theme.css';
 import '../styles/OrderFood.css';
 
 export default function OrderFood() {
+    const navigate = useNavigate();
     const [menuItems, setMenuItems] = useState([]);
     const [filteredItems, setFilteredItems] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -26,14 +27,15 @@ export default function OrderFood() {
     useEffect(() => {
         const fetchMenuItems = async () => {
             try {
-                const response = await axios.get('https://hrms-ai-integrated-system-production.up.railway.app/api/menus');
+                const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+                const response = await axios.get(`${apiUrl}/menus`);
                 setMenuItems(response.data);
                 setFilteredItems(response.data);
-                
+
                 // Extract unique categories
                 const uniqueCategories = [...new Set(response.data.map(item => item.category))];
                 setCategories(uniqueCategories);
-                
+
                 setLoading(false);
             } catch (err) {
                 setError('Failed to load menu items');
@@ -104,14 +106,21 @@ export default function OrderFood() {
 
         if (itemIndex !== -1) {
             existingCart[itemIndex].quantity += 1;
+            toast.success(`${item.name} quantity updated! Click cart to checkout.`, {
+                onClick: handleGoToCart,
+                style: { cursor: 'pointer' }
+            });
         } else {
             existingCart.push({ ...item, quantity: 1 });
+            toast.success(`${item.name} added to cart! Click cart to checkout.`, {
+                onClick: handleGoToCart,
+                style: { cursor: 'pointer' }
+            });
         }
 
         localStorage.setItem("cart", JSON.stringify(existingCart));
         setCart(existingCart);
         window.dispatchEvent(new Event("cartUpdated"));
-        toast.success(`${item.name} added to cart!`);
 
         // Record interaction for recommendation system
         const userId = recommendationHelpers.getCurrentUserId();
@@ -139,6 +148,10 @@ export default function OrderFood() {
 
     const getCartTotal = () => {
         return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
+    };
+
+    const handleGoToCart = () => {
+        navigate('/cart');
     };
 
 
@@ -196,7 +209,7 @@ export default function OrderFood() {
                         </div>
 
                         {/* Loading Grid */}
-                        <div style={{
+                        <div className="order-food-loading-grid" style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
                             gap: '1.5rem',
@@ -266,12 +279,12 @@ export default function OrderFood() {
                 padding: 0
             }}>
                 {/* Hero Section */}
-                <div style={{
+                <div className="order-food-hero" style={{
                     textAlign: 'center',
                     marginBottom: '2rem',
                     padding: '2rem 1.5rem 1rem'
                 }}>
-                    <h1 style={{
+                    <h1 className="order-food-title" style={{
                         fontSize: '2.5rem',
                         fontWeight: '700',
                         background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 30%, #bb86fc 70%, #ff6b9d 100%)',
@@ -284,7 +297,7 @@ export default function OrderFood() {
                     }}>
                         🍽️ Order Delicious Food
                     </h1>
-                    <p style={{
+                    <p className="order-food-subtitle" style={{
                         fontSize: '1rem',
                         color: 'rgba(255, 255, 255, 0.8)',
                         margin: '0',
@@ -295,14 +308,14 @@ export default function OrderFood() {
                 </div>
 
                 {/* Search and Filters Section */}
-                <div style={{
+                <div className="order-food-filters" style={{
                     background: 'rgba(100, 255, 218, 0.05)',
                     borderRadius: '1rem',
                     padding: '1.5rem',
                     margin: '0 1.5rem 2rem',
                     border: '1px solid rgba(100, 255, 218, 0.1)'
                 }}>
-                    <div style={{
+                    <div className="order-food-filters-grid" style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
                         gap: '1rem',
@@ -393,141 +406,53 @@ export default function OrderFood() {
                     </div>
                 </div>
 
-                {/* AI-Powered Recommendations Section */}
+                {/* Three-Tab Recommendations Section */}
                 <div style={{ margin: '0 1.5rem 2rem' }}>
                     <PersonalizedRecommendations
-                        maxItems={6}
+                        maxItems={50} // Increased for "For You" tab to show more menu items
                         onAddToCart={handleAddToCart}
                         onRate={handleRateItem}
                         className="mb-5"
+                        filteredItems={filteredItems}
+                        searchTerm={searchTerm}
+                        selectedCategory={selectedCategory}
                     />
-                </div>
-
-                {/* Enhanced Menu Items Grid - Same as For You Section */}
-                <div style={{ margin: '0 1.5rem 2rem' }}>
-                    {/* Section Header */}
-                    <div style={{
-                        textAlign: 'center',
-                        marginBottom: '2rem',
-                        padding: '1rem 0'
-                    }}>
-                        <h2 style={{
-                            fontSize: '2rem',
-                            fontWeight: '700',
-                            color: '#ffffff',
-                            marginBottom: '0.5rem',
-                            background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 50%, #bb86fc 100%)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text'
-                        }}>
-                            🔥 Trending Dishes
-                        </h2>
-                        <p style={{
-                            fontSize: '1rem',
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            margin: 0
-                        }}>
-                            Popular choices from our menu
-                        </p>
-                    </div>
-
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 350px))',
-                        gap: '1rem',
-                        maxWidth: '100%',
-                        justifyContent: 'center'
-                    }}>
-                        {loading ? (
-                            Array(8).fill().map((_, index) => (
-                                <div
-                                    key={index}
-                                    style={{
-                                        background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
-                                        backdropFilter: 'blur(20px)',
-                                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                                        borderRadius: '1rem',
-                                        overflow: 'hidden',
-                                        height: '500px',
-                                        animation: 'pulse 2s ease-in-out infinite'
-                                    }}
-                                />
-                            ))
-                        ) : filteredItems.length === 0 ? (
-                            <div style={{
-                                gridColumn: '1 / -1',
-                                textAlign: 'center',
-                                padding: '4rem 2rem',
-                                color: 'rgba(255, 255, 255, 0.8)'
-                            }}>
-                                <div style={{
-                                    fontSize: '4rem',
-                                    marginBottom: '1rem'
-                                }}>🍽️</div>
-                                <h3 style={{
-                                    fontSize: '1.5rem',
-                                    fontWeight: '600',
-                                    color: '#fff',
-                                    marginBottom: '0.5rem'
-                                }}>
-                                    No dishes found
-                                </h3>
-                                <p style={{ fontSize: '1rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-                                    Try adjusting your search or category filters
-                                </p>
-                            </div>
-                        ) : (
-                            filteredItems.map((item, index) => (
-                                <div key={item._id || index}>
-                                    <RecommendationCard
-                                        recommendation={{
-                                            ...item,
-                                            score: item.rating || 4.5,
-                                            reason: 'trending',
-                                            confidence: 'high'
-                                        }}
-                                        onAddToCart={handleAddToCart}
-                                        onRate={handleRateItem}
-                                        showReason={false}
-                                        showConfidence={false}
-                                        className="trending"
-                                    />
-                                </div>
-                            ))
-                        )}
-                    </div>
                 </div>
                 </div>
 
                 {/* Floating Cart */}
                 {cart.length > 0 && (
-                    <div style={{
-                        position: 'fixed',
-                        bottom: '2rem',
-                        right: '2rem',
-                        background: 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)',
-                        color: '#0a192f',
-                        padding: '1rem 1.5rem',
-                        borderRadius: '2rem',
-                        boxShadow: '0 8px 25px rgba(100, 255, 218, 0.4)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.75rem',
-                        cursor: 'pointer',
-                        transition: 'all 0.3s ease',
-                        zIndex: 1000,
-                        fontSize: '0.9rem',
-                        fontWeight: '600'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.05)';
-                        e.currentTarget.style.boxShadow = '0 12px 35px rgba(100, 255, 218, 0.5)';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
-                        e.currentTarget.style.boxShadow = '0 8px 25px rgba(100, 255, 218, 0.4)';
-                    }}
+                    <div
+                        className="order-food-floating-cart"
+                        onClick={handleGoToCart}
+                        style={{
+                            position: 'fixed',
+                            bottom: '2rem',
+                            right: '2rem',
+                            background: 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)',
+                            color: '#0a192f',
+                            padding: '1rem 1.5rem',
+                            borderRadius: '2rem',
+                            boxShadow: '0 8px 25px rgba(100, 255, 218, 0.4)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s ease',
+                            zIndex: 1000,
+                            fontSize: '0.9rem',
+                            fontWeight: '600',
+                            userSelect: 'none'
+                        }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            e.currentTarget.style.boxShadow = '0 12px 35px rgba(100, 255, 218, 0.5)';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(100, 255, 218, 0.4)';
+                        }}
+                        title="Click to view cart"
                     >
                         <FiShoppingCart size={18} />
                         <span>{cart.length} items</span>

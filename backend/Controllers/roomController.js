@@ -105,7 +105,30 @@ exports.addRoom = async (req, res) => {
       petFriendly
     } = req.body;
 
-    const image = req.file ? `/uploads/${req.file.filename}` : null;
+    // Handle image upload
+    let image = null;
+    if (req.file) {
+      if (req.file.filename) {
+        // Disk storage (development)
+        image = `/uploads/${req.file.filename}`;
+        console.log('Development upload - saved to disk:', image);
+      } else {
+        // Memory storage (production) - since we can't save files on Vercel,
+        // we'll set image to null and let frontend handle placeholder
+        console.log('Production environment detected - file upload not supported on serverless');
+        console.log('File details:', {
+          originalname: req.file.originalname,
+          mimetype: req.file.mimetype,
+          size: req.file.size
+        });
+        // Don't set image path for production uploads since files can't be served
+        image = null;
+      }
+    } else if (req.body.imageUrl) {
+      // Handle image URL
+      image = req.body.imageUrl;
+      console.log('Image URL provided:', image);
+    }
 
     // Parse amenities if it's a string
     let parsedAmenities = [];
@@ -270,8 +293,22 @@ exports.updateRoom = async (req, res) => {
       description,
     };
 
+    // Handle image update
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
+      if (req.file.filename) {
+        // Disk storage (development)
+        updateData.image = `/uploads/${req.file.filename}`;
+        console.log('Development update - saved to disk:', updateData.image);
+      } else {
+        // Memory storage (production) - don't update image field
+        console.log('Production environment detected - file upload not supported on serverless');
+        console.log('Keeping existing image for room update');
+        // Don't update the image field in production
+      }
+    } else if (req.body.imageUrl) {
+      // Handle image URL update
+      updateData.image = req.body.imageUrl;
+      console.log('Image URL updated:', updateData.image);
     }
 
     const updatedRoom = await Room.findByIdAndUpdate(

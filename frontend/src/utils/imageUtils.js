@@ -1,37 +1,48 @@
 /**
- * Image Utility Functions for HRMS Frontend
- * Handles image URLs, fallbacks, and optimization across the application
- *
- * @description Utility functions for consistent image handling and URL management
- * @version 1.0.0
- *
+ * Utility function to handle image URLs consistently across the application
  * Supports both external URLs (Unsplash, etc.) and local uploads
  */
 
-export const getImageUrl = (
-  imagePath,
-  fallback = "/images/placeholder-food.jpg"
-) => {
-  if (!imagePath) return fallback;
+import { apiConfig } from '../config/api';
+
+export const getImageUrl = (imagePath, fallback = "/images/placeholder-food.jpg") => {
+  // Return fallback if no image path provided
+  if (!imagePath) {
+    console.log('getImageUrl: No image path provided, using fallback:', fallback);
+    return fallback;
+  }
+
+  // Handle invalid image paths (common issue with failed uploads)
+  if (imagePath.includes('undefined') || imagePath === '/uploads/undefined' || imagePath === 'undefined') {
+    console.log('getImageUrl: Invalid image path detected:', imagePath, 'using fallback:', fallback);
+    return fallback;
+  }
 
   try {
     // If it's already a full URL (Unsplash, external sources), return as is
-    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      console.log('getImageUrl: External URL detected:', imagePath);
       return imagePath;
     }
 
     // If it's a local upload path
-    const cleanPath = imagePath.replace(/^\/+/, "");
+    const cleanPath = imagePath.replace(/^\/+/, '');
+    console.log('getImageUrl: Processing local path:', imagePath, '-> cleaned:', cleanPath);
 
+    let finalUrl;
     // Check if it already includes uploads in the path
-    if (cleanPath.includes("uploads")) {
-      return `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`;
+    if (cleanPath.includes('uploads/') || cleanPath.startsWith('uploads')) {
+      finalUrl = `${apiConfig.serverURL}/${cleanPath}`;
+    } else {
+      // Default to uploads folder
+      finalUrl = `${apiConfig.serverURL}/uploads/${cleanPath}`;
     }
 
-    // Default to uploads folder
-    return `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
+    console.log('getImageUrl: Final URL:', finalUrl, 'Server URL:', apiConfig.serverURL);
+    return finalUrl;
+
   } catch (error) {
-    console.error("Error formatting image URL:", error);
+    console.error('getImageUrl: Error formatting image URL:', error, 'for path:', imagePath);
     return fallback;
   }
 };
@@ -44,12 +55,23 @@ export const getMenuImageUrl = (imagePath) => {
 };
 
 /**
+ * Get image URL specifically for room items
+ */
+export const getRoomImageUrl = (imagePath) => {
+  return getImageUrl(imagePath, "/images/placeholder-room.jpg");
+};
+
+/**
+ * Get image URL specifically for table items
+ */
+export const getTableImageUrl = (imagePath) => {
+  return getImageUrl(imagePath, "/images/placeholder-table.jpg");
+};
+
+/**
  * Handle image error by setting fallback
  */
-export const handleImageError = (
-  e,
-  fallback = "/images/placeholder-food.jpg"
-) => {
+export const handleImageError = (e, fallback = "/images/placeholder-food.jpg") => {
   e.target.src = fallback;
   e.target.onerror = null; // Prevent infinite loop
 };

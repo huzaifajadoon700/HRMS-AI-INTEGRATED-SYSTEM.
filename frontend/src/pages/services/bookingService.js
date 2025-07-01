@@ -1,6 +1,7 @@
 import axios from "axios";
+import { apiConfig } from "../../config/api";
 
-const API_URL = "https://hrms-ai-integrated-system-production.up.railway.app/api/bookings";
+const API_URL = apiConfig.endpoints.bookings;
 
 // Create a new booking
 export const createBooking = async (bookingData, token) => {

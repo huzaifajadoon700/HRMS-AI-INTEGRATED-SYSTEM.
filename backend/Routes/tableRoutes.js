@@ -36,7 +36,9 @@ const {
   getTableRecommendations,
   getUserTableHistory,
   getPopularTables,
-  getTableAnalytics
+  getTableAnalytics,
+  trackTableReservation,
+  getReservedTablesFromRecommendations
 } = require('../Controllers/tableRecommendationController');
 
 const {
@@ -56,6 +58,9 @@ router.post('/interactions', ensureAuthenticated, recordTableInteraction);
 router.get('/recommendations/:userId', ensureAuthenticated, getTableRecommendations);
 router.get('/recommendations', ensureAuthenticated, getTableRecommendations); // For current user
 router.get('/history/:userId', ensureAuthenticated, getUserTableHistory);
+router.post('/track-reservation', ensureAuthenticated, trackTableReservation);
+router.get('/reserved-from-recommendations/:userId', ensureAuthenticated, getReservedTablesFromRecommendations);
+router.get('/reserved-from-recommendations', ensureAuthenticated, getReservedTablesFromRecommendations); // For current user
 
 // Admin routes
 router.post('/', ensureAuthenticated, ensureAdmin, upload.single('image'), addTable);

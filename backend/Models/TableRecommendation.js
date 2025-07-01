@@ -21,7 +21,7 @@ const tableRecommendationSchema = new mongoose.Schema({
     },
     reason: {
       type: String,
-      enum: ['collaborative_filtering', 'content_based', 'popularity', 'contextual'],
+      enum: ['collaborative_filtering', 'content_based', 'popularity', 'contextual', 'hybrid', 'smart_matching'],
       required: true
     },
     confidence: {
@@ -65,7 +65,35 @@ const tableRecommendationSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
     expires: 3600 // 1 hour in seconds
-  }
+  },
+  // Track which recommended tables were actually reserved
+  reservedTables: [{
+    tableId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Table'
+    },
+    reservedAt: {
+      type: Date,
+      default: Date.now
+    },
+    rank: Number, // The rank of this table in the original recommendations
+    reservationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'TableReservation'
+    }
+  }],
+  // Track which recommended tables were clicked/viewed
+  clickedTables: [{
+    tableId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Table'
+    },
+    clickedAt: {
+      type: Date,
+      default: Date.now
+    },
+    rank: Number
+  }]
 }, {
   timestamps: true
 });

@@ -84,6 +84,55 @@ const ServicesPage = () => {
             0% { transform: translateX(-100%); }
             100% { transform: translateX(100%); }
           }
+
+          /* Responsive Styles for Services Page */
+          @media (max-width: 768px) {
+            .services-page-container {
+              padding: 2rem 1rem !important;
+            }
+            .services-page-title {
+              font-size: 2.5rem !important;
+            }
+            .services-page-subtitle {
+              font-size: 1rem !important;
+            }
+            .services-grid-responsive {
+              grid-template-columns: 1fr !important;
+              gap: 1.5rem !important;
+            }
+            .service-card-responsive {
+              padding: 1.5rem !important;
+              min-height: 250px !important;
+            }
+            .service-card-title {
+              font-size: 1.25rem !important;
+            }
+            .service-card-description {
+              font-size: 0.9rem !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .services-page-container {
+              padding: 1.5rem 0.75rem !important;
+            }
+            .services-page-title {
+              font-size: 2rem !important;
+            }
+            .services-page-subtitle {
+              font-size: 0.9rem !important;
+            }
+            .service-card-responsive {
+              padding: 1.25rem !important;
+              min-height: 220px !important;
+            }
+            .service-card-title {
+              font-size: 1.1rem !important;
+            }
+            .service-card-description {
+              font-size: 0.85rem !important;
+            }
+          }
         `}
       </style>
 
@@ -124,7 +173,7 @@ const ServicesPage = () => {
           zIndex: 0
         }} />
 
-        <div style={{
+        <div className="services-page-container" style={{
           width: '100%',
           maxWidth: '1200px',
           margin: '0 auto',
@@ -134,7 +183,7 @@ const ServicesPage = () => {
         }}>
           {/* Header Section */}
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-            <h1 style={{
+            <h1 className="services-page-title" style={{
               fontSize: '3rem',
               fontWeight: '900',
               background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 50%, #bb86fc 100%)',
@@ -147,7 +196,7 @@ const ServicesPage = () => {
             }}>
               Premium Services
             </h1>
-            <p style={{
+            <p className="services-page-subtitle" style={{
               fontSize: '1.2rem',
               color: 'rgba(255, 255, 255, 0.8)',
               maxWidth: '600px',
@@ -160,7 +209,7 @@ const ServicesPage = () => {
           </div>
 
           {/* Services Grid */}
-          <div style={{
+          <div className="services-grid-responsive" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
             gap: '2rem',
@@ -169,6 +218,7 @@ const ServicesPage = () => {
             {services.map((service, index) => (
               <div
                 key={index}
+                className="service-card-responsive"
                 style={{
                   background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
                   backdropFilter: 'blur(20px)',
@@ -265,7 +315,7 @@ const ServicesPage = () => {
                   position: 'relative',
                   zIndex: 2
                 }}>
-                  <h3 style={{
+                  <h3 className="service-card-title" style={{
                     fontSize: '1.5rem',
                     fontWeight: '800',
                     color: '#fff',
@@ -279,7 +329,7 @@ const ServicesPage = () => {
                     {service.title}
                   </h3>
 
-                  <p style={{
+                  <p className="service-card-description" style={{
                     color: 'rgba(255, 255, 255, 0.8)',
                     fontSize: '1rem',
                     lineHeight: '1.6',

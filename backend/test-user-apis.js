@@ -1,6 +1,5 @@
 const axios = require('axios');
 
-// Updated: Improved user API test clarity
 async function testUserAPIs() {
     console.log('🎯 TESTING USER-SIDE RECOMMENDATION APIS');
     console.log('=========================================\n');

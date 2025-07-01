@@ -66,7 +66,8 @@ const Profile = () => {
       }
 
       try {
-        const response = await axios.get("http://localhost:8080/api/user/profile", {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/user/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setUser(response.data);
@@ -85,22 +86,23 @@ const Profile = () => {
   const fetchUserStats = async (token) => {
     try {
       setStatsLoading(true);
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
 
       // Fetch reservations
-      const reservationsResponse = await axios.get("http://localhost:8080/api/reservations/user", {
+      const reservationsResponse = await axios.get(`${apiUrl}/reservations/user`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const reservations = reservationsResponse.data || [];
 
       // Fetch orders
-      const ordersResponse = await axios.get("http://localhost:8080/api/orders", {
+      const ordersResponse = await axios.get(`${apiUrl}/orders`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { limit: 100 } // Get more orders for accurate count
       });
       const orders = ordersResponse.data?.orders || [];
 
       // Fetch bookings
-      const bookingsResponse = await axios.get("http://localhost:8080/api/bookings/user", {
+      const bookingsResponse = await axios.get(`${apiUrl}/bookings/user`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const bookings = bookingsResponse.data || [];
@@ -153,8 +155,9 @@ const Profile = () => {
     }
 
     try {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       await axios.put(
-        "http://localhost:8080/api/user/profile",
+        `${apiUrl}/user/profile`,
         { name: user.name, email: user.email, phone: user.phone },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -181,8 +184,9 @@ const Profile = () => {
     }
     
     try {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       await axios.put(
-        "http://localhost:8080/api/user/password",
+        `${apiUrl}/user/password`,
         { currentPassword, newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -306,7 +310,7 @@ const Profile = () => {
                       <FiTrendingUp />
                     </div>
                     <div className="stat-content">
-                      <h3>{statsLoading ? '...' : `$${stats.totalSpent.toFixed(2)}`}</h3>
+                      <h3>{statsLoading ? '...' : `Rs. ${stats.totalSpent.toLocaleString('en-PK')}`}</h3>
                       <p>Total Spent</p>
                     </div>
                   </div>

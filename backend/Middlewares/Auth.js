@@ -1,11 +1,3 @@
-/**
- * Authentication Middleware for HRMS System
- * JWT token validation and role-based access control
- *
- * @description Secure middleware for protecting routes and verifying user roles
- * @version 1.0.0
- */
-
 const jwt = require("jsonwebtoken");
 
 const ensureAuthenticated = (req, res, next) => {
@@ -17,7 +9,7 @@ const ensureAuthenticated = (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: "Access denied. No token provided.",
-        code: "NO_TOKEN",
+        code: "NO_TOKEN"
       });
     }
 
@@ -27,7 +19,7 @@ const ensureAuthenticated = (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: "Access denied. Invalid token format.",
-        code: "INVALID_FORMAT",
+        code: "INVALID_FORMAT"
       });
     }
 
@@ -39,20 +31,20 @@ const ensureAuthenticated = (req, res, next) => {
       id: decoded.id || decoded._id,
       _id: decoded.id || decoded._id, // Add _id for compatibility
       email: decoded.email,
-      role: decoded.role || "user",
+      role: decoded.role || 'user',
       name: decoded.name,
-      isAdmin: decoded.role === "admin" || decoded.isAdmin,
+      isAdmin: decoded.role === 'admin' || decoded.isAdmin
     };
 
     next();
   } catch (error) {
-    console.error("Authentication error:", error.message);
+    console.error('Authentication error:', error.message);
 
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({
         success: false,
         message: "Access denied. Invalid token.",
-        code: "INVALID_TOKEN",
+        code: "INVALID_TOKEN"
       });
     }
 
@@ -60,14 +52,14 @@ const ensureAuthenticated = (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: "Access denied. Token has expired.",
-        code: "TOKEN_EXPIRED",
+        code: "TOKEN_EXPIRED"
       });
     }
 
     return res.status(500).json({
       success: false,
       message: "Internal server error during authentication.",
-      code: "SERVER_ERROR",
+      code: "SERVER_ERROR"
     });
   }
 };
@@ -79,30 +71,28 @@ const ensureAdmin = (req, res, next) => {
       return res.status(401).json({
         success: false,
         message: "Access denied. User not authenticated.",
-        code: "NOT_AUTHENTICATED",
+        code: "NOT_AUTHENTICATED"
       });
     }
 
     // Check if user has admin role
     if (req.user.role !== "admin") {
-      console.warn(
-        `Access denied for user ${req.user.id}: Not an admin (role: ${req.user.role})`
-      );
+      console.warn(`Access denied for user ${req.user.id}: Not an admin (role: ${req.user.role})`);
       return res.status(403).json({
         success: false,
         message: "Access denied. Administrator privileges required.",
-        code: "INSUFFICIENT_PRIVILEGES",
+        code: "INSUFFICIENT_PRIVILEGES"
       });
     }
 
     console.log(`Admin access granted for user ${req.user.id}`);
     next();
   } catch (error) {
-    console.error("Admin authorization error:", error.message);
+    console.error('Admin authorization error:', error.message);
     return res.status(500).json({
       success: false,
       message: "Internal server error during authorization.",
-      code: "SERVER_ERROR",
+      code: "SERVER_ERROR"
     });
   }
 };
@@ -115,25 +105,25 @@ const ensureRole = (allowedRoles) => {
         return res.status(401).json({
           success: false,
           message: "Access denied. User not authenticated.",
-          code: "NOT_AUTHENTICATED",
+          code: "NOT_AUTHENTICATED"
         });
       }
 
       if (!allowedRoles.includes(req.user.role)) {
         return res.status(403).json({
           success: false,
-          message: `Access denied. Required roles: ${allowedRoles.join(", ")}`,
-          code: "INSUFFICIENT_PRIVILEGES",
+          message: `Access denied. Required roles: ${allowedRoles.join(', ')}`,
+          code: "INSUFFICIENT_PRIVILEGES"
         });
       }
 
       next();
     } catch (error) {
-      console.error("Role authorization error:", error.message);
+      console.error('Role authorization error:', error.message);
       return res.status(500).json({
         success: false,
         message: "Internal server error during authorization.",
-        code: "SERVER_ERROR",
+        code: "SERVER_ERROR"
       });
     }
   };
@@ -143,5 +133,5 @@ module.exports = {
   ensureAuthenticated,
   ensureAdmin,
   ensureRole,
-  auth: ensureAuthenticated, // Alias for compatibility
+  auth: ensureAuthenticated  // Alias for compatibility
 };

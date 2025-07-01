@@ -22,7 +22,8 @@ const BookForm = ({ room, onClose, refreshBookings }) => {
     try {
       setAvailability({ ...availability, isChecking: true });
       
-      const response = await axios.get(`http://localhost:8080/api/rooms/availability`, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms/availability`, {
         params: {
           checkInDate: checkIn,
           checkOutDate: checkOut
@@ -104,8 +105,9 @@ const BookForm = ({ room, onClose, refreshBookings }) => {
         return;
       }
 
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const response = await axios.post(
-        "http://localhost:8080/api/bookings",
+        `${apiUrl}/bookings`,
         {
           roomId: room._id,
           roomType: room.roomType,

@@ -6,9 +6,11 @@ import axios from 'axios';
 import PageLayout from '../components/layout/PageLayout';
 import './OrderConfirmationNew.css';
 
+import { apiConfig } from '../config/api';
+
 // Create a configurable axios instance
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: apiConfig.serverURL,
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -42,12 +44,27 @@ const OrderConfirmation = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   
+  // Helper functions for responsive design
+  const isMobile = () => windowWidth <= 768;
+  const isTablet = () => windowWidth <= 1024 && windowWidth > 768;
+
   // Log function to help with troubleshooting if needed
   const logInfo = (message, data) => {
     console.log(`[INFO] ${message}:`, data);
   };
   
+  // Handle window resize for responsive design
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   // On component mount, fetch the most recent order
   useEffect(() => {
     logInfo('Component mounted', new Date().toISOString());
@@ -58,15 +75,16 @@ const OrderConfirmation = () => {
   // Simple test to check if backend is reachable
   const testBackendConnection = async () => {
     try {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       logInfo("Testing backend connection", {
-        url: 'https://hrms-ai-integrated-system-production.up.railway.app/api/health',
+        url: `${apiUrl}/health`,
         timestamp: new Date().toISOString()
       });
-      
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
-      const response = await fetch('https://hrms-ai-integrated-system-production.up.railway.app/api/health', {
+
+      const response = await fetch(`${apiUrl}/health`, {
         method: 'GET',
         signal: controller.signal,
         headers: {
@@ -254,6 +272,11 @@ const OrderConfirmation = () => {
     if (!order || !order._id) {
       // toast.error("Order data missing");
       return;
+    }
+
+    // Scroll to top on mobile for better UX
+    if (isMobile()) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     
     // Clean up the order object to remove any MongoDB specific properties

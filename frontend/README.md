@@ -1,12 +1,6 @@
-<!-- Updated: Documentation formatting improved -->
-
-# HRMS AI Integrated System - Frontend
+# Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## 🏨 About This Project
-
-This is the frontend for the Hotel and Restaurant Management System with AI integration features.
 
 ## Available Scripts
 

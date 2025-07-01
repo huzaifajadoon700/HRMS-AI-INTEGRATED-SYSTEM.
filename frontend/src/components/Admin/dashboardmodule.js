@@ -51,7 +51,8 @@ export default function Dashboardmodule() {
         console.log("🔄 Fetching dashboard analytics...");
 
         // Fetch comprehensive analytics data from backend
-        const analyticsResponse = await axios.get("https://hrms-ai-integrated-system-production.up.railway.app/api/admin/dashboard/analytics", {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const analyticsResponse = await axios.get(`${apiUrl}/admin/dashboard/analytics`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -65,19 +66,19 @@ export default function Dashboardmodule() {
         // Also fetch individual data for detailed processing
         const requests = [
           // Rooms data
-          axios.get("http://localhost:8080/api/rooms", {
+          axios.get(`${apiUrl}/rooms`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           // Food orders data - get ALL orders for admin dashboard
-          axios.get("http://localhost:8080/api/orders?limit=1000", {
+          axios.get(`${apiUrl}/orders?limit=1000`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           // Menu items for food analytics
-          axios.get("http://localhost:8080/api/menus", {
+          axios.get(`${apiUrl}/menus`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
           // Room bookings data
-          axios.get("http://localhost:8080/api/bookings", {
+          axios.get(`${apiUrl}/bookings`, {
             headers: { Authorization: `Bearer ${token}` },
           }).catch(error => {
             console.error("🏨 Bookings API Error:", error.response?.data || error.message);
@@ -85,15 +86,15 @@ export default function Dashboardmodule() {
             return { data: [] }; // Return empty array on error
           }),
           // Table reservations data
-          axios.get("http://localhost:8080/api/table-reservations", {
+          axios.get(`${apiUrl}/table-reservations`, {
             headers: { Authorization: `Bearer ${token}` },
           }).catch(() => ({ data: [] })),
           // Tables data
-          axios.get("http://localhost:8080/api/tables", {
+          axios.get(`${apiUrl}/tables`, {
             headers: { Authorization: `Bearer ${token}` },
           }).catch(() => ({ data: [] })),
         // Recommendation system evaluation
-        axios.get("http://localhost:8080/api/food-recommendations/evaluation/system?testPeriodDays=7", {
+        axios.get(`${apiUrl}/food-recommendations/evaluation/system?testPeriodDays=7`, {
           headers: { Authorization: `Bearer ${token}` },
         }).catch(() => ({ data: { success: false } })),
         ];
@@ -584,7 +585,7 @@ export default function Dashboardmodule() {
           <div className="title-section">
             <div className="title-wrapper">
               <div className="title-icon-wrapper">
-                <FaChartBar className="title-icon" />
+                <FaChartLine className="title-icon" />
               </div>
               <div className="title-text">
                 <h1 className="dash-title-enhanced">
@@ -677,7 +678,8 @@ export default function Dashboardmodule() {
                 onClick={async () => {
                   try {
                     const token = localStorage.getItem("token");
-                    const response = await axios.get("http://localhost:8080/api/bookings/test", {
+                    const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+                    const response = await axios.get(`${apiUrl}/bookings/test`, {
                       headers: { Authorization: `Bearer ${token}` }
                     });
                     console.log("🧪 Booking Test Result:", response.data);
@@ -697,7 +699,8 @@ export default function Dashboardmodule() {
                 onClick={async () => {
                   try {
                     const token = localStorage.getItem("token");
-                    const response = await axios.get("http://localhost:8080/api/bookings/db-check", {
+                    const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+                    const response = await axios.get(`${apiUrl}/bookings/db-check`, {
                       headers: { Authorization: `Bearer ${token}` }
                     });
                     console.log("🔍 DB Check Result:", response.data);

@@ -1,14 +1,17 @@
 import Options from "./Menu/options";
 import Navbar from "./layout/navbar";
+import { useHotelInfo, useHeroContent } from "../../hooks/useHotelInfo";
 
 // import Navbar from "./components/navbar";
 function Landingpage(){
+    const hotelInfo = useHotelInfo();
+    const heroContent = useHeroContent();
 
     return(
         <div className="app">
         <Navbar/>
         <header className="hero">
-          <h1 >Experience Luxury and Comfort with SlickBooker</h1>
+          <h1>{heroContent.mainTitle}</h1>
           
           <button style={{margin:"20px"}} className="hero-btn">Book a Room</button>
           <button className="hero-btn">Reserve a Table </button>

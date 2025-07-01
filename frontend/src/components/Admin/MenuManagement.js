@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { getMenuImageUrl, handleImageError } from "../../utils/imageUtils";
 import "./MenuManagement.css";
 
 const MenuManagement = () => {
@@ -26,10 +27,11 @@ const MenuManagement = () => {
   const fetchMenuItems = async () => {
     setLoading(true);
     try {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const url = selectedCategory === "all"
-        ? "http://localhost:8080/api/menus"
-        : `http://localhost:8080/api/menus/category/${selectedCategory}`;
-      
+        ? `${apiUrl}/menus`
+        : `${apiUrl}/menus/category/${selectedCategory}`;
+
       const response = await axios.get(url);
       setMenuItems(response.data);
     } catch (error) {
@@ -74,7 +76,8 @@ const MenuManagement = () => {
         formData.append("image", image);
       }
 
-      const response = await axios.post("http://localhost:8080/api/menus", formData, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.post(`${apiUrl}/menus`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -116,7 +119,8 @@ const MenuManagement = () => {
         formData.append("image", image);
       }
 
-      const response = await axios.put(`http://localhost:8080/api/menus/${id}`, formData, {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.put(`${apiUrl}/menus/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -138,7 +142,8 @@ const MenuManagement = () => {
     if (window.confirm("Are you sure you want to delete this menu item?")) {
       setLoading(true);
       try {
-        await axios.delete(`http://localhost:8080/api/menus/${id}`);
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        await axios.delete(`${apiUrl}/menus/${id}`);
         setMenuItems(menuItems.filter(item => item._id !== id));
         toast.success("Menu item deleted successfully");
       } catch (error) {
@@ -151,7 +156,8 @@ const MenuManagement = () => {
 
   const handleAvailabilityToggle = async (id, currentStatus) => {
     try {
-      const response = await axios.patch(`http://localhost:8080/api/menus/${id}/toggle-availability`);
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.patch(`${apiUrl}/menus/${id}/toggle-availability`);
       setMenuItems(menuItems.map(item => item._id === id ? response.data : item));
       toast.success("Availability updated successfully");
     } catch (error) {
@@ -159,11 +165,7 @@ const MenuManagement = () => {
     }
   };
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return "https://via.placeholder.com/150";
-    if (imagePath.startsWith("http")) return imagePath;
-    return `http://localhost:8080${imagePath}`;
-  };
+
 
   return (
     <div className="menu-management cosmic-container">
@@ -203,12 +205,10 @@ const MenuManagement = () => {
             <tr key={item._id}>
               <td>
                 <img
-                  src={getImageUrl(item.image)}
+                  src={getMenuImageUrl(item.image)}
                   alt={item.name}
                   className="menu-thumbnail"
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/150";
-                  }}
+                  onError={(e) => handleImageError(e, "https://via.placeholder.com/150")}
                 />
               </td>
               <td>{item.name}</td>
@@ -216,8 +216,8 @@ const MenuManagement = () => {
               <td>Rs. {parseFloat(item.price).toFixed(0)}</td>
               <td>{item.category}</td>
               <td>
-                <span className={`availability-badge ${item.availability ? "available" : "unavailable"}`}>
-                  {item.availability ? "Available" : "Unavailable"}
+                <span className={`availability-badge ${item.availability === true ? "available" : "unavailable"}`}>
+                  {item.availability === true ? "Available" : "Unavailable"}
                 </span>
               </td>
               <td>
@@ -225,7 +225,7 @@ const MenuManagement = () => {
                   className="btn cosmic-btn-warning btn-sm"
                   onClick={() => handleAvailabilityToggle(item._id, item.availability)}
                 >
-                  {item.availability ? "Set Unavailable" : "Set Available"}
+                  {item.availability === true ? "Set Unavailable" : "Set Available"}
                 </button>
                 <button
                   className="btn cosmic-btn-info btn-sm ms-2"
@@ -261,7 +261,7 @@ const MenuManagement = () => {
           />
           {(imagePreview || editingItem?.image) && (
             <img
-              src={imagePreview || getImageUrl(editingItem?.image)}
+              src={imagePreview || getMenuImageUrl(editingItem?.image)}
               alt="Preview"
               className="image-preview mt-2"
             />

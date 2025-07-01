@@ -9,6 +9,7 @@ import {
   FiStar, FiAward, FiShield, FiBriefcase
 } from "react-icons/fi";
 import "./AdminManageRooms.css";
+import "./StaffManagement.css";
 
 const StaffManagement = () => {
   const navigate = useNavigate();
@@ -100,7 +101,8 @@ const StaffManagement = () => {
   const fetchStaff = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/api/staff", {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/staff`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setStaff(response.data);
@@ -131,8 +133,9 @@ const StaffManagement = () => {
 
     try {
       const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       const response = await axios.post(
-        "http://localhost:8080/api/staff",
+        `${apiUrl}/staff`,
         newStaff,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -167,7 +170,8 @@ const StaffManagement = () => {
     if (window.confirm("Are you sure you want to delete this staff member?")) {
       try {
         const token = localStorage.getItem("token");
-        await axios.delete(`http://localhost:8080/api/staff/${id}`, {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        await axios.delete(`${apiUrl}/staff/${id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setStaff(staff.filter(member => member._id !== id));

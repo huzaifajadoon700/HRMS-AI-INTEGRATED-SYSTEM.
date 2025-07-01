@@ -1,25 +1,11 @@
-/**
- * Header Component for HRMS Frontend
- * Navigation bar with user authentication, cart, and responsive design
- *
- * @description Main navigation component with role-based menu items
- * @version 1.0.0
- */
-
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navbar, Nav, Container, Button, Dropdown } from "react-bootstrap";
 import { BsCart } from "react-icons/bs";
-import {
-  FiUser,
-  FiShoppingBag,
-  FiCalendar,
-  FiHome,
-  FiLogOut,
-  FiLayout,
-} from "react-icons/fi";
+import { FiUser, FiShoppingBag, FiCalendar, FiHome, FiLogOut, FiLayout, FiX } from "react-icons/fi";
 import { BiMessageSquare } from "react-icons/bi";
 import { navList } from "../data/Data";
+import { useHotelInfo, useLogos } from "../../hooks/useHotelInfo";
 import "../../styles/simple-theme.css";
 import "./header.css";
 
@@ -28,7 +14,39 @@ export default function Header() {
   const [userRole, setUserRole] = useState(null);
   const [cartItems, setCartItems] = useState(0);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const navigate = useNavigate();
+
+  // Get dynamic hotel information and logos
+  const hotelInfo = useHotelInfo();
+  const logos = useLogos();
+
+  // Force re-render when hotel settings change
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      // Force component re-render by updating state
+      setForceUpdate(prev => prev + 1);
+    };
+
+    window.addEventListener('hotelSettingsChanged', handleSettingsChange);
+
+    return () => {
+      window.removeEventListener('hotelSettingsChanged', handleSettingsChange);
+    };
+  }, []);
+
+  // Also listen for hotelInfo changes
+  useEffect(() => {
+    // This will trigger a re-render when hotelInfo changes
+  }, [hotelInfo.hotelName, hotelInfo.loading]);
+
+  // Debug logging to check if data is loading (remove in production)
+  // console.log('Header.jsx - Hotel Info:', hotelInfo);
+  // console.log('Header.jsx - Loading state:', hotelInfo.loading);
+  // console.log('Header.jsx - Hotel Name:', hotelInfo.hotelName);
+  // console.log('Header.jsx - Logos:', logos);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -73,10 +91,76 @@ export default function Header() {
     setUserRole(null);
 
     // Dispatch custom event to update header
-    window.dispatchEvent(new Event("authStateChanged"));
+    window.dispatchEvent(new Event('authStateChanged'));
 
     navigate("/login", { replace: true });
   };
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
+  // Handle profile dropdown toggle with auto-scroll
+  const handleProfileDropdownToggle = (isOpen) => {
+    setProfileDropdownOpen(isOpen);
+
+    // Auto-scroll to top on mobile when dropdown opens
+    if (isOpen && window.innerWidth <= 991) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      }, 100); // Small delay to ensure dropdown is rendered
+    }
+  };
+
+  // Handle click on mobile menu overlay close button
+  useEffect(() => {
+    const handleMobileMenuClick = (e) => {
+      if (mobileMenuOpen && e.target.closest('.navbar-collapse::before')) {
+        closeMobileMenu();
+      }
+    };
+
+    if (mobileMenuOpen) {
+      document.addEventListener('click', handleMobileMenuClick);
+      return () => document.removeEventListener('click', handleMobileMenuClick);
+    }
+  }, [mobileMenuOpen]);
+
+  // Handle profile dropdown auto-scroll and body scroll prevention
+  useEffect(() => {
+    const handleProfileDropdownScroll = () => {
+      if (profileDropdownOpen && window.innerWidth <= 991) {
+        // Prevent body scroll when dropdown is open on mobile
+        document.body.classList.add('dropdown-open');
+        document.body.style.overflow = 'hidden';
+        document.body.style.position = 'fixed';
+        document.body.style.width = '100%';
+      } else {
+        // Restore body scroll
+        document.body.classList.remove('dropdown-open');
+        document.body.style.overflow = 'unset';
+        document.body.style.position = 'unset';
+        document.body.style.width = 'unset';
+      }
+    };
+
+    handleProfileDropdownScroll();
+
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('dropdown-open');
+      document.body.style.overflow = 'unset';
+      document.body.style.position = 'unset';
+      document.body.style.width = 'unset';
+    };
+  }, [profileDropdownOpen]);
 
   return (
     <Navbar
@@ -91,22 +175,63 @@ export default function Header() {
           as={Link}
           to="/"
           className="d-flex align-items-center gap-2 brand-link"
+          key={hotelInfo.hotelName}
         >
-          <div className="logo-glow">
-            <span className="text-accent">HOTEL</span>
-            <span className="text-light">ROYAL</span>
+          {logos.primary && logos.primary !== '/images/logo-primary.png' ? (
+            <img
+              src={logos.primary}
+              alt={`${hotelInfo.hotelName} Logo`}
+              className="header-logo-image"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
+            />
+          ) : null}
+          <div className="logo-glow" style={{ display: logos.primary && logos.primary !== '/images/logo-primary.png' ? 'none' : 'block' }}>
+            <span className="text-accent">{hotelInfo.hotelName?.split(' ')[0]?.toUpperCase() || 'HOTEL'}</span>
+            {hotelInfo.hotelName?.split(' ').length > 1 && (
+              <span className="text-light">{hotelInfo.hotelName.split(' ').slice(1).join(' ').toUpperCase()}</span>
+            )}
           </div>
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="main-nav" className="mobile-menu">
-          <div className="hamburger">
-            <span />
-            <span />
-            <span />
-          </div>
-        </Navbar.Toggle>
+        {/* Mobile Header Actions */}
+        <div className="d-flex align-items-center gap-3 d-lg-none mobile-header-actions">
+          <Link
+            to="/cart"
+            className="mobile-cart-icon position-relative text-decoration-none d-flex align-items-center justify-content-center"
+          >
+            <BsCart size={20} className="text-light" />
+            {cartItems > 0 && (
+              <span className="mobile-cart-badge">{cartItems}</span>
+            )}
+          </Link>
 
-        <Navbar.Collapse id="main-nav">
+          <Navbar.Toggle
+            aria-controls="main-nav"
+            className="mobile-menu"
+            onClick={toggleMobileMenu}
+          >
+            <div className="hamburger">
+              {mobileMenuOpen ? (
+                <FiX size={24} />
+              ) : (
+                <>
+                  <span />
+                  <span />
+                  <span />
+                </>
+              )}
+            </div>
+          </Navbar.Toggle>
+        </div>
+
+        <Navbar.Collapse id="main-nav" in={mobileMenuOpen}>
+          {/* Mobile menu close button */}
+          <div className="mobile-menu-close d-lg-none" onClick={closeMobileMenu}>
+            <FiX size={24} />
+          </div>
           <Nav className="navbar-nav">
             {navList.map((item) => (
               <Nav.Link
@@ -114,15 +239,26 @@ export default function Header() {
                 as={Link}
                 to={item.path}
                 className="nav-link"
+                onClick={closeMobileMenu}
               >
                 {item.text}
               </Nav.Link>
             ))}
-            <Nav.Link as={Link} to="/help" className="nav-link">
+            <Nav.Link
+              as={Link}
+              to="/help"
+              className="nav-link"
+              onClick={closeMobileMenu}
+            >
               Help
             </Nav.Link>
             {userName && (
-              <Nav.Link as={Link} to="/feedback" className="nav-link">
+              <Nav.Link
+                as={Link}
+                to="/feedback"
+                className="nav-link"
+                onClick={closeMobileMenu}
+              >
                 <BiMessageSquare className="me-1" />
                 Feedback
               </Nav.Link>
@@ -130,24 +266,33 @@ export default function Header() {
           </Nav>
 
           <div className="d-flex align-items-center gap-4 auth-section">
+            {/* Cart icon moved to header on mobile, keep for desktop */}
             <Link
               to="/cart"
-              className="cart-icon position-relative text-decoration-none"
+              className="cart-icon position-relative text-decoration-none d-flex align-items-center justify-content-center d-none d-lg-flex"
+              onClick={closeMobileMenu}
             >
-              <BsCart size={20} className="text-light" />
-              {cartItems > 0 && <span className="cart-badge">{cartItems}</span>}
+              <BsCart size={22} className="text-light" />
+              {cartItems > 0 && (
+                <span className="cart-badge">{cartItems}</span>
+              )}
             </Link>
 
             {userName ? (
-              <Dropdown>
-                <Dropdown.Toggle
-                  variant="link"
-                  className="user-greeting d-flex align-items-center gap-2"
-                >
+              <Dropdown onToggle={handleProfileDropdownToggle}>
+                <Dropdown.Toggle variant="link" className="user-greeting d-flex align-items-center gap-2">
                   <FiUser size={18} className="text-light" />
                   <span className="text-light">{userName}</span>
                 </Dropdown.Toggle>
                 <Dropdown.Menu className="dropdown-menu-custom">
+                  {/* Mobile Close Button */}
+                  <div className="d-lg-none mobile-dropdown-close" onClick={() => {
+                    setProfileDropdownOpen(false);
+                    closeMobileMenu();
+                  }}>
+                    <FiX size={24} />
+                  </div>
+
                   {/* Enhanced User Header */}
                   <div className="dropdown-header-custom">
                     <div className="user-avatar">
@@ -160,33 +305,29 @@ export default function Header() {
                   </div>
 
                   {userRole === "admin" && (
-                    <Dropdown.Item
-                      as={Link}
-                      to="/dashboard"
-                      className="admin-item"
-                    >
+                    <Dropdown.Item as={Link} to="/dashboard" className="admin-item" onClick={closeMobileMenu}>
                       <FiLayout className="dropdown-icon" />
                       Dashboard
                     </Dropdown.Item>
                   )}
-                  <Dropdown.Item as={Link} to="/profile">
+                  <Dropdown.Item as={Link} to="/profile" onClick={closeMobileMenu}>
                     <FiUser className="dropdown-icon" />
                     Profile
                   </Dropdown.Item>
-                  <Dropdown.Item as={Link} to="/my-orders">
+                  <Dropdown.Item as={Link} to="/my-orders" onClick={closeMobileMenu}>
                     <FiShoppingBag className="dropdown-icon" />
                     My Orders
                   </Dropdown.Item>
-                  <Dropdown.Item as={Link} to="/my-reservations">
+                  <Dropdown.Item as={Link} to="/my-reservations" onClick={closeMobileMenu}>
                     <FiCalendar className="dropdown-icon" />
                     My Reservations
                   </Dropdown.Item>
-                  <Dropdown.Item as={Link} to="/my-bookings">
+                  <Dropdown.Item as={Link} to="/my-bookings" onClick={closeMobileMenu}>
                     <FiHome className="dropdown-icon" />
                     My Bookings
                   </Dropdown.Item>
                   <Dropdown.Divider />
-                  <Dropdown.Item onClick={handleLogout} className="logout-item">
+                  <Dropdown.Item onClick={() => { handleLogout(); closeMobileMenu(); }} className="logout-item">
                     <FiLogOut className="dropdown-icon" />
                     Log Out
                   </Dropdown.Item>
@@ -194,7 +335,7 @@ export default function Header() {
               </Dropdown>
             ) : (
               <Button
-                onClick={() => navigate("/login")}
+                onClick={() => { navigate("/login"); closeMobileMenu(); }}
                 className="auth-button"
               >
                 Sign In

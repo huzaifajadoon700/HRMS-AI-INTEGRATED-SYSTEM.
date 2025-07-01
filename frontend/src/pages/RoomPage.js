@@ -19,7 +19,116 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import RoomDetailsModal from '../components/RoomDetailsModal';
-import RoomRecommendationExplainer from '../components/RoomRecommendationExplainer';
+import { getRoomImageUrl, handleImageError } from '../utils/imageUtils';
+// import RoomRecommendationExplainer from '../components/RoomRecommendationExplainer';
+
+// Add responsive styles for RoomPage
+const responsiveStyles = `
+  @media (max-width: 768px) {
+    .room-page-hero {
+      padding: 1.5rem 1rem 1rem !important;
+    }
+    .room-page-title {
+      font-size: 2rem !important;
+    }
+    .room-page-subtitle {
+      font-size: 0.9rem !important;
+    }
+    .room-page-tabs {
+      flex-direction: column !important;
+      gap: 0.5rem !important;
+    }
+    .room-page-tab-button {
+      padding: 0.625rem 1rem !important;
+      font-size: 0.8rem !important;
+    }
+    .room-page-filters {
+      margin: 0 1rem 1.5rem !important;
+      padding: 1rem !important;
+    }
+    .room-page-filters-grid {
+      grid-template-columns: 1fr !important;
+      gap: 0.75rem !important;
+    }
+    .room-page-grid {
+      grid-template-columns: 1fr !important;
+      gap: 1rem !important;
+      margin: 0 1rem !important;
+    }
+    .room-page-card {
+      margin: 0 !important;
+    }
+    .room-page-card-content {
+      padding: 1.25rem !important;
+    }
+    .room-page-card-title {
+      font-size: 1.1rem !important;
+    }
+    .room-page-card-description {
+      font-size: 0.85rem !important;
+    }
+    .room-page-badge {
+      padding: 0.375rem 0.625rem !important;
+      font-size: 0.75rem !important;
+    }
+    .room-page-button {
+      padding: 0.625rem 1rem !important;
+      font-size: 0.85rem !important;
+    }
+    .room-page-amenity {
+      font-size: 0.7rem !important;
+      padding: 0.25rem 0.5rem !important;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .room-page-hero {
+      padding: 1rem 0.75rem 0.75rem !important;
+    }
+    .room-page-title {
+      font-size: 1.75rem !important;
+    }
+    .room-page-subtitle {
+      font-size: 0.85rem !important;
+    }
+    .room-page-filters {
+      margin: 0 0.75rem 1.25rem !important;
+      padding: 0.75rem !important;
+    }
+    .room-page-grid {
+      margin: 0 0.75rem !important;
+      gap: 0.75rem !important;
+    }
+    .room-page-card-content {
+      padding: 1rem !important;
+    }
+    .room-page-card-title {
+      font-size: 1rem !important;
+    }
+    .room-page-card-description {
+      font-size: 0.8rem !important;
+    }
+    .room-page-badge {
+      padding: 0.25rem 0.5rem !important;
+      font-size: 0.7rem !important;
+    }
+    .room-page-button {
+      padding: 0.5rem 0.75rem !important;
+      font-size: 0.8rem !important;
+    }
+    .room-page-amenity {
+      font-size: 0.65rem !important;
+      padding: 0.2rem 0.4rem !important;
+    }
+  }
+`;
+
+// Inject styles
+if (typeof document !== 'undefined') {
+  const styleElement = document.createElement('style');
+  styleElement.textContent = responsiveStyles;
+  document.head.appendChild(styleElement);
+}
 
 const RoomPage = () => {
   const navigate = useNavigate();
@@ -50,22 +159,7 @@ const RoomPage = () => {
     errors: []
   });
 
-  // Helper function to get the correct image URL
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return '/images/placeholder-room.jpg';
-    
-    try {
-      if (imagePath.startsWith('http')) return imagePath;
-      const cleanPath = imagePath.replace(/^\/+/, '');
-      if (cleanPath.includes('uploads')) {
-        return `https://hrms-ai-integrated-system-production.up.railway.app/${cleanPath}`;
-      }
-      return `https://hrms-ai-integrated-system-production.up.railway.app/uploads/${cleanPath}`;
-    } catch (error) {
-      console.error('Error formatting image URL:', error);
-      return '/images/placeholder-room.jpg';
-    }
-  };
+
 
   // Check if user is logged in
   useEffect(() => {
@@ -80,7 +174,8 @@ const RoomPage = () => {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await axios.get('https://hrms-ai-integrated-system-production.up.railway.app/api/rooms');
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/rooms`);
         setRooms(response.data);
       } catch (error) {
         setError('Failed to load rooms. Please try again.');
@@ -97,7 +192,8 @@ const RoomPage = () => {
   useEffect(() => {
     const fetchPopularRooms = async () => {
       try {
-        const response = await axios.get('/api/rooms/popular?count=6');
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const response = await axios.get(`${apiUrl}/rooms/popular?count=6`);
         if (response.data.success) {
           setPopularRooms(response.data.popularRooms);
         }
@@ -116,14 +212,16 @@ const RoomPage = () => {
 
       setRecommendationsLoading(true);
       try {
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
         const response = await axios.get(
-          `https://hrms-ai-integrated-system-production.up.railway.app/api/rooms/recommendations/${user.id}?count=8`,
+          `${apiUrl}/rooms/recommendations/${user.id}?count=8`,
           {
             headers: { Authorization: `Bearer ${user.token}` }
           }
         );
 
         if (response.data.success) {
+          console.log('RoomPage - Fetched recommendations:', response.data.recommendations.length, response.data.recommendations);
           setRecommendedRooms(response.data.recommendations);
         }
       } catch (error) {
@@ -141,8 +239,9 @@ const RoomPage = () => {
     if (!user?.id || !user?.token) return;
 
     try {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
       await axios.post(
-        'https://hrms-ai-integrated-system-production.up.railway.app/api/rooms/interactions',
+        `${apiUrl}/rooms/interactions`,
         {
           userId: user.id,
           roomId,
@@ -265,154 +364,37 @@ const RoomPage = () => {
     });
   };
 
-  // Comprehensive booking validation
-  const validateBooking = (room, checkInDate, checkOutDate, guests) => {
-    const errors = [];
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
 
-    // Date validations
-    if (!checkInDate) {
-      errors.push("Please select a check-in date");
-    } else {
-      const checkIn = new Date(checkInDate);
-      if (checkIn < today) {
-        errors.push("Check-in date cannot be in the past");
-      }
 
-      // Check if date is too far in future (1 year)
-      const maxDate = new Date();
-      maxDate.setFullYear(maxDate.getFullYear() + 1);
-      if (checkIn > maxDate) {
-        errors.push("Cannot book rooms more than 1 year in advance");
-      }
-    }
-
-    if (!checkOutDate) {
-      errors.push("Please select a check-out date");
-    } else if (checkInDate) {
-      const checkIn = new Date(checkInDate);
-      const checkOut = new Date(checkOutDate);
-
-      if (checkOut <= checkIn) {
-        errors.push("Check-out date must be after check-in date");
-      }
-
-      // Maximum stay validation (30 days)
-      const daysDiff = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-      if (daysDiff > 30) {
-        errors.push("Maximum stay is 30 days. For longer stays, please contact us directly");
-      }
-
-      if (daysDiff < 1) {
-        errors.push("Minimum stay is 1 night");
-      }
-    }
-
-    // Guest validation
-    if (!guests || guests < 1) {
-      errors.push("Please specify number of guests (minimum 1)");
-    } else if (guests > (room.capacity || 4)) {
-      errors.push(`This room can accommodate maximum ${room.capacity || 4} guests`);
-    } else if (guests > 10) {
-      errors.push("For groups larger than 10, please contact us directly");
-    }
-
-    // Room availability validation
-    if (room.status && room.status !== 'Available') {
-      errors.push("This room is currently not available for booking");
-    }
-
-    return errors;
-  };
-
-  // Check for double booking
-  const checkRoomAvailability = async (roomId, checkInDate, checkOutDate) => {
-    try {
-      const response = await axios.get(`https://hrms-ai-integrated-system-production.up.railway.app/api/rooms/availability`, {
-        params: {
-          checkInDate,
-          checkOutDate
-        }
-      });
-
-      // Find the specific room in the response array
-      const roomAvailability = response.data.find(r => r.room._id === roomId);
-
-      if (!roomAvailability) {
-        console.warn("Room not found in availability response");
-        return true; // Default to available if room not found
-      }
-
-      return roomAvailability.isAvailable;
-    } catch (error) {
-      console.error("Error checking room availability:", error);
-      // Don't throw error, just return true to allow booking attempt
-      // The actual booking API will handle the final validation
-      return true;
-    }
-  };
-
-  // Enhanced room booking handler with validation
+  // Enhanced room booking handler - Always allow booking, let user fill details manually
   const handleBookRoom = async (room) => {
     const { checkInDate, checkOutDate, guests } = bookingValidation;
 
-    // If dates are not selected, prompt user to select them
-    if (!checkInDate || !checkOutDate) {
-      setBookingValidation(prev => ({
-        ...prev,
-        errors: ["Please select check-in and check-out dates before booking."]
-      }));
-      // Scroll to the booking form
-      const bookingForm = document.querySelector('.booking-form');
-      if (bookingForm) {
-        bookingForm.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-      return;
-    }
-
-    // Validate booking data
-    const validationErrors = validateBooking(room, checkInDate, checkOutDate, guests);
-    if (validationErrors.length > 0) {
-      setBookingValidation(prev => ({ ...prev, errors: validationErrors }));
-      return;
-    }
-
     try {
-      // Check for double booking
-      const isAvailable = await checkRoomAvailability(room._id, checkInDate, checkOutDate);
-      if (!isAvailable) {
-        setBookingValidation(prev => ({
-          ...prev,
-          errors: ["This room is already booked for the selected dates. Please choose different dates."]
-        }));
-        return;
-      }
-
       // Record booking interaction
       await recordInteraction(room._id, 'booking', {
-        checkInDate,
-        checkOutDate,
-        guests,
+        checkInDate: checkInDate || null,
+        checkOutDate: checkOutDate || null,
+        guests: guests || 1,
         roomType: room.roomType,
         price: room.price
       });
 
-      // Clear validation errors
+      // Clear any previous validation errors
       setBookingValidation(prev => ({ ...prev, errors: [] }));
 
-      // Navigate to booking page with room details
+      // Navigate to booking page with room details (dates optional)
       const bookingData = {
         roomId: room._id,
         roomName: room.roomName || `Room ${room.roomNumber}`,
         roomType: room.roomType,
-        roomImage: getImageUrl(room.image),
+        roomImage: getRoomImageUrl(room.image),
         price: room.price,
         capacity: room.capacity,
         amenities: room.amenities,
-        checkInDate,
-        checkOutDate,
-        guests
+        checkInDate: checkInDate || '', // Pass empty string if no date selected
+        checkOutDate: checkOutDate || '', // Pass empty string if no date selected
+        guests: guests || 1
       };
 
       console.log('Booking room with ID:', room._id);
@@ -433,14 +415,22 @@ const RoomPage = () => {
 
   // Get current rooms to display based on active tab
   const getCurrentRooms = () => {
+    let result;
     switch (activeTab) {
       case 'recommended':
-        return getFilteredRooms(recommendedRooms);
+        result = getFilteredRooms(recommendedRooms);
+        console.log('RoomPage - Recommended rooms after filtering:', result.length, 'from', recommendedRooms.length);
+        break;
       case 'popular':
-        return getFilteredRooms(popularRooms);
+        result = getFilteredRooms(popularRooms);
+        console.log('RoomPage - Popular rooms after filtering:', result.length, 'from', popularRooms.length);
+        break;
       default:
-        return getFilteredRooms(rooms);
+        result = getFilteredRooms(rooms);
+        console.log('RoomPage - All rooms after filtering:', result.length, 'from', rooms.length);
+        break;
     }
+    return result;
   };
 
   // Get price in Pakistani Rupees
@@ -581,12 +571,12 @@ const RoomPage = () => {
           padding: '60px 1.5rem 1.5rem'
         }}>
           {/* Hero Section */}
-          <div style={{
+          <div className="room-page-hero" style={{
             textAlign: 'center',
             marginBottom: '2rem',
             padding: '1rem 0'
           }}>
-            <h1 style={{
+            <h1 className="room-page-title" style={{
               fontSize: '2.5rem',
               fontWeight: '700',
               background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 30%, #bb86fc 70%, #ff6b9d 100%)',
@@ -600,7 +590,7 @@ const RoomPage = () => {
             }}>
               Luxury Accommodations
             </h1>
-            <p style={{
+            <p className="room-page-subtitle" style={{
               fontSize: '1rem',
               color: 'rgba(255, 255, 255, 0.8)',
               margin: '0',
@@ -630,7 +620,7 @@ const RoomPage = () => {
           )}
 
           {/* Modern Filters and Tabs */}
-          <div style={{
+          <div className="room-page-filters" style={{
             background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
             backdropFilter: 'blur(20px)',
             border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -640,13 +630,14 @@ const RoomPage = () => {
             animation: 'slideInUp 0.8s ease-out 0.4s both'
           }}>
             {/* Tabs */}
-            <div style={{
+            <div className="room-page-tabs" style={{
               display: 'flex',
               gap: '0.75rem',
               marginBottom: '1.5rem',
               flexWrap: 'wrap'
             }}>
               <button
+                className="room-page-tab-button"
                 onClick={() => setActiveTab('all')}
                 style={{
                   padding: '0.5rem 1rem',
@@ -671,6 +662,7 @@ const RoomPage = () => {
 
               {user && (
                 <button
+                  className="room-page-tab-button"
                   onClick={() => setActiveTab('recommended')}
                   style={{
                     padding: '0.5rem 1rem',
@@ -705,6 +697,7 @@ const RoomPage = () => {
               )}
 
               <button
+                className="room-page-tab-button"
                 onClick={() => setActiveTab('popular')}
                 style={{
                   padding: '0.5rem 1rem',
@@ -729,7 +722,7 @@ const RoomPage = () => {
             </div>
 
             {/* Quick Filters */}
-            <div style={{
+            <div className="room-page-filters-grid" style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
               gap: '0.75rem',
@@ -844,70 +837,7 @@ const RoomPage = () => {
             </div>
           </div>
 
-          {/* Enhanced Recommendation Info */}
-          {activeTab === 'recommended' && user && (
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(100, 255, 218, 0.15) 0%, rgba(187, 134, 252, 0.15) 100%)',
-              border: '1px solid rgba(100, 255, 218, 0.4)',
-              borderRadius: '1rem',
-              padding: '1.5rem',
-              marginBottom: '2rem',
-              color: '#64ffda',
-              position: 'relative',
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                position: 'absolute',
-                top: '-50%',
-                right: '-50%',
-                width: '200%',
-                height: '200%',
-                background: 'radial-gradient(circle, rgba(100, 255, 218, 0.1) 0%, transparent 70%)',
-                animation: 'pulse 3s ease-in-out infinite'
-              }} />
-              <div style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
-                  <div style={{
-                    background: 'rgba(100, 255, 218, 0.2)',
-                    borderRadius: '50%',
-                    padding: '0.75rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}>
-                    <FiCpu size={24} />
-                  </div>
-                  <div>
-                    <h4 style={{ margin: 0, fontSize: '1.25rem', fontWeight: '700' }}>
-                      🤖 AI-Powered Room Recommendations
-                    </h4>
-                    <p style={{ margin: 0, opacity: 0.9, fontSize: '0.9rem' }}>
-                      Real SVD machine learning model analyzing 3,220+ users
-                    </p>
-                  </div>
-                </div>
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '1rem',
-                  marginTop: '1rem'
-                }}>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#64ffda' }}>80%</div>
-                    <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>Accuracy Rate</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#bb86fc' }}>0.85</div>
-                    <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>RMSE Score</div>
-                  </div>
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: '1.5rem', fontWeight: '700', color: '#64ffda' }}>Real-time</div>
-                    <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>ML Predictions</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+
 
           {!user && activeTab === 'recommended' && (
             <div style={{
@@ -1336,7 +1266,7 @@ const RoomPage = () => {
           </div>
 
           {/* Rooms Grid */}
-          <div style={{
+          <div className="room-page-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
             gap: '1.5rem',
@@ -1396,6 +1326,7 @@ const RoomPage = () => {
                 return (
                   <div
                     key={room._id || roomItem.roomId}
+                    className="room-page-card"
                     style={{
                       background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
                       backdropFilter: 'blur(20px)',
@@ -1422,13 +1353,9 @@ const RoomPage = () => {
                     {/* Image Section */}
                     <div style={{ position: 'relative', height: '250px', overflow: 'hidden' }}>
                       <img
-                        src={getImageUrl(room.image)}
+                        src={getRoomImageUrl(room.image)}
                         alt={room.roomNumber || room.roomName}
-                        onError={(e) => {
-                          console.error('Error loading image:', room.image);
-                          e.target.src = '/images/placeholder-room.jpg';
-                          e.target.onerror = null;
-                        }}
+                        onError={(e) => handleImageError(e, '/images/placeholder-room.jpg')}
                         style={{
                           width: '100%',
                           height: '100%',
@@ -1444,7 +1371,7 @@ const RoomPage = () => {
                       />
 
                       {/* Price Badge */}
-                      <div style={{
+                      <div className="room-page-badge" style={{
                         position: 'absolute',
                         top: '1rem',
                         right: '1rem',
@@ -1496,7 +1423,7 @@ const RoomPage = () => {
                       )}
                     </div>
                     {/* Card Content */}
-                    <div style={{
+                    <div className="room-page-card-content" style={{
                       padding: '1.5rem',
                       display: 'flex',
                       flexDirection: 'column',
@@ -1510,7 +1437,7 @@ const RoomPage = () => {
                         marginBottom: '1rem'
                       }}>
                         <div>
-                          <h3 style={{
+                          <h3 className="room-page-card-title" style={{
                             fontSize: '1.25rem',
                             fontWeight: '700',
                             color: '#fff',
@@ -1556,7 +1483,7 @@ const RoomPage = () => {
                       </div>
 
                       {/* Description */}
-                      <p style={{
+                      <p className="room-page-card-description" style={{
                         color: 'rgba(255, 255, 255, 0.8)',
                         fontSize: '0.9rem',
                         lineHeight: '1.5',
@@ -1580,6 +1507,7 @@ const RoomPage = () => {
                         {room.amenities && room.amenities.slice(0, 3).map((amenity, index) => (
                           <span
                             key={index}
+                            className="room-page-amenity"
                             style={{
                               padding: '0.25rem 0.75rem',
                               background: 'rgba(100, 255, 218, 0.1)',
@@ -1619,19 +1547,16 @@ const RoomPage = () => {
                         marginTop: 'auto'
                       }}>
                         <button
+                          className="room-page-button"
                           onClick={() => handleBookRoom(room)}
                           disabled={false}
                           style={{
                             flex: 1,
                             padding: '0.75rem 1rem',
-                            background: (!bookingValidation.checkInDate || !bookingValidation.checkOutDate)
-                              ? 'rgba(255, 255, 255, 0.1)'
-                              : 'linear-gradient(135deg, #64ffda 0%, #bb86fc 100%)',
+                            background: 'linear-gradient(135deg, #64ffda 0%, #bb86fc 100%)',
                             border: 'none',
                             borderRadius: '0.75rem',
-                            color: (!bookingValidation.checkInDate || !bookingValidation.checkOutDate)
-                              ? 'rgba(255, 255, 255, 0.8)'
-                              : '#0a0a0a',
+                            color: '#0a0a0a',
                             fontSize: '0.9rem',
                             fontWeight: '600',
                             cursor: 'pointer',
@@ -1643,10 +1568,11 @@ const RoomPage = () => {
                           }}
                         >
                           <FiShoppingCart size={14} />
-                          {!bookingValidation.checkInDate || !bookingValidation.checkOutDate ? 'Select Dates' : 'Book Now'}
+                          Book Now
                         </button>
 
                         <button
+                          className="room-page-button"
                           onClick={() => handleViewDetails(room, roomItem)}
                           style={{
                             padding: '0.75rem 1rem',

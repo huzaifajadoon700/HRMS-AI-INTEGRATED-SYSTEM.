@@ -147,6 +147,216 @@
       "timestamp": "2025-06-05T10:56:39.816Z",
       "date": "2025-06-05",
       "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90994",
+      "rating": 3,
+      "timestamp": "2025-06-14T16:26:57.320Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90994",
+      "rating": 3,
+      "timestamp": "2025-06-14T16:26:57.818Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90994",
+      "rating": 3,
+      "timestamp": "2025-06-14T16:26:57.826Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099d",
+      "rating": 5,
+      "timestamp": "2025-06-14T16:40:21.083Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099d",
+      "rating": 5,
+      "timestamp": "2025-06-14T16:40:21.502Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099d",
+      "rating": 5,
+      "timestamp": "2025-06-14T16:40:21.508Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90999",
+      "rating": 5,
+      "timestamp": "2025-06-14T16:40:54.724Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90999",
+      "rating": 5,
+      "timestamp": "2025-06-14T16:40:56.045Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90999",
+      "rating": 5,
+      "timestamp": "2025-06-14T16:40:56.052Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90999",
+      "rating": 5,
+      "timestamp": "2025-06-14T16:40:57.299Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90999",
+      "rating": 5,
+      "timestamp": "2025-06-14T16:40:57.698Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90999",
+      "rating": 5,
+      "timestamp": "2025-06-14T16:40:57.719Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90994",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:27:33.945Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90994",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:27:34.863Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90994",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:27:34.870Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099d",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:27:45.600Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099d",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:27:45.997Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099d",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:27:46.056Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90999",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:28:07.715Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90999",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:28:08.109Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90999",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:28:08.120Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90995",
+      "rating": 5,
+      "timestamp": "2025-06-15T06:09:48.492Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90995",
+      "rating": 5,
+      "timestamp": "2025-06-15T06:09:48.915Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d90995",
+      "rating": 5,
+      "timestamp": "2025-06-15T06:09:48.920Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099c",
+      "rating": 5,
+      "timestamp": "2025-06-15T07:44:59.751Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099c",
+      "rating": 5,
+      "timestamp": "2025-06-15T07:45:00.158Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099c",
+      "rating": 5,
+      "timestamp": "2025-06-15T07:45:00.164Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "684e7c0a9b2f6a7f7946412f",
+      "rating": 5,
+      "timestamp": "2025-06-15T08:00:52.354Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "684e7c0a9b2f6a7f7946412f",
+      "rating": 5,
+      "timestamp": "2025-06-15T08:00:52.831Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "684e7c0a9b2f6a7f7946412f",
+      "rating": 5,
+      "timestamp": "2025-06-15T08:00:52.854Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
     }
   ],
   "683be4e72fe4e7ff04e8ca73": [
@@ -199,6 +409,94 @@
       "rating": 4,
       "timestamp": "2025-06-10T16:51:49.658Z",
       "date": "2025-06-10",
+      "interaction_type": "rating"
+    }
+  ],
+  "684dcd8460d954d6ae745b38": [
+    {
+      "recipe_id": "683c13488fde14dd4093c625",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:32:36.815Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "683c13488fde14dd4093c625",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:32:37.228Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "683c13488fde14dd4093c625",
+      "rating": 5,
+      "timestamp": "2025-06-14T19:32:37.287Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099c",
+      "rating": 4,
+      "timestamp": "2025-06-14T19:32:49.417Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099c",
+      "rating": 4,
+      "timestamp": "2025-06-14T19:32:50.087Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "6841f951a4128dabe9d9099c",
+      "rating": 4,
+      "timestamp": "2025-06-14T19:32:50.229Z",
+      "date": "2025-06-14",
+      "interaction_type": "rating"
+    }
+  ],
+  "684f08ca441479d9c638bb0d": [
+    {
+      "recipe_id": "684e7cbe51ab9798783017f8",
+      "rating": 5,
+      "timestamp": "2025-06-15T17:58:50.458Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "684e7cbe51ab9798783017f8",
+      "rating": 5,
+      "timestamp": "2025-06-15T17:58:51.249Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "684e7cbe51ab9798783017f8",
+      "rating": 5,
+      "timestamp": "2025-06-15T17:58:51.267Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "684e7cbe51ab9798783017fe",
+      "rating": 3,
+      "timestamp": "2025-06-15T17:59:00.215Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "684e7cbe51ab9798783017fe",
+      "rating": 3,
+      "timestamp": "2025-06-15T17:59:00.731Z",
+      "date": "2025-06-15",
+      "interaction_type": "rating"
+    },
+    {
+      "recipe_id": "684e7cbe51ab9798783017fe",
+      "rating": 3,
+      "timestamp": "2025-06-15T17:59:00.747Z",
+      "date": "2025-06-15",
       "interaction_type": "rating"
     }
   ]

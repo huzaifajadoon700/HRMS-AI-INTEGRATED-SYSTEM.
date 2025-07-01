@@ -1,31 +1,57 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { FiArrowRight, FiHome, FiCoffee, FiCalendar, FiStar } from "react-icons/fi";
+import { useNavigate, useLocation } from "react-router-dom";
+import { FiHome, FiCoffee, FiCalendar, FiStar } from "react-icons/fi";
 import { BsShieldCheck, BsAward, BsClock } from "react-icons/bs";
+import { useHotelInfo, useHeroContent } from "../../hooks/useHotelInfo";
 import './MainContentCarousel.css';
 
 const MainContentCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Get dynamic hotel content
+  const hotelInfo = useHotelInfo();
+  const heroContent = useHeroContent();
+
+  // Debug: Check if router context is available
+  useEffect(() => {
+    console.log('Router context available:', !!navigate);
+    console.log('Current location:', location.pathname);
+  }, [navigate, location]);
+
+  const handleNavigation = (path, event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log('Navigating to:', path); // Debug log
+    try {
+      navigate(path);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback to window.location if navigate fails
+      window.location.href = path;
+    }
+  };
 
   const heroSlides = [
     {
       image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop",
-      title: "Luxury Hotel Experience",
-      subtitle: "WELCOME TO LUXURY",
-      description: "Premium accommodations with Pakistani heritage"
+      title: heroContent.mainTitle,
+      subtitle: heroContent.subtitle,
+      description: heroContent.description
     },
     {
       image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070&auto=format&fit=crop",
       title: "Culinary Excellence Awaits",
       subtitle: "AUTHENTIC FLAVORS",
-      description: "Finest Pakistani and international cuisine"
+      description: `Finest cuisine at ${hotelInfo.hotelName}`
     },
     {
       image: "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=2070&auto=format&fit=crop",
       title: "Elegant Dining Experience",
       subtitle: "RESERVE YOUR TABLE",
-      description: "Beautiful restaurants with city views"
+      description: `Beautiful restaurants with city views at ${hotelInfo.hotelName}`
     }
   ];
 
@@ -73,38 +99,59 @@ const MainContentCarousel = () => {
 
         {/* Enhanced Action Buttons */}
         <div className="hero-buttons">
-          <Link to="/rooms" className="hero-btn primary book-room">
+          <button
+            onClick={(e) => handleNavigation('/rooms', e)}
+            className="hero-btn primary book-room"
+            type="button"
+            style={{
+              pointerEvents: 'auto',
+              position: 'relative',
+              zIndex: 1000
+            }}
+          >
             <div className="btn-icon">
               <FiHome />
             </div>
             <div className="btn-content">
-              <span className="btn-title">BOOK ROOM</span>
-              <span className="btn-subtitle">Luxury Stays</span>
+              <span className="btn-title">Book Room</span>
             </div>
-            <FiArrowRight className="btn-arrow" />
-          </Link>
+          </button>
 
-          <Link to="/order-food" className="hero-btn secondary order-food">
+          <button
+            onClick={(e) => handleNavigation('/order-food', e)}
+            className="hero-btn secondary order-food"
+            type="button"
+            style={{
+              pointerEvents: 'auto',
+              position: 'relative',
+              zIndex: 1000
+            }}
+          >
             <div className="btn-icon">
               <FiCoffee />
             </div>
             <div className="btn-content">
-              <span className="btn-title">ORDER FOOD</span>
-              <span className="btn-subtitle">Gourmet Cuisine</span>
+              <span className="btn-title">Order Food</span>
             </div>
-            <FiArrowRight className="btn-arrow" />
-          </Link>
+          </button>
 
-          <Link to="/reserve-table" className="hero-btn tertiary reserve-table">
+          <button
+            onClick={(e) => handleNavigation('/reserve-table', e)}
+            className="hero-btn tertiary reserve-table"
+            type="button"
+            style={{
+              pointerEvents: 'auto',
+              position: 'relative',
+              zIndex: 1000
+            }}
+          >
             <div className="btn-icon">
               <FiCalendar />
             </div>
             <div className="btn-content">
-              <span className="btn-title">RESERVE TABLE</span>
-              <span className="btn-subtitle">Fine Dining</span>
+              <span className="btn-title">Reserve Table</span>
             </div>
-            <FiArrowRight className="btn-arrow" />
-          </Link>
+          </button>
         </div>
 
         {/* Trust Indicators */}

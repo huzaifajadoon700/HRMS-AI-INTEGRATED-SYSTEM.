@@ -1,14 +1,17 @@
 import React from 'react';
+import { useHotelInfo } from '../hooks/useHotelInfo';
 import './Footer.css';
 
 const Footer = () => {
+  const hotelInfo = useHotelInfo();
+
   return (
     <footer className="footer">
       <div className="container">
         <div className="row">
           <div className="col-md-12">
             <p className="text-center">
-              © {new Date().getFullYear()} Restaurant Management System. All rights reserved.
+              © {new Date().getFullYear()} {hotelInfo.hotelName}. All rights reserved.
             </p>
           </div>
         </div>

@@ -9,6 +9,7 @@ import {
   FiMapPin, FiDollarSign, FiCalendar, FiClock, FiWifi, FiTv, FiCoffee
 } from "react-icons/fi";
 import RoomRecommendationAnalytics from "./RoomRecommendationAnalytics";
+import { getRoomImageUrl, handleImageError } from "../../utils/imageUtils";
 import "./AdminManageRooms.css";
 
 const AdminViewRooms = () => {
@@ -40,7 +41,8 @@ const AdminViewRooms = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:8080/api/rooms", {
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRooms(response.data);
@@ -59,7 +61,8 @@ const AdminViewRooms = () => {
 
   const fetchPopularRooms = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/rooms/popular?count=10");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/rooms/popular?count=10`);
       if (response.data.success) {
         setPopularRooms(response.data.popularRooms);
       }
@@ -77,20 +80,7 @@ const AdminViewRooms = () => {
     }).format(price);
   };
 
-  const getImageUrl = (imagePath) => {
-    if (!imagePath) return '/images/placeholder-room.jpg';
-    try {
-      if (imagePath.startsWith('http')) return imagePath;
-      const cleanPath = imagePath.replace(/^\/+/, '');
-      if (cleanPath.includes('uploads')) {
-        return `http://localhost:8080/${cleanPath}`;
-      }
-      return `http://localhost:8080/uploads/${cleanPath}`;
-    } catch (error) {
-      console.error('Error formatting image URL:', error);
-      return '/images/placeholder-room.jpg';
-    }
-  };
+
 
   // Filter and sort rooms
   const filteredRooms = rooms.filter(room => {
@@ -269,13 +259,10 @@ const AdminViewRooms = () => {
                     <div key={room._id} className={`enhanced-room-card ${isPopular ? 'popular' : ''} ${viewMode}-card`}>
                       <div className="room-image-container">
                         <img
-                          src={getImageUrl(room.image)}
+                          src={getRoomImageUrl(room.image)}
                           alt={`Room ${room.roomNumber}`}
                           className="room-image"
-                          onError={(e) => {
-                            e.target.src = "/images/placeholder-room.jpg";
-                            e.target.onerror = null;
-                          }}
+                          onError={(e) => handleImageError(e, "/images/placeholder-room.jpg")}
                         />
                         <div className="image-overlay">
                           <div className="overlay-actions">

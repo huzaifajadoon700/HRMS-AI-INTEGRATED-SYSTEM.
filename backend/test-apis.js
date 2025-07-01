@@ -1,4 +1,3 @@
-// Updated: Improved test script clarity
 // Test script to verify all admin dashboard APIs are working
 const axios = require('axios');
 

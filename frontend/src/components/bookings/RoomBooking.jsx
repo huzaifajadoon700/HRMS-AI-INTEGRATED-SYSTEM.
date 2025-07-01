@@ -107,15 +107,31 @@ const RoomBooking = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Scroll to top utility function
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
     // Add debug logging
     React.useEffect(() => {
         console.log('Payment form visibility:', showPayment);
     }, [showPayment]);
 
+    // Scroll to top when payment form is shown
+    React.useEffect(() => {
+        if (showPayment) {
+            scrollToTop();
+        }
+    }, [showPayment]);
+
     React.useEffect(() => {
         const fetchRoomDetails = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/rooms/${roomId}`);
+                const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+                const response = await axios.get(`${apiUrl}/rooms/${roomId}`);
                 setRoom(response.data);
             } catch (err) {
                 setError('Failed to fetch room details');
@@ -181,7 +197,8 @@ const RoomBooking = () => {
                 paymentMethodId: paymentMethodId
             };
 
-            const response = await axios.post('http://localhost:8080/api/bookings', bookingData, {
+            const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+            const response = await axios.post(`${apiUrl}/bookings`, bookingData, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

@@ -1,11 +1,3 @@
-/**
- * User Routes for HRMS System
- * API endpoints for user profile management and account operations
- *
- * @description Express router for user-related operations with authentication
- * @version 1.0.0
- */
-
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../Middlewares/Auth");
@@ -13,7 +5,7 @@ const {
   getProfile,
   updateProfile,
   updatePassword,
-  getUserById,
+  getUserById
 } = require("../Controllers/UserController");
 
 // ✅ Get User Profile (Logged-in users only)

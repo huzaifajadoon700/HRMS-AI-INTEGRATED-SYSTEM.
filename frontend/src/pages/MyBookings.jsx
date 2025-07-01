@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   FiHome,
   FiClock,
@@ -16,52 +16,96 @@ import {
   FiTv,
   FiCoffee
 } from 'react-icons/fi';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './MyBookings.css';
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('upcoming');
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const fetchBookings = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/bookings/user`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const bookingsData = response.data || [];
+
+      // Transform the data to match the expected format
+      const transformedBookings = bookingsData.map(booking => ({
+        id: booking._id || booking.id,
+        roomType: booking.roomType || 'Standard Room',
+        roomNumber: booking.roomNumber || 'N/A',
+        checkIn: booking.checkInDate || booking.checkIn,
+        checkOut: booking.checkOutDate || booking.checkOut,
+        guests: booking.guests || 1,
+        nights: booking.nights || 1,
+        pricePerNight: booking.pricePerNight || booking.totalPrice,
+        totalAmount: booking.totalPrice || booking.totalAmount || 0,
+        status: booking.status || 'Confirmed',
+        amenities: booking.amenities || ['WiFi'],
+        bookingDate: booking.createdAt || booking.bookingDate || new Date().toISOString()
+      }));
+
+      setBookings(transformedBookings);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+      setError("Failed to load bookings. Please try again later.");
+
+      // If API fails, show sample data as fallback
+      const sampleBookings = [
+        {
+          id: 'BK001',
+          roomType: 'Deluxe Suite',
+          roomNumber: '205',
+          checkIn: '2024-01-15',
+          checkOut: '2024-01-18',
+          guests: 2,
+          nights: 3,
+          pricePerNight: 15000,
+          totalAmount: 45000,
+          status: 'Confirmed',
+          amenities: ['WiFi', 'TV', 'Coffee'],
+          bookingDate: '2024-01-10'
+        },
+        {
+          id: 'BK002',
+          roomType: 'Standard Room',
+          roomNumber: '102',
+          checkIn: '2024-01-20',
+          checkOut: '2024-01-22',
+          guests: 1,
+          nights: 2,
+          pricePerNight: 8000,
+          totalAmount: 16000,
+          status: 'Pending',
+          amenities: ['WiFi', 'TV'],
+          bookingDate: '2024-01-12'
+        }
+      ];
+      setBookings(sampleBookings);
+    } finally {
+      setLoading(false);
+    }
+  }, [navigate]);
 
   useEffect(() => {
-    // Sample data for demonstration
-    const sampleBookings = [
-      {
-        id: 'BK001',
-        roomType: 'Deluxe Suite',
-        roomNumber: '205',
-        checkIn: '2024-01-15',
-        checkOut: '2024-01-18',
-        guests: 2,
-        nights: 3,
-        pricePerNight: 15000,
-        totalAmount: 45000,
-        status: 'Confirmed',
-        amenities: ['WiFi', 'TV', 'Coffee'],
-        bookingDate: '2024-01-10'
-      },
-      {
-        id: 'BK002',
-        roomType: 'Standard Room',
-        roomNumber: '102',
-        checkIn: '2024-01-20',
-        checkOut: '2024-01-22',
-        guests: 1,
-        nights: 2,
-        pricePerNight: 8000,
-        totalAmount: 16000,
-        status: 'Pending',
-        amenities: ['WiFi', 'TV'],
-        bookingDate: '2024-01-12'
-      }
-    ];
-
-    // Simulate API call
-    setTimeout(() => {
-      setBookings(sampleBookings);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    fetchBookings();
+  }, [fetchBookings]);
 
   const isUpcoming = (checkIn) => {
     return new Date(checkIn) >= new Date();
@@ -161,9 +205,31 @@ const MyBookings = () => {
                 Past
               </button>
             </div>
+            <div className="refresh-section">
+              <button
+                className="refresh-btn"
+                onClick={fetchBookings}
+                disabled={loading}
+              >
+                <FiRefreshCw className={loading ? 'spinning' : ''} />
+                Refresh
+              </button>
+            </div>
           </div>
         </div>
       </section>
+
+      {/* Error Message */}
+      {error && (
+        <section className="error-section">
+          <div className="container-fluid">
+            <div className="error-message">
+              <FiX />
+              {error}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Main Content */}
       <section className="bookings-content">

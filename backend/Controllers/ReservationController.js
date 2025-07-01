@@ -4,7 +4,7 @@ const PDFDocument = require('pdfkit');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('../config/stripe');
 
 // Create a new reservation
 exports.createReservation = async (req, res) => {
@@ -64,6 +64,12 @@ exports.createReservation = async (req, res) => {
     // Process payment with Stripe
     let paymentIntent;
     if (payment === 'card' && paymentMethodId) {
+      if (!stripe) {
+        return res.status(500).json({
+          error: 'Payment processing unavailable',
+          message: 'Stripe is not configured properly'
+        });
+      }
       try {
         // First create the payment intent
         paymentIntent = await stripe.paymentIntents.create({

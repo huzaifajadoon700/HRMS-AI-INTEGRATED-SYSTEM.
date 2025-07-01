@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Table, Form } from "react-bootstrap";
 import { initializeSocket, disconnectSocket } from "../services/socketService";
+import { apiConfig } from "../config/api";
 
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -22,7 +23,7 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:8080/api/orders");
+      const response = await axios.get(apiConfig.endpoints.orders);
       setOrders(response.data);
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -33,11 +34,12 @@ const AdminOrders = () => {
 
   const updateOrderStatus = async (orderId, status) => {
     try {
-      await axios.put(`http://localhost:8080/api/orders/${orderId}/status`, { status });
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      await axios.put(`${apiUrl}/orders/${orderId}/status`, { status });
       // Update local state immediately for better UX
-      setOrders(prevOrders => 
-        prevOrders.map(order => 
-          order._id === orderId 
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order._id === orderId
             ? { ...order, deliveryStatus: status }
             : order
         )
