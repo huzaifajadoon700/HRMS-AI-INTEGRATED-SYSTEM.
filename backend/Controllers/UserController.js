@@ -1,7 +1,18 @@
-// UserController.js - Handles user-related operations
+/**
+ * HRMS AI Integrated System - Enhanced User Controller
+ * Hotel and Restaurant Management System with AI-powered features
+ *
+ * @description Enhanced user controller with improved error handling and standardized responses
+ * @version 1.1.0
+ * @author HRMS Development Team
+ * @updated 2025-07-01 - Enhanced error handling and response standardization
+ */
 
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
+const { Logger, ErrorHandler, asyncHandler } = require("../utils/errorHandler");
+const ApiResponse = require("../utils/apiResponse");
+const Joi = require("joi");
 
 // Controller to get the authenticated user's profile
 exports.getProfile = async (req, res) => {
