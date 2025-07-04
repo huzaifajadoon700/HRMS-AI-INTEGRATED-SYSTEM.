@@ -1,44 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { 
-  FiTrendingUp, 
-  FiUsers, 
-  FiStar, 
-  FiEye, 
-  FiHeart,
-  FiBarChart2,
-  FiRefreshCw,
-  FiDownload
-} from 'react-icons/fi';
-import { Card, Row, Col, Table, Badge, Button, Alert, Spinner } from 'react-bootstrap';
-import './AdminManageRooms.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "./simple-admin.css";
 
 const RoomRecommendationAnalytics = () => {
-  const [analytics, setAnalytics] = useState(null);
-  const [popularRooms, setPopularRooms] = useState([]);
-  const [recentInteractions, setRecentInteractions] = useState([]);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [mlMetrics, setMlMetrics] = useState(null);
-  const [confusionMatrix, setConfusionMatrix] = useState(null);
-  const [mlServiceStatus, setMlServiceStatus] = useState(null);
+  const [rooms, setRooms] = useState([]);
+  const [analytics, setAnalytics] = useState({
+    totalRooms: 0,
+    totalBookings: 0,
+    averageRating: 0,
+    popularRoomType: "Standard",
+  });
 
   useEffect(() => {
-    fetchAnalytics();
-    fetchPopularRooms();
-    fetchRecentInteractions();
-    fetchMLMetrics();
-    fetchConfusionMatrix();
-    fetchMLServiceStatus();
-  }, []);
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+
+    if (!token || role !== "admin") {
+      toast.error("Please login as admin to access this page");
+      navigate("/login");
+      return;
+    }
+
+    fetchRoomAnalytics();
+  }, [navigate]);
 
   const fetchAnalytics = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const token = localStorage.getItem("token");
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       // Use the correct admin analytics endpoint
       const response = await axios.get(`${apiUrl}/admin/dashboard/analytics`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.data.success || response.data.analytics) {
@@ -48,8 +46,13 @@ const RoomRecommendationAnalytics = () => {
           totalRecommendations: analytics.rooms?.totalBookings || 1247,
           activeUsers: analytics.overview?.totalUsers || 89,
           clickThroughRate: 23.5, // This would need to be calculated from interaction data
-          conversionRate: analytics.rooms?.bookings > 0 ?
-            ((analytics.rooms.bookings / analytics.overview?.totalUsers || 1) * 100).toFixed(1) : 12.8
+          conversionRate:
+            analytics.rooms?.bookings > 0
+              ? (
+                  (analytics.rooms.bookings / analytics.overview?.totalUsers ||
+                    1) * 100
+                ).toFixed(1)
+              : 12.8,
         });
       } else {
         // Fallback to mock data if endpoint doesn't exist
@@ -57,24 +60,26 @@ const RoomRecommendationAnalytics = () => {
           totalRecommendations: 1247,
           activeUsers: 89,
           clickThroughRate: 23.5,
-          conversionRate: 12.8
+          conversionRate: 12.8,
         });
       }
     } catch (error) {
-      console.error('Error fetching analytics:', error);
+      console.error("Error fetching analytics:", error);
       // Provide mock data instead of error
       setAnalytics({
         totalRecommendations: 1247,
         activeUsers: 89,
         clickThroughRate: 23.5,
-        conversionRate: 12.8
+        conversionRate: 12.8,
       });
     }
   };
 
   const fetchPopularRooms = async () => {
     try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/rooms/popular?count=10`);
       if (response.data.success) {
         setPopularRooms(response.data.popularRooms);
@@ -82,46 +87,80 @@ const RoomRecommendationAnalytics = () => {
         // Fallback to regular rooms if popular endpoint doesn't work
         const roomsResponse = await axios.get(`${apiUrl}/rooms`);
         if (roomsResponse.data) {
-          const mockPopularRooms = roomsResponse.data.slice(0, 10).map((room, index) => ({
-            ...room,
-            score: (4.5 - index * 0.1).toFixed(1),
-            reason: index < 3 ? 'collaborative_filtering' : index < 6 ? 'content_based' : 'popularity'
-          }));
+          const mockPopularRooms = roomsResponse.data
+            .slice(0, 10)
+            .map((room, index) => ({
+              ...room,
+              score: (4.5 - index * 0.1).toFixed(1),
+              reason:
+                index < 3
+                  ? "collaborative_filtering"
+                  : index < 6
+                  ? "content_based"
+                  : "popularity",
+            }));
           setPopularRooms(mockPopularRooms);
         }
       }
     } catch (error) {
-      console.error('Error fetching popular rooms:', error);
+      console.error("Error fetching popular rooms:", error);
       // Try to fetch regular rooms as fallback
       try {
-        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const apiUrl =
+          process.env.REACT_APP_API_BASE_URL ||
+          "https://hrms-bace.vercel.app/api";
         const roomsResponse = await axios.get(`${apiUrl}/rooms`);
         if (roomsResponse.data) {
-          const mockPopularRooms = roomsResponse.data.slice(0, 10).map((room, index) => ({
-            ...room,
-            score: (4.5 - index * 0.1).toFixed(1),
-            reason: index < 3 ? 'collaborative_filtering' : index < 6 ? 'content_based' : 'popularity'
-          }));
+          const mockPopularRooms = roomsResponse.data
+            .slice(0, 10)
+            .map((room, index) => ({
+              ...room,
+              score: (4.5 - index * 0.1).toFixed(1),
+              reason:
+                index < 3
+                  ? "collaborative_filtering"
+                  : index < 6
+                  ? "content_based"
+                  : "popularity",
+            }));
           setPopularRooms(mockPopularRooms);
         }
       } catch (fallbackError) {
-        console.error('Error fetching fallback rooms:', fallbackError);
+        console.error("Error fetching fallback rooms:", fallbackError);
       }
     }
   };
 
   const fetchRecentInteractions = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       // This would need a new endpoint to get recent interactions across all users
       // For now, we'll simulate some data
       setRecentInteractions([
-        { id: 1, userId: 'user123', roomNumber: '101', type: 'view', timestamp: new Date() },
-        { id: 2, userId: 'user456', roomNumber: '201', type: 'booking', timestamp: new Date() },
-        { id: 3, userId: 'user789', roomNumber: '301', type: 'rating', timestamp: new Date() }
+        {
+          id: 1,
+          userId: "user123",
+          roomNumber: "101",
+          type: "view",
+          timestamp: new Date(),
+        },
+        {
+          id: 2,
+          userId: "user456",
+          roomNumber: "201",
+          type: "booking",
+          timestamp: new Date(),
+        },
+        {
+          id: 3,
+          userId: "user789",
+          roomNumber: "301",
+          type: "rating",
+          timestamp: new Date(),
+        },
       ]);
     } catch (error) {
-      console.error('Error fetching recent interactions:', error);
+      console.error("Error fetching recent interactions:", error);
     } finally {
       setLoading(false);
     }
@@ -129,71 +168,77 @@ const RoomRecommendationAnalytics = () => {
 
   const fetchMLMetrics = async () => {
     try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/rooms/ml/accuracy`);
       if (response.data.success) {
         setMlMetrics(response.data);
       }
     } catch (error) {
-      console.error('Error fetching ML metrics:', error);
+      console.error("Error fetching ML metrics:", error);
       setMlMetrics({
         success: false,
-        error: 'ML service not available',
-        real_model: false
+        error: "ML service not available",
+        real_model: false,
       });
     }
   };
 
   const fetchConfusionMatrix = async () => {
     try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/rooms/ml/confusion-matrix`);
       if (response.data.success) {
         setConfusionMatrix(response.data);
       }
     } catch (error) {
-      console.error('Error fetching confusion matrix:', error);
+      console.error("Error fetching confusion matrix:", error);
       setConfusionMatrix({
         success: false,
-        error: 'ML service not available'
+        error: "ML service not available",
       });
     }
   };
 
   const fetchMLServiceStatus = async () => {
     try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/rooms/ml/status`);
       if (response.data.success) {
         setMlServiceStatus(response.data);
       }
     } catch (error) {
-      console.error('Error fetching ML service status:', error);
+      console.error("Error fetching ML service status:", error);
       setMlServiceStatus({
         success: false,
-        error: 'ML service not available',
+        error: "ML service not available",
         model_loaded: false,
-        model_ready: false
+        model_ready: false,
       });
     }
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('en-PK', {
-      style: 'currency',
-      currency: 'PKR',
-      minimumFractionDigits: 0
+    return new Intl.NumberFormat("en-PK", {
+      style: "currency",
+      currency: "PKR",
+      minimumFractionDigits: 0,
     }).format(price);
   };
 
   const getInteractionBadge = (type) => {
     const badges = {
-      view: { color: 'info', icon: <FiEye size={12} /> },
-      booking: { color: 'success', icon: <FiHeart size={12} /> },
-      rating: { color: 'warning', icon: <FiStar size={12} /> },
-      inquiry: { color: 'secondary', icon: <FiUsers size={12} /> }
+      view: { color: "info", icon: <FiEye size={12} /> },
+      booking: { color: "success", icon: <FiHeart size={12} /> },
+      rating: { color: "warning", icon: <FiStar size={12} /> },
+      inquiry: { color: "secondary", icon: <FiUsers size={12} /> },
     };
-    
+
     const badge = badges[type] || badges.view;
     return (
       <Badge bg={badge.color} className="d-flex align-items-center gap-1">
@@ -264,9 +309,7 @@ const RoomRecommendationAnalytics = () => {
           <Card className="cosmic-card h-100">
             <Card.Body className="text-center">
               <FiUsers size={32} className="text-success mb-2" />
-              <h3 className="cosmic-number">
-                {analytics?.activeUsers || 0}
-              </h3>
+              <h3 className="cosmic-number">{analytics?.activeUsers || 0}</h3>
               <p className="text-muted">Active Users</p>
             </Card.Body>
           </Card>
@@ -329,12 +372,12 @@ const RoomRecommendationAnalytics = () => {
                         <td>
                           <Badge bg="primary">
                             <FiStar className="me-1" size={12} />
-                            {roomItem.score?.toFixed(1) || 'N/A'}
+                            {roomItem.score?.toFixed(1) || "N/A"}
                           </Badge>
                         </td>
                         <td>
                           <Badge bg="secondary">
-                            {roomItem.reason || 'popularity'}
+                            {roomItem.reason || "popularity"}
                           </Badge>
                         </td>
                       </tr>
@@ -358,12 +401,17 @@ const RoomRecommendationAnalytics = () => {
             <Card.Body>
               <div className="interaction-list">
                 {recentInteractions.map((interaction) => (
-                  <div key={interaction.id} className="interaction-item mb-3 p-2 border rounded">
+                  <div
+                    key={interaction.id}
+                    className="interaction-item mb-3 p-2 border rounded"
+                  >
                     <div className="d-flex justify-content-between align-items-center">
                       <div>
                         <strong>Room {interaction.roomNumber}</strong>
                         <br />
-                        <small className="text-muted">User: {interaction.userId}</small>
+                        <small className="text-muted">
+                          User: {interaction.userId}
+                        </small>
                       </div>
                       <div className="text-end">
                         {getInteractionBadge(interaction.type)}
@@ -396,14 +444,17 @@ const RoomRecommendationAnalytics = () => {
                 <Alert variant="success">
                   <h6>✅ Real SVD Model Active</h6>
                   <p className="mb-0">
-                    Room recommendation ML model is running with {mlServiceStatus.users_count} users and {mlServiceStatus.rooms_count} rooms.
+                    Room recommendation ML model is running with{" "}
+                    {mlServiceStatus.users_count} users and{" "}
+                    {mlServiceStatus.rooms_count} rooms.
                   </p>
                 </Alert>
               ) : (
                 <Alert variant="warning">
                   <h6>⚠️ ML Model Service Unavailable</h6>
                   <p className="mb-0">
-                    Using fallback hybrid algorithm. Start the ML service for real SVD recommendations.
+                    Using fallback hybrid algorithm. Start the ML service for
+                    real SVD recommendations.
                   </p>
                 </Alert>
               )}
@@ -412,13 +463,17 @@ const RoomRecommendationAnalytics = () => {
                 <Row className="mt-3">
                   <Col md={6}>
                     <div className="metric-item text-center">
-                      <h4 className="text-primary">{mlMetrics.rmse?.toFixed(4) || 'N/A'}</h4>
+                      <h4 className="text-primary">
+                        {mlMetrics.rmse?.toFixed(4) || "N/A"}
+                      </h4>
                       <p className="text-muted">RMSE Score</p>
                     </div>
                   </Col>
                   <Col md={6}>
                     <div className="metric-item text-center">
-                      <h4 className="text-success">{mlMetrics.mae?.toFixed(4) || 'N/A'}</h4>
+                      <h4 className="text-success">
+                        {mlMetrics.mae?.toFixed(4) || "N/A"}
+                      </h4>
                       <p className="text-muted">MAE Score</p>
                     </div>
                   </Col>
@@ -442,13 +497,19 @@ const RoomRecommendationAnalytics = () => {
                   <Row className="text-center mb-3">
                     <Col md={6}>
                       <div className="metric-item">
-                        <h5 className="text-success">{confusionMatrix.confusion_matrix?.true_positives || 0}</h5>
+                        <h5 className="text-success">
+                          {confusionMatrix.confusion_matrix?.true_positives ||
+                            0}
+                        </h5>
                         <small>True Positives</small>
                       </div>
                     </Col>
                     <Col md={6}>
                       <div className="metric-item">
-                        <h5 className="text-danger">{confusionMatrix.confusion_matrix?.false_positives || 0}</h5>
+                        <h5 className="text-danger">
+                          {confusionMatrix.confusion_matrix?.false_positives ||
+                            0}
+                        </h5>
                         <small>False Positives</small>
                       </div>
                     </Col>
@@ -456,13 +517,19 @@ const RoomRecommendationAnalytics = () => {
                   <Row className="text-center mb-3">
                     <Col md={6}>
                       <div className="metric-item">
-                        <h5 className="text-warning">{confusionMatrix.confusion_matrix?.false_negatives || 0}</h5>
+                        <h5 className="text-warning">
+                          {confusionMatrix.confusion_matrix?.false_negatives ||
+                            0}
+                        </h5>
                         <small>False Negatives</small>
                       </div>
                     </Col>
                     <Col md={6}>
                       <div className="metric-item">
-                        <h5 className="text-info">{confusionMatrix.confusion_matrix?.true_negatives || 0}</h5>
+                        <h5 className="text-info">
+                          {confusionMatrix.confusion_matrix?.true_negatives ||
+                            0}
+                        </h5>
                         <small>True Negatives</small>
                       </div>
                     </Col>
@@ -470,19 +537,34 @@ const RoomRecommendationAnalytics = () => {
                   <Row className="text-center">
                     <Col md={4}>
                       <div className="metric-item">
-                        <h6 className="text-primary">{(confusionMatrix.confusion_matrix?.accuracy * 100)?.toFixed(1) || 0}%</h6>
+                        <h6 className="text-primary">
+                          {(
+                            confusionMatrix.confusion_matrix?.accuracy * 100
+                          )?.toFixed(1) || 0}
+                          %
+                        </h6>
                         <small>Accuracy</small>
                       </div>
                     </Col>
                     <Col md={4}>
                       <div className="metric-item">
-                        <h6 className="text-success">{(confusionMatrix.confusion_matrix?.precision * 100)?.toFixed(1) || 0}%</h6>
+                        <h6 className="text-success">
+                          {(
+                            confusionMatrix.confusion_matrix?.precision * 100
+                          )?.toFixed(1) || 0}
+                          %
+                        </h6>
                         <small>Precision</small>
                       </div>
                     </Col>
                     <Col md={4}>
                       <div className="metric-item">
-                        <h6 className="text-warning">{(confusionMatrix.confusion_matrix?.recall * 100)?.toFixed(1) || 0}%</h6>
+                        <h6 className="text-warning">
+                          {(
+                            confusionMatrix.confusion_matrix?.recall * 100
+                          )?.toFixed(1) || 0}
+                          %
+                        </h6>
                         <small>Recall</small>
                       </div>
                     </Col>
@@ -490,7 +572,9 @@ const RoomRecommendationAnalytics = () => {
                 </div>
               ) : (
                 <Alert variant="warning">
-                  <p className="mb-0">Confusion matrix not available. ML service required.</p>
+                  <p className="mb-0">
+                    Confusion matrix not available. ML service required.
+                  </p>
                 </Alert>
               )}
             </Card.Body>
@@ -512,14 +596,14 @@ const RoomRecommendationAnalytics = () => {
               <Alert variant="info">
                 <h6>System Status: Active</h6>
                 <p className="mb-0">
-                  The room recommendation system is running smoothly with 1-month user history tracking.
-                  {mlServiceStatus?.model_ready ?
-                    ' Real SVD model providing collaborative filtering recommendations.' :
-                    ' Hybrid algorithm combining collaborative filtering, content-based filtering, and popularity-based recommendations.'
-                  }
+                  The room recommendation system is running smoothly with
+                  1-month user history tracking.
+                  {mlServiceStatus?.model_ready
+                    ? " Real SVD model providing collaborative filtering recommendations."
+                    : " Hybrid algorithm combining collaborative filtering, content-based filtering, and popularity-based recommendations."}
                 </p>
               </Alert>
-              
+
               <Row className="mt-3">
                 <Col md={4}>
                   <div className="metric-item">
