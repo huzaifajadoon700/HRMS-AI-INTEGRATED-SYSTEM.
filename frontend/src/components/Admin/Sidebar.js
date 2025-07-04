@@ -1,14 +1,40 @@
-  import React, { useState, useEffect } from "react";
- import "./sidebar.css"
+import React, { useState, useEffect } from "react";
+import "./sidebar.css";
 import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
-  FiHome, FiUser, FiLayers, FiGrid, FiShoppingCart, FiUsers,
-  FiBarChart, FiSettings, FiMenu, FiX, FiChevronDown, FiChevronRight,
-  FiLogOut, FiSearch, FiBell, FiMail, FiCalendar, FiTrendingUp,
-  FiActivity, FiStar, FiHeart, FiBookOpen, FiCoffee, FiMapPin,
-  FiClock, FiDollarSign, FiPieChart, FiTarget, FiGlobe,
-  FiPlus, FiEdit, FiTrash
+  FiHome,
+  FiUser,
+  FiLayers,
+  FiGrid,
+  FiShoppingCart,
+  FiUsers,
+  FiBarChart,
+  FiSettings,
+  FiMenu,
+  FiX,
+  FiChevronDown,
+  FiChevronRight,
+  FiLogOut,
+  FiSearch,
+  FiBell,
+  FiMail,
+  FiCalendar,
+  FiTrendingUp,
+  FiActivity,
+  FiStar,
+  FiHeart,
+  FiBookOpen,
+  FiCoffee,
+  FiMapPin,
+  FiClock,
+  FiDollarSign,
+  FiPieChart,
+  FiTarget,
+  FiGlobe,
+  FiPlus,
+  FiEdit,
+  FiTrash,
 } from "react-icons/fi";
 import "./EnhancedDashboardModule.css";
 import Dashboardmodule from "./dashboardmodule";
@@ -43,7 +69,7 @@ import TableRecommendationAnalytics from "./TableRecommendationAnalytics";
 import RecommendationEvaluation from "./RecommendationEvaluation";
 import RoomRecommendationAnalytics from "./RoomRecommendationAnalytics";
 
-const Dashboard = () => {
+const Sidebar = () => {
   const [selectedModule, setSelectedModule] = useState("Dashboard");
   const [userName, setUserName] = useState(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -80,29 +106,33 @@ const Dashboard = () => {
   // Close mobile menu when clicking outside or on escape
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (isMobileMenuOpen && !event.target.closest('.enhanced-sidebar') && !event.target.closest('.mobile-menu-toggle')) {
+      if (
+        isMobileMenuOpen &&
+        !event.target.closest(".enhanced-sidebar") &&
+        !event.target.closest(".mobile-menu-toggle")
+      ) {
         setIsMobileMenuOpen(false);
       }
     };
 
     const handleEscape = (event) => {
-      if (event.key === 'Escape' && isMobileMenuOpen) {
+      if (event.key === "Escape" && isMobileMenuOpen) {
         setIsMobileMenuOpen(false);
       }
     };
 
     if (isMobileMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.addEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'hidden'; // Prevent background scroll
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden"; // Prevent background scroll
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = "unset";
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
     };
   }, [isMobileMenuOpen]);
 
@@ -112,12 +142,12 @@ const Dashboard = () => {
       icon: FiHome,
       component: "Dashboard",
       badge: "Live",
-      badgeColor: "success"
+      badgeColor: "success",
     },
     {
       name: "User Profile",
       icon: FiUser,
-      component: "User Profile"
+      component: "User Profile",
     },
     {
       name: "Room Management",
@@ -127,7 +157,11 @@ const Dashboard = () => {
         { name: "Add Room", component: "AdminAddRoom", icon: FiPlus },
         { name: "Update Room", component: "AdminRoomUpdate", icon: FiEdit },
         { name: "Delete Room", component: "AdminDeleteRoom", icon: FiTrash },
-        { name: "ML Analytics", component: "RoomRecommendationAnalytics", icon: FiStar }
+        {
+          name: "ML Analytics",
+          component: "RoomRecommendationAnalytics",
+          icon: FiStar,
+        },
       ],
     },
     {
@@ -138,8 +172,12 @@ const Dashboard = () => {
         { name: "Add Menu", component: "AdminAddMenu", icon: FiPlus },
         { name: "Update Menu", component: "AdminUpdateMenu", icon: FiEdit },
         { name: "Delete Menu", component: "AdminDeleteMenu", icon: FiTrash },
-        { name: "ML Analytics", component: "RecommendationEvaluation", icon: FiStar }
-      ]
+        {
+          name: "ML Analytics",
+          component: "RecommendationEvaluation",
+          icon: FiStar,
+        },
+      ],
     },
     {
       name: "Table Management",
@@ -149,7 +187,11 @@ const Dashboard = () => {
         { name: "Add Table", component: "AdminAddTable", icon: FiPlus },
         { name: "Update Table", component: "AdminUpdateTable", icon: FiEdit },
         { name: "Delete Table", component: "AdminDeleteTable", icon: FiTrash },
-        { name: "Analytics", component: "TableRecommendationAnalytics", icon: FiTrendingUp }
+        {
+          name: "Analytics",
+          component: "TableRecommendationAnalytics",
+          icon: FiTrendingUp,
+        },
       ],
     },
     {
@@ -158,42 +200,79 @@ const Dashboard = () => {
       badge: notifications > 0 ? notifications.toString() : null,
       badgeColor: "warning",
       submenu: [
-        { name: "View Orders", component: "AdminOrders", icon: FiShoppingCart, route: "/admin/orders" },
-        { name: "Manage Bookings", component: "AdminManageBookings", icon: FiCalendar },
-        { name: "Manage Reservations", component: "AdminManageReservations", icon: FiMapPin }
-      ]
+        {
+          name: "View Orders",
+          component: "AdminOrders",
+          icon: FiShoppingCart,
+          route: "/admin/orders",
+        },
+        {
+          name: "Manage Bookings",
+          component: "AdminManageBookings",
+          icon: FiCalendar,
+        },
+        {
+          name: "Manage Reservations",
+          component: "AdminManageReservations",
+          icon: FiMapPin,
+        },
+      ],
     },
     {
       name: "Staff Management",
       icon: FiUsers,
       submenu: [
         { name: "Staff List", component: "StaffManagement", icon: FiUsers },
-        { name: "Shift Management", component: "ShiftManagement", icon: FiClock }
-      ]
+        {
+          name: "Shift Management",
+          component: "ShiftManagement",
+          icon: FiClock,
+        },
+      ],
     },
     {
       name: "Customer Management",
       icon: FiHeart,
-      component: "AdminCustomerManagement"
+      component: "AdminCustomerManagement",
     },
     {
       name: "Analytics & Reports",
       icon: FiBarChart,
       submenu: [
-        { name: "Business Reports", component: "ReportingAnalytics", icon: FiPieChart },
-        { name: "Sentiment Analysis", component: "SentimentAnalysis", icon: FiActivity },
+        {
+          name: "Business Reports",
+          component: "ReportingAnalytics",
+          icon: FiPieChart,
+        },
+        {
+          name: "Sentiment Analysis",
+          component: "SentimentAnalysis",
+          icon: FiActivity,
+        },
 
-        { name: "ML Evaluation", component: "RecommendationEvaluation", icon: FiStar }
-      ]
+        {
+          name: "ML Evaluation",
+          component: "RecommendationEvaluation",
+          icon: FiStar,
+        },
+      ],
     },
     {
       name: "Settings",
       icon: FiSettings,
       submenu: [
-        { name: "System Settings", component: "AdminSettings", icon: FiSettings },
-        { name: "Hotel Branding", component: "HotelBrandingSettings", icon: FiGlobe }
-      ]
-    }
+        {
+          name: "System Settings",
+          component: "AdminSettings",
+          icon: FiSettings,
+        },
+        {
+          name: "Hotel Branding",
+          component: "HotelBrandingSettings",
+          icon: FiGlobe,
+        },
+      ],
+    },
   ];
 
   const renderContent = () => {
@@ -267,98 +346,119 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="enhanced-dashboard-container">
+    <div className="admin-dashboard-container">
       {/* Mobile Menu Overlay */}
       <div
-        className={`mobile-overlay ${isMobileMenuOpen ? 'active' : ''}`}
+        className={`mobile-overlay ${isMobileMenuOpen ? "active" : ""}`}
         onClick={() => setIsMobileMenuOpen(false)}
-        style={{ display: isMobileMenuOpen ? 'block' : 'none' }}
+        style={{ display: isMobileMenuOpen ? "block" : "none" }}
       />
 
-      {/* Enhanced Sidebar */}
-      <aside className={`enhanced-sidebar ${isSidebarCollapsed ? "collapsed" : ""} ${isMobileMenuOpen ? "mobile-open" : ""}`}>
-
-        {/* Sidebar Toggle Button */}
-        <button
-          className="sidebar-toggle-btn"
-          onClick={toggleSidebar}
-          title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-        >
-          {isSidebarCollapsed ? <FiChevronRight /> : <FiChevronDown />}
-        </button>
-
-
-        {/* Admin Profile Section */}
-        {!isSidebarCollapsed && (
-          <div className="admin-profile">
-            <div className="profile-info">
-              <h4 className="profile-name">{userName || "Default Admin"}</h4>
-              <p className="profile-role">ADMINISTRATOR</p>
+      {/* Clean Sidebar */}
+      <aside
+        className={`admin-sidebar ${isSidebarCollapsed ? "collapsed" : ""}`}
+      >
+        {/* Sidebar Header */}
+        <div className="sidebar-header">
+          <div className="sidebar-logo">D</div>
+          {!isSidebarCollapsed && (
+            <div>
+              <h3 className="sidebar-title">Delisas</h3>
+              <p className="sidebar-subtitle">Dashboard</p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Navigation Menu */}
-        <div className="sidebar-menu">
-          <div className="menu-section">
-            <h6 className="menu-title">
-              <FiActivity className="section-icon" />
-              {!isSidebarCollapsed && "Main Modules"}
-            </h6>
-            <ul className="menu-list">
+        {/* Navigation */}
+        <nav className="sidebar-nav">
+          <div className="nav-section">
+            {!isSidebarCollapsed && (
+              <h6 className="nav-section-title" style={{ color: "#000000" }}>
+                Main Modules
+              </h6>
+            )}
+            <ul className="nav-list">
               {menuItems.map((item) => {
                 const IconComponent = item.icon;
-                const isActive = selectedModule === item.name || selectedModule === item.component;
+                const isActive =
+                  selectedModule === item.name ||
+                  selectedModule === item.component;
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const isDropdownOpen = openDropdown === item.name;
 
                 return (
                   <React.Fragment key={item.name}>
-                    <li
-                      className={`menu-item ${isActive ? "active" : ""} ${hasSubmenu ? "has-submenu" : ""}`}
-                      onClick={() => {
-                        if (hasSubmenu) {
-                          toggleDropdown(item.name);
-                        } else {
-                          setSelectedModule(item.component || item.name);
-                          // Close mobile menu when item is selected
-                          if (window.innerWidth <= 768) {
-                            setIsMobileMenuOpen(false);
+                    <li className="nav-item">
+                      <a
+                        href="#"
+                        className={`nav-link ${isActive ? "active" : ""}`}
+                        style={{
+                          color: "#000000 !important",
+                          textDecoration: "none",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.color = "#000000";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.color = "#000000";
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (hasSubmenu) {
+                            toggleDropdown(item.name);
+                          } else {
+                            setSelectedModule(item.component || item.name);
+                            if (window.innerWidth <= 768) {
+                              setIsMobileMenuOpen(false);
+                            }
                           }
-                        }
-                      }}
-                    >
-                      <div className="menu-item-content">
-                        <div className="menu-item-left">
-                          <div className="menu-icon">
-                            <IconComponent />
-                          </div>
-                          {!isSidebarCollapsed && (
-                            <span className="menu-text">{item.name}</span>
-                          )}
-                        </div>
-
+                        }}
+                      >
+                        <IconComponent
+                          className="nav-icon"
+                          style={{ color: "#000000 !important" }}
+                          onMouseEnter={(e) => {
+                            e.target.style.color = "#000000";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.color = "#000000";
+                          }}
+                        />
                         {!isSidebarCollapsed && (
-                          <div className="menu-item-right">
+                          <>
+                            <span style={{ color: "#000000 !important" }}>
+                              {item.name}
+                            </span>
                             {item.badge && (
-                              <span className={`menu-badge ${item.badgeColor || 'primary'}`}>
-                                {item.badge}
-                              </span>
+                              <span className="nav-badge">{item.badge}</span>
                             )}
                             {hasSubmenu && (
-                              <div className="dropdown-arrow">
-                                {isDropdownOpen ? <FiChevronDown /> : <FiChevronRight />}
-                              </div>
+                              <FiChevronDown
+                                className={`nav-chevron ${
+                                  isDropdownOpen ? "open" : ""
+                                }`}
+                                style={{ color: "#000000 !important" }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.color = "#000000";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.color = "#000000";
+                                }}
+                              />
                             )}
-                          </div>
+                          </>
                         )}
-                      </div>
+                      </a>
 
                       {isSidebarCollapsed && (
                         <div className="menu-tooltip">
                           <span>{item.name}</span>
                           {item.badge && (
-                            <span className={`tooltip-badge ${item.badgeColor || 'primary'}`}>
+                            <span
+                              className={`tooltip-badge ${
+                                item.badgeColor || "primary"
+                              }`}
+                            >
                               {item.badge}
                             </span>
                           )}
@@ -367,30 +467,51 @@ const Dashboard = () => {
                     </li>
 
                     {hasSubmenu && isDropdownOpen && !isSidebarCollapsed && (
-                      <ul className="submenu">
+                      <ul className="nav-submenu">
                         {item.submenu.map((subItem) => {
                           const SubIconComponent = subItem.icon || FiGrid;
-                          const isSubActive = selectedModule === subItem.component;
+                          const isSubActive =
+                            selectedModule === subItem.component;
 
                           return (
-                            <li
-                              key={subItem.name}
-                              className={`submenu-item ${isSubActive ? "active" : ""}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setSelectedModule(subItem.component);
-                                // Close mobile menu when submenu item is selected
-                                if (window.innerWidth <= 768) {
-                                  setIsMobileMenuOpen(false);
-                                }
-                              }}
-                            >
-                              <div className="submenu-item-content">
-                                <div className="submenu-icon">
-                                  <SubIconComponent />
-                                </div>
-                                <span className="submenu-text">{subItem.name}</span>
-                              </div>
+                            <li key={subItem.name} className="nav-item">
+                              <a
+                                href="#"
+                                className={`nav-link submenu-link ${
+                                  isSubActive ? "active" : ""
+                                }`}
+                                style={{
+                                  color: "#000000 !important",
+                                  textDecoration: "none",
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.target.style.color = "#000000";
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.target.style.color = "#000000";
+                                }}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setSelectedModule(subItem.component);
+                                  if (window.innerWidth <= 768) {
+                                    setIsMobileMenuOpen(false);
+                                  }
+                                }}
+                              >
+                                <SubIconComponent
+                                  className="nav-icon"
+                                  style={{ color: "#000000 !important" }}
+                                  onMouseEnter={(e) => {
+                                    e.target.style.color = "#000000";
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.target.style.color = "#000000";
+                                  }}
+                                />
+                                <span style={{ color: "#000000 !important" }}>
+                                  {subItem.name}
+                                </span>
+                              </a>
                             </li>
                           );
                         })}
@@ -401,127 +522,110 @@ const Dashboard = () => {
               })}
             </ul>
           </div>
-        </div>
 
-
+          {/* User Menu at Bottom */}
+          <div className="nav-section">
+            <div className="nav-item">
+              <div className="user-menu">
+                <div className="user-avatar">
+                  {(userName || "Admin").charAt(0).toUpperCase()}
+                </div>
+                {!isSidebarCollapsed && (
+                  <div className="user-info">
+                    <p className="user-name">{userName || "Default Admin"}</p>
+                    <p className="user-role">ADMINISTRATOR</p>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="nav-item">
+              <a
+                href="#"
+                className="nav-link"
+                style={{
+                  color: "#000000 !important",
+                  textDecoration: "none",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.color = "#000000";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.color = "#000000";
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleLogout();
+                }}
+              >
+                <FiLogOut
+                  className="nav-icon"
+                  style={{ color: "#000000 !important" }}
+                  onMouseEnter={(e) => {
+                    e.target.style.color = "#000000";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.color = "#000000";
+                  }}
+                />
+                {!isSidebarCollapsed && (
+                  <span style={{ color: "#000000 !important" }}>Logout</span>
+                )}
+              </a>
+            </div>
+          </div>
+        </nav>
       </aside>
 
-      {/* Enhanced Main Content */}
-      <main className="enhanced-main-content">
-        {/* Enhanced Top Navigation */}
-        <nav className="enhanced-navbar">
-          <div className="navbar-left">
+      {/* Main Content Area */}
+      <main
+        className={`admin-main ${
+          isSidebarCollapsed ? "sidebar-collapsed" : ""
+        }`}
+      >
+        {/* Top Header */}
+        <header className="admin-header">
+          <div className="header-left">
             <button
-              className="mobile-menu-toggle"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Toggle mobile menu"
+              className="header-btn"
+              onClick={toggleSidebar}
+              title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
             >
-              {isMobileMenuOpen ? <FiX /> : <FiMenu />}
+              <FiMenu />
             </button>
-            <div className="breadcrumb">
-              <FiHome className="breadcrumb-icon" />
-              <span className="breadcrumb-text">Dashboard</span>
-              {selectedModule !== "Dashboard" && (
-                <>
-                  <FiChevronRight className="breadcrumb-separator" />
-                  <span className="breadcrumb-current">{selectedModule}</span>
-                </>
-              )}
+            <div>
+              <h1 className="header-title">Hi, {userName || "Sarah"}!</h1>
+              <p className="header-subtitle">
+                Whole data about your business here.
+              </p>
             </div>
           </div>
 
-          <div className="navbar-center">
-            <div className="global-search">
+          <div className="header-right">
+            <div className="header-search">
               <FiSearch className="search-icon" />
               <input
                 type="text"
                 placeholder="Global search..."
                 className="search-input"
               />
-              <div className="search-shortcut">⌘K</div>
             </div>
-          </div>
 
-          <div className="navbar-right">
-            <div className="navbar-actions">
-              <div className="notification-btn">
-                <button className="action-btn" onClick={toggleNotification}>
-                  <FiBell className="action-icon" />
-                  {notifications > 0 && (
-                    <span className="notification-badge">{notifications}</span>
-                  )}
-                </button>
-                {isNotificationOpen && (
-                  <div className="notification-dropdown">
-                    <div className="notification-header">
-                      <h4>Notifications</h4>
-                      <span className="notification-count">{notifications} new</span>
-                    </div>
-                    <div className="notification-list">
-                      <div className="notification-item">
-                        <div className="notification-icon">
-                          <FiShoppingCart />
-                        </div>
-                        <div className="notification-content">
-                          <p>New order received</p>
-                          <span>2 minutes ago</span>
-                        </div>
-                      </div>
-                      <div className="notification-item">
-                        <div className="notification-icon">
-                          <FiCalendar />
-                        </div>
-                        <div className="notification-content">
-                          <p>Room booking confirmed</p>
-                          <span>5 minutes ago</span>
-                        </div>
-                      </div>
-                      <div className="notification-item">
-                        <div className="notification-icon">
-                          <FiUsers />
-                        </div>
-                        <div className="notification-content">
-                          <p>New staff member added</p>
-                          <span>10 minutes ago</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="notification-footer">
-                      <button className="view-all-btn">View All</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button className="action-btn mail-btn">
-                <FiMail className="action-icon" />
+            <div className="header-actions">
+              <button className="header-btn">
+                <FiBell />
               </button>
-
-              <div className="user-menu">
-                <div className="user-info">
-                  <div className="user-details">
-                    <span className="user-name">{userName || "Default Admin"}</span>
-                    <span className="user-role">ADMINISTRATOR</span>
-                  </div>
-                </div>
-                <button className="logout-button" onClick={handleLogout}>
-                  <FiLogOut className="logout-icon" />
-                  <span className="logout-text">Logout</span>
-                </button>
-              </div>
+              <button className="header-btn">
+                <FiMail />
+              </button>
             </div>
           </div>
-        </nav>
+        </header>
 
-        {/* Enhanced Content Wrapper */}
-        <div className="enhanced-content-wrapper">
-          <div className="content-container">
-            {renderContent()}
-          </div>
-        </div>
+        {/* Dashboard Content */}
+        <div className="admin-content">{renderContent()}</div>
       </main>
     </div>
   );
 };
 
-export default Dashboard;
+export default Sidebar;

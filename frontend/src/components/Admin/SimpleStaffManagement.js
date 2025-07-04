@@ -1,12 +1,7 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import "./simple-admin.css";
+import React, { useState, useEffect } from 'react';
+import './simple-admin.css';
 
-const StaffManagement = () => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
+const SimpleStaffManagement = () => {
   const [staff, setStaff] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [departmentFilter, setDepartmentFilter] = useState('All Departments');
@@ -24,37 +19,16 @@ const StaffManagement = () => {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-    
-    if (!token || role !== "admin") {
-      toast.error("Please login as admin to access this page");
-      navigate("/login");
-      return;
-    }
-
     fetchStaff();
-  }, [navigate]);
+  }, []);
 
   const fetchStaff = async () => {
     try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      const response = await axios.get(`${apiUrl}/staff`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setStaff(response.data);
+      const response = await fetch('/api/staff');
+      const data = await response.json();
+      setStaff(data);
     } catch (error) {
-      console.error("Error fetching staff:", error);
-      if (error.response?.status === 401) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        navigate("/login");
-      }
-      toast.error("Failed to fetch staff");
-    } finally {
-      setLoading(false);
+      console.error('Error fetching staff:', error);
     }
   };
 
@@ -68,24 +42,19 @@ const StaffManagement = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      const url = editingStaff ? `${apiUrl}/staff/${editingStaff._id}` : `${apiUrl}/staff`;
+      const url = editingStaff ? `/api/staff/${editingStaff.id}` : '/api/staff';
       const method = editingStaff ? 'PUT' : 'POST';
       
-      await axios({
+      await fetch(url, {
         method,
-        url,
-        data: formData,
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
       });
       
-      toast.success(editingStaff ? "Staff updated successfully" : "Staff added successfully");
       fetchStaff();
       resetForm();
     } catch (error) {
-      console.error("Error saving staff:", error);
-      toast.error("Failed to save staff");
+      console.error('Error saving staff:', error);
     }
   };
 
@@ -95,19 +64,13 @@ const StaffManagement = () => {
     setShowAddForm(true);
   };
 
-  const handleDelete = async (staffId) => {
+  const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this staff member?')) {
       try {
-        const token = localStorage.getItem("token");
-        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-        await axios.delete(`${apiUrl}/staff/${staffId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        toast.success("Staff deleted successfully");
+        await fetch(`/api/staff/${id}`, { method: 'DELETE' });
         fetchStaff();
       } catch (error) {
-        console.error("Error deleting staff:", error);
-        toast.error("Failed to delete staff");
+        console.error('Error deleting staff:', error);
       }
     }
   };
@@ -134,13 +97,41 @@ const StaffManagement = () => {
     return matchesSearch && matchesDepartment;
   });
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  const staffStats = {
+    total: staff.length,
+    active: staff.filter(s => s.status === 'Active').length,
+    inactive: staff.filter(s => s.status === 'Inactive').length,
+    departments: [...new Set(staff.map(s => s.department))].length
+  };
 
   return (
     <div className="simple-admin-container">
       <div className="simple-admin-header">
         <h1>Staff Management</h1>
         <p>Manage staff members and their information</p>
+      </div>
+
+      <div className="simple-stats-grid">
+        <div className="simple-stat-card">
+          <h3>Total Staff</h3>
+          <div className="stat-number">{staffStats.total}</div>
+          <div className="stat-label">All Staff</div>
+        </div>
+        <div className="simple-stat-card">
+          <h3>Active Staff</h3>
+          <div className="stat-number">{staffStats.active}</div>
+          <div className="stat-label">Currently Active</div>
+        </div>
+        <div className="simple-stat-card">
+          <h3>Inactive Staff</h3>
+          <div className="stat-number">{staffStats.inactive}</div>
+          <div className="stat-label">Not Active</div>
+        </div>
+        <div className="simple-stat-card">
+          <h3>Departments</h3>
+          <div className="stat-number">{staffStats.departments}</div>
+          <div className="stat-label">Total Departments</div>
+        </div>
       </div>
 
       <div className="simple-admin-controls">
@@ -282,13 +273,13 @@ const StaffManagement = () => {
           </thead>
           <tbody>
             {filteredStaff.map(member => (
-              <tr key={member._id}>
+              <tr key={member.id}>
                 <td>{member.name}</td>
                 <td>{member.email}</td>
                 <td>{member.phone || 'N/A'}</td>
                 <td>{member.department}</td>
                 <td>{member.position}</td>
-                <td>Rs. {member.salary || 'N/A'}</td>
+                <td>${member.salary || 'N/A'}</td>
                 <td>{member.hireDate || 'N/A'}</td>
                 <td>
                   <span className={`simple-status simple-status-${member.status?.toLowerCase()}`}>
@@ -304,7 +295,7 @@ const StaffManagement = () => {
                       Edit
                     </button>
                     <button 
-                      onClick={() => handleDelete(member._id)}
+                      onClick={() => handleDelete(member.id)}
                       className="simple-btn simple-btn-small simple-btn-danger"
                     >
                       Delete
@@ -316,20 +307,8 @@ const StaffManagement = () => {
           </tbody>
         </table>
       </div>
-
-      {filteredStaff.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <p>No staff members found.</p>
-          <button 
-            onClick={() => setShowAddForm(true)}
-            className="simple-btn simple-btn-primary"
-          >
-            Add First Staff Member
-          </button>
-        </div>
-      )}
     </div>
   );
 };
 
-export default StaffManagement;
+export default SimpleStaffManagement;

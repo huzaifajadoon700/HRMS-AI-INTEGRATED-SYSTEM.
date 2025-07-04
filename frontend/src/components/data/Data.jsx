@@ -28,8 +28,8 @@ export const navList = [
         id: 42,
         path: "/my-reservations",
         text: "My Reservations",
-      }
-    ]
+      },
+    ],
   },
   {
     id: 5,
@@ -86,7 +86,7 @@ export const carouselData = [
     subtitle: "Your Perfect Stay Awaits",
     btn1: "Book Room",
     btn2: "Reserve Table",
-  }
+  },
 ];
 // Note: This data is now dynamic and should be replaced with useHotelStats() hook in components
 // Keeping this as fallback data only

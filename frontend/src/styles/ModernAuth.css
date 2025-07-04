@@ -1,52 +1,53 @@
-/* Modern Authentication Styles */
+/* Clean Authentication Styles - shadcn/ui inspired */
 
 .modern-auth-container {
   min-height: 100vh;
   position: relative;
-  overflow: hidden;
+  background: var(--primary-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-lg);
 }
 
 .auth-background {
   position: relative;
   z-index: 1;
-}
-
-/* Floating Animation Elements */
-.floating-elements {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 2;
+  max-width: 400px;
 }
 
-.floating-star, .floating-heart {
-  position: absolute;
-  color: rgba(255, 255, 255, 0.3);
-  animation: float 6s ease-in-out infinite;
+/* Clean Auth Card */
+.auth-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--spacing-2xl);
+  width: 100%;
 }
 
-.star-1 {
-  top: 20%;
-  left: 10%;
-  font-size: 24px;
-  animation-delay: 0s;
+.auth-header {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
 }
 
-.heart-1 {
-  top: 60%;
-  right: 15%;
-  font-size: 20px;
-  animation-delay: 2s;
+.auth-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-sm);
 }
 
-.star-2 {
-  bottom: 30%;
-  left: 20%;
-  font-size: 18px;
-  animation-delay: 4s;
+.auth-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* Remove floating elements for clean design */
+.floating-elements {
+  display: none;
 }
 
 .heart-2 {
@@ -57,8 +58,15 @@
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-  50% { transform: translateY(-20px) rotate(180deg); opacity: 0.7; }
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+    opacity: 0.7;
+  }
 }
 
 /* Modern Auth Card */
@@ -97,9 +105,15 @@
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .auth-title {
@@ -209,7 +223,7 @@
 }
 
 .divider-modern::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 0;
@@ -266,18 +280,19 @@
   .auth-title {
     font-size: 1.75rem;
   }
-  
+
   .logo-circle {
     width: 60px;
     height: 60px;
   }
-  
+
   .modern-auth-card {
     margin: 1rem;
     border-radius: 16px;
   }
-  
-  .floating-star, .floating-heart {
+
+  .floating-star,
+  .floating-heart {
     display: none;
   }
 }

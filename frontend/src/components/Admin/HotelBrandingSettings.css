@@ -2,13 +2,13 @@
 
 /* Ensure CSS Variables are Available */
 :root {
-  --primary-bg: #0A192F;
+  --primary-bg: #0a192f;
   --secondary-bg: #112240;
   --accent-primary: #64ffda;
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.8);
   --border-color: rgba(255, 255, 255, 0.1);
-  --bg-primary: #0A192F;
+  --bg-primary: #0a192f;
 }
 
 /* Ensure body can scroll */
@@ -26,7 +26,7 @@ body {
   padding-left: 280px;
   padding-bottom: 100px;
   box-sizing: border-box;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Header Section - Following AdminViewRooms pattern */
@@ -259,8 +259,12 @@ body {
 }
 
 /* Professional styling for all full-width fields */
-.enhanced-admin-settings-module-container .setting-group.full-width .enhanced-textarea,
-.enhanced-admin-settings-module-container .setting-group.full-width .enhanced-input,
+.enhanced-admin-settings-module-container
+  .setting-group.full-width
+  .enhanced-textarea,
+.enhanced-admin-settings-module-container
+  .setting-group.full-width
+  .enhanced-input,
 .enhanced-admin-settings-module-container textarea.enhanced-textarea,
 .enhanced-admin-settings-module-container input.enhanced-input {
   display: block !important;
@@ -279,7 +283,9 @@ body {
 }
 
 /* Specific textarea styling */
-.enhanced-admin-settings-module-container .setting-group.full-width .enhanced-textarea,
+.enhanced-admin-settings-module-container
+  .setting-group.full-width
+  .enhanced-textarea,
 .enhanced-admin-settings-module-container textarea.enhanced-textarea {
   min-height: 120px !important;
   height: auto !important;
@@ -354,8 +360,12 @@ body {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Ensure section actions are visible */
@@ -370,7 +380,9 @@ body {
 }
 
 /* Collapsed Sidebar Support */
-.enhanced-sidebar.collapsed ~ .enhanced-main-content .enhanced-admin-settings-module-container {
+.enhanced-sidebar.collapsed
+  ~ .enhanced-main-content
+  .enhanced-admin-settings-module-container {
   padding-left: 80px !important;
 }
 

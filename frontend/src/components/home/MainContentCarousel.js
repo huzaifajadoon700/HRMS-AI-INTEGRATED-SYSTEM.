@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { FiHome, FiCoffee, FiCalendar, FiStar } from "react-icons/fi";
 import { BsShieldCheck, BsAward, BsClock } from "react-icons/bs";
 import { useHotelInfo, useHeroContent } from "../../hooks/useHotelInfo";
-import './MainContentCarousel.css';
+import "./MainContentCarousel.css";
 
 const MainContentCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -17,18 +17,18 @@ const MainContentCarousel = () => {
 
   // Debug: Check if router context is available
   useEffect(() => {
-    console.log('Router context available:', !!navigate);
-    console.log('Current location:', location.pathname);
+    console.log("Router context available:", !!navigate);
+    console.log("Current location:", location.pathname);
   }, [navigate, location]);
 
   const handleNavigation = (path, event) => {
     event.preventDefault();
     event.stopPropagation();
-    console.log('Navigating to:', path); // Debug log
+    console.log("Navigating to:", path); // Debug log
     try {
       navigate(path);
     } catch (error) {
-      console.error('Navigation error:', error);
+      console.error("Navigation error:", error);
       // Fallback to window.location if navigate fails
       window.location.href = path;
     }
@@ -36,23 +36,26 @@ const MainContentCarousel = () => {
 
   const heroSlides = [
     {
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop",
       title: heroContent.mainTitle,
       subtitle: heroContent.subtitle,
-      description: heroContent.description
+      description: heroContent.description,
     },
     {
-      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=2070&auto=format&fit=crop",
       title: "Culinary Excellence Awaits",
       subtitle: "AUTHENTIC FLAVORS",
-      description: `Finest cuisine at ${hotelInfo.hotelName}`
+      description: `Finest cuisine at ${hotelInfo.hotelName}`,
     },
     {
-      image: "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=2070&auto=format&fit=crop",
+      image:
+        "https://images.unsplash.com/photo-1551632811-561732d1e306?q=80&w=2070&auto=format&fit=crop",
       title: "Elegant Dining Experience",
       subtitle: "RESERVE YOUR TABLE",
-      description: `Beautiful restaurants with city views at ${hotelInfo.hotelName}`
-    }
+      description: `Beautiful restaurants with city views at ${hotelInfo.hotelName}`,
+    },
   ];
 
   useEffect(() => {
@@ -64,12 +67,14 @@ const MainContentCarousel = () => {
   }, [heroSlides.length]);
 
   return (
-    <div className={`hero-section ${isLoaded ? 'loaded' : ''}`}>
+    <div className={`hero-section ${isLoaded ? "loaded" : ""}`}>
       {/* Background Images with Parallax Effect */}
       {heroSlides.map((slide, index) => (
         <div
           key={index}
-          className={`hero-background ${index === currentSlide ? 'active' : ''}`}
+          className={`hero-background ${
+            index === currentSlide ? "active" : ""
+          }`}
           style={{ backgroundImage: `url(${slide.image})` }}
         />
       ))}
@@ -95,18 +100,20 @@ const MainContentCarousel = () => {
 
         <p className="hero-subtitle">{heroSlides[currentSlide].subtitle}</p>
         <h1 className="hero-title">{heroSlides[currentSlide].title}</h1>
-        <p className="hero-description">{heroSlides[currentSlide].description}</p>
+        <p className="hero-description">
+          {heroSlides[currentSlide].description}
+        </p>
 
         {/* Enhanced Action Buttons */}
         <div className="hero-buttons">
           <button
-            onClick={(e) => handleNavigation('/rooms', e)}
+            onClick={(e) => handleNavigation("/rooms", e)}
             className="hero-btn primary book-room"
             type="button"
             style={{
-              pointerEvents: 'auto',
-              position: 'relative',
-              zIndex: 1000
+              pointerEvents: "auto",
+              position: "relative",
+              zIndex: 1000,
             }}
           >
             <div className="btn-icon">
@@ -118,13 +125,13 @@ const MainContentCarousel = () => {
           </button>
 
           <button
-            onClick={(e) => handleNavigation('/order-food', e)}
+            onClick={(e) => handleNavigation("/order-food", e)}
             className="hero-btn secondary order-food"
             type="button"
             style={{
-              pointerEvents: 'auto',
-              position: 'relative',
-              zIndex: 1000
+              pointerEvents: "auto",
+              position: "relative",
+              zIndex: 1000,
             }}
           >
             <div className="btn-icon">
@@ -136,13 +143,13 @@ const MainContentCarousel = () => {
           </button>
 
           <button
-            onClick={(e) => handleNavigation('/reserve-table', e)}
+            onClick={(e) => handleNavigation("/reserve-table", e)}
             className="hero-btn tertiary reserve-table"
             type="button"
             style={{
-              pointerEvents: 'auto',
-              position: 'relative',
-              zIndex: 1000
+              pointerEvents: "auto",
+              position: "relative",
+              zIndex: 1000,
             }}
           >
             <div className="btn-icon">
@@ -176,14 +183,12 @@ const MainContentCarousel = () => {
         {heroSlides.map((_, index) => (
           <button
             key={index}
-            className={`indicator ${index === currentSlide ? 'active' : ''}`}
+            className={`indicator ${index === currentSlide ? "active" : ""}`}
             onClick={() => setCurrentSlide(index)}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
-
-
     </div>
   );
 };

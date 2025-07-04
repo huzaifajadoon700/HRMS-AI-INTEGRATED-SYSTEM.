@@ -1,621 +1,311 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import {
-  FiSettings, FiSave, FiRefreshCw, FiGlobe, FiMail, FiUsers,
-  FiBell, FiShield, FiDatabase, FiServer, FiLock, FiEye,
-  FiToggleLeft, FiToggleRight, FiCheck, FiX, FiEdit,
-  FiMonitor, FiSmartphone, FiTablet, FiWifi, FiClock
-} from 'react-icons/fi';
-import './AdminManageRooms.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "./simple-admin.css";
 
-const AdminSettings = () => {
+const Setting = () => {
   const navigate = useNavigate();
-  const [settings, setSettings] = useState({
-    siteName: 'Hotel Management System',
-    adminEmail: 'admin@hotelms.com',
-    siteStatus: true,
-    notifications: true,
-    emailNotifications: true,
-    smsNotifications: false,
-    maxUsers: 100,
-    maxRooms: 50,
-    currency: 'PKR',
-    timezone: 'Asia/Karachi',
-    language: 'en',
-    theme: 'dark',
-    maintenanceMode: false,
-    backupFrequency: 'daily',
-    sessionTimeout: 30,
-    passwordPolicy: true,
-    twoFactorAuth: false,
-    apiAccess: true
-  });
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
+  const [settings, setSettings] = useState({
+    // General Settings
+    hotelName: '',
+    hotelAddress: '',
+    hotelPhone: '',
+    hotelEmail: '',
+    currency: 'PKR',
+    timezone: 'Asia/Karachi',
+    
+    // Booking Settings
+    checkInTime: '14:00',
+    checkOutTime: '12:00',
+    maxAdvanceBooking: 365,
+    cancellationPolicy: '24 hours',
+    
+    // Payment Settings
+    taxRate: 16,
+    serviceCharge: 10,
+    paymentMethods: ['Cash', 'Card', 'Bank Transfer'],
+    
+    // Notification Settings
+    emailNotifications: true,
+    smsNotifications: false,
+    bookingConfirmation: true,
+    paymentReminders: true,
+    
+    // System Settings
+    maintenanceMode: false,
+    backupFrequency: 'daily',
+    sessionTimeout: 30
+  });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-
+    
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
       return;
     }
+
+    fetchSettings();
   }, [navigate]);
 
-  // Handle change in input fields
-  const handleChange = (e) => {
+  const fetchSettings = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const response = await axios.get(`${apiUrl}/settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSettings({ ...settings, ...response.data });
+    } catch (error) {
+      console.error("Error fetching settings:", error);
+      // Keep default settings if API fails
+    }
+  };
+
+  const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setSettings({
       ...settings,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'checkbox' ? checked : value
     });
   };
 
-  // Handle save button click
-  const handleSave = () => {
-    // Basic validation
-    if (!settings.siteName || !settings.adminEmail || !settings.maxUsers) {
-      toast.error('Please fill out all required fields.');
-      return;
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(settings.adminEmail)) {
-      toast.error('Please enter a valid email address.');
-      return;
-    }
-
-    // Simulate saving process
+  const handleSave = async () => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast.success('Settings saved successfully!');
-
-      // Save settings logic (e.g., send a POST request to your backend)
-      console.log('Settings saved:', settings);
-    }, 1500);
-  };
-
-  const handleReset = () => {
-    if (window.confirm('Are you sure you want to reset all settings to default values?')) {
-      setSettings({
-        siteName: 'Hotel Management System',
-        adminEmail: 'admin@hotelms.com',
-        siteStatus: true,
-        notifications: true,
-        emailNotifications: true,
-        smsNotifications: false,
-        maxUsers: 100,
-        maxRooms: 50,
-        currency: 'PKR',
-        timezone: 'Asia/Karachi',
-        language: 'en',
-        theme: 'dark',
-        maintenanceMode: false,
-        backupFrequency: 'daily',
-        sessionTimeout: 30,
-        passwordPolicy: true,
-        twoFactorAuth: false,
-        apiAccess: true
+    try {
+      const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      
+      await axios.put(`${apiUrl}/settings`, settings, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Settings reset to default values!');
+      
+      toast.success("Settings saved successfully");
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      toast.error("Failed to save settings");
+    } finally {
+      setLoading(false);
     }
   };
+
+  const renderGeneralSettings = () => (
+    <div className="simple-form">
+      <h3>General Settings</h3>
+      <div className="simple-form-row">
+        <input
+          type="text"
+          name="hotelName"
+          placeholder="Hotel Name"
+          value={settings.hotelName}
+          onChange={handleInputChange}
+        />
+        <input
+          type="email"
+          name="hotelEmail"
+          placeholder="Hotel Email"
+          value={settings.hotelEmail}
+          onChange={handleInputChange}
+        />
+      </div>
+      <div className="simple-form-row">
+        <input
+          type="tel"
+          name="hotelPhone"
+          placeholder="Hotel Phone"
+          value={settings.hotelPhone}
+          onChange={handleInputChange}
+        />
+        <select
+          name="currency"
+          value={settings.currency}
+          onChange={handleInputChange}
+        >
+          <option value="PKR">Pakistani Rupee (PKR)</option>
+          <option value="USD">US Dollar (USD)</option>
+          <option value="EUR">Euro (EUR)</option>
+        </select>
+      </div>
+      <textarea
+        name="hotelAddress"
+        placeholder="Hotel Address"
+        value={settings.hotelAddress}
+        onChange={handleInputChange}
+        rows="3"
+      />
+    </div>
+  );
+
+  const renderBookingSettings = () => (
+    <div className="simple-form">
+      <h3>Booking Settings</h3>
+      <div className="simple-form-row">
+        <input
+          type="time"
+          name="checkInTime"
+          value={settings.checkInTime}
+          onChange={handleInputChange}
+        />
+        <input
+          type="time"
+          name="checkOutTime"
+          value={settings.checkOutTime}
+          onChange={handleInputChange}
+        />
+      </div>
+      <div className="simple-form-row">
+        <input
+          type="number"
+          name="maxAdvanceBooking"
+          placeholder="Max Advance Booking (days)"
+          value={settings.maxAdvanceBooking}
+          onChange={handleInputChange}
+        />
+        <select
+          name="cancellationPolicy"
+          value={settings.cancellationPolicy}
+          onChange={handleInputChange}
+        >
+          <option value="24 hours">24 Hours</option>
+          <option value="48 hours">48 Hours</option>
+          <option value="72 hours">72 Hours</option>
+          <option value="No cancellation">No Cancellation</option>
+        </select>
+      </div>
+    </div>
+  );
+
+  const renderPaymentSettings = () => (
+    <div className="simple-form">
+      <h3>Payment Settings</h3>
+      <div className="simple-form-row">
+        <input
+          type="number"
+          name="taxRate"
+          placeholder="Tax Rate (%)"
+          value={settings.taxRate}
+          onChange={handleInputChange}
+        />
+        <input
+          type="number"
+          name="serviceCharge"
+          placeholder="Service Charge (%)"
+          value={settings.serviceCharge}
+          onChange={handleInputChange}
+        />
+      </div>
+      <div style={{ marginTop: '20px' }}>
+        <h4>Payment Methods</h4>
+        <div style={{ display: 'flex', gap: '20px', marginTop: '10px' }}>
+          {['Cash', 'Card', 'Bank Transfer', 'Online Payment'].map(method => (
+            <label key={method} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <input
+                type="checkbox"
+                checked={settings.paymentMethods.includes(method)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSettings({
+                      ...settings,
+                      paymentMethods: [...settings.paymentMethods, method]
+                    });
+                  } else {
+                    setSettings({
+                      ...settings,
+                      paymentMethods: settings.paymentMethods.filter(m => m !== method)
+                    });
+                  }
+                }}
+              />
+              {method}
+            </label>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderNotificationSettings = () => (
+    <div className="simple-form">
+      <h3>Notification Settings</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        {[
+          { key: 'emailNotifications', label: 'Email Notifications' },
+          { key: 'smsNotifications', label: 'SMS Notifications' },
+          { key: 'bookingConfirmation', label: 'Booking Confirmation' },
+          { key: 'paymentReminders', label: 'Payment Reminders' }
+        ].map(item => (
+          <label key={item.key} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <input
+              type="checkbox"
+              name={item.key}
+              checked={settings[item.key]}
+              onChange={handleInputChange}
+            />
+            {item.label}
+          </label>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="enhanced-admin-settings-module-container">
-      {/* Enhanced Header */}
-      <div className="enhanced-settings-header">
-        <div className="header-content">
-          <div className="title-section">
-            <div className="title-wrapper">
-              <div className="title-icon">
-                <FiSettings />
-              </div>
-              <div className="title-text">
-                <h1 className="page-title">System Settings</h1>
-                <p className="page-subtitle">Configure and manage your hotel management system</p>
-              </div>
-            </div>
+    <div className="simple-admin-container">
+      <div className="simple-admin-header">
+        <h1>Settings</h1>
+        <p>Configure system settings and preferences</p>
+      </div>
 
-            <div className="header-actions">
-              <button
-                className="action-btn secondary"
-                onClick={handleReset}
-                disabled={loading}
-              >
-                <FiRefreshCw className={loading ? 'spinning' : ''} />
-                <span>Reset to Default</span>
-              </button>
-
-              <button
-                className="action-btn primary"
-                onClick={handleSave}
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <FiRefreshCw className="spinning" />
-                    <span>Saving...</span>
-                  </>
-                ) : (
-                  <>
-                    <FiSave />
-                    <span>Save Settings</span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
+      {/* Tab Navigation */}
+      <div style={{ marginBottom: '30px' }}>
+        <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid #e5e7eb' }}>
+          {[
+            { key: 'general', label: 'General' },
+            { key: 'booking', label: 'Booking' },
+            { key: 'payment', label: 'Payment' },
+            { key: 'notifications', label: 'Notifications' }
+          ].map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`simple-btn ${activeTab === tab.key ? 'simple-btn-primary' : 'simple-btn-secondary'}`}
+              style={{ borderRadius: '0', borderBottom: 'none' }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Enhanced Content */}
-      <div className="enhanced-settings-content">
-        <div className="content-container">
-          <div className="settings-layout">
-            {/* Settings Navigation */}
-            <div className="settings-nav">
-              <div className="nav-header">
-                <h3>Settings Categories</h3>
-              </div>
-              <div className="nav-items">
-                <button
-                  className={`nav-item ${activeTab === 'general' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('general')}
-                >
-                  <FiGlobe className="nav-icon" />
-                  <span>General</span>
-                </button>
-                <button
-                  className={`nav-item ${activeTab === 'notifications' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('notifications')}
-                >
-                  <FiBell className="nav-icon" />
-                  <span>Notifications</span>
-                </button>
-                <button
-                  className={`nav-item ${activeTab === 'security' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('security')}
-                >
-                  <FiShield className="nav-icon" />
-                  <span>Security</span>
-                </button>
-                <button
-                  className={`nav-item ${activeTab === 'system' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('system')}
-                >
-                  <FiServer className="nav-icon" />
-                  <span>System</span>
-                </button>
-                <button
-                  className={`nav-item ${activeTab === 'appearance' ? 'active' : ''}`}
-                  onClick={() => setActiveTab('appearance')}
-                >
-                  <FiMonitor className="nav-icon" />
-                  <span>Appearance</span>
-                </button>
-              </div>
-            </div>
+      {/* Tab Content */}
+      <div className="simple-form-container">
+        {activeTab === 'general' && renderGeneralSettings()}
+        {activeTab === 'booking' && renderBookingSettings()}
+        {activeTab === 'payment' && renderPaymentSettings()}
+        {activeTab === 'notifications' && renderNotificationSettings()}
 
-            {/* Settings Content */}
-            <div className="settings-content">
-              {activeTab === 'general' && (
-                <div className="settings-section">
-                  <div className="section-header">
-                    <h2>General Settings</h2>
-                    <p>Basic configuration for your hotel management system</p>
-                  </div>
-
-                  <div className="settings-grid">
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiGlobe className="label-icon" />
-                        Site Name
-                        <span className="required">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="enhanced-input"
-                        name="siteName"
-                        value={settings.siteName}
-                        onChange={handleChange}
-                        placeholder="Enter site name"
-                      />
-                    </div>
-
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiMail className="label-icon" />
-                        Admin Email
-                        <span className="required">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        className="enhanced-input"
-                        name="adminEmail"
-                        value={settings.adminEmail}
-                        onChange={handleChange}
-                        placeholder="Enter admin email"
-                      />
-                    </div>
-
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiUsers className="label-icon" />
-                        Maximum Users
-                      </label>
-                      <input
-                        type="number"
-                        className="enhanced-input"
-                        name="maxUsers"
-                        value={settings.maxUsers}
-                        onChange={handleChange}
-                        min="1"
-                        max="1000"
-                      />
-                    </div>
-
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiGlobe className="label-icon" />
-                        Maximum Rooms
-                      </label>
-                      <input
-                        type="number"
-                        className="enhanced-input"
-                        name="maxRooms"
-                        value={settings.maxRooms}
-                        onChange={handleChange}
-                        min="1"
-                        max="500"
-                      />
-                    </div>
-
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiGlobe className="label-icon" />
-                        Currency
-                      </label>
-                      <select
-                        className="enhanced-select"
-                        name="currency"
-                        value={settings.currency}
-                        onChange={handleChange}
-                      >
-                        <option value="PKR">Pakistani Rupee (PKR)</option>
-                        <option value="USD">US Dollar (USD)</option>
-                        <option value="EUR">Euro (EUR)</option>
-                        <option value="GBP">British Pound (GBP)</option>
-                      </select>
-                    </div>
-
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiGlobe className="label-icon" />
-                        Timezone
-                      </label>
-                      <select
-                        className="enhanced-select"
-                        name="timezone"
-                        value={settings.timezone}
-                        onChange={handleChange}
-                      >
-                        <option value="Asia/Karachi">Asia/Karachi</option>
-                        <option value="UTC">UTC</option>
-                        <option value="America/New_York">America/New_York</option>
-                        <option value="Europe/London">Europe/London</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="toggle-settings">
-                    <div className="toggle-group">
-                      <div className="toggle-info">
-                        <h4>Site Status</h4>
-                        <p>Enable or disable the entire website</p>
-                      </div>
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          name="siteStatus"
-                          checked={settings.siteStatus}
-                          onChange={handleChange}
-                        />
-                        <span className="toggle-slider">
-                          <span className="toggle-button">
-                            {settings.siteStatus ? <FiCheck /> : <FiX />}
-                          </span>
-                        </span>
-                      </label>
-                    </div>
-
-                    <div className="toggle-group">
-                      <div className="toggle-info">
-                        <h4>Maintenance Mode</h4>
-                        <p>Put the site in maintenance mode</p>
-                      </div>
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          name="maintenanceMode"
-                          checked={settings.maintenanceMode}
-                          onChange={handleChange}
-                        />
-                        <span className="toggle-slider">
-                          <span className="toggle-button">
-                            {settings.maintenanceMode ? <FiCheck /> : <FiX />}
-                          </span>
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'notifications' && (
-                <div className="settings-section">
-                  <div className="section-header">
-                    <h2>Notification Settings</h2>
-                    <p>Configure how and when notifications are sent</p>
-                  </div>
-
-                  <div className="toggle-settings">
-                    <div className="toggle-group">
-                      <div className="toggle-info">
-                        <h4>General Notifications</h4>
-                        <p>Enable or disable all notifications</p>
-                      </div>
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          name="notifications"
-                          checked={settings.notifications}
-                          onChange={handleChange}
-                        />
-                        <span className="toggle-slider">
-                          <span className="toggle-button">
-                            {settings.notifications ? <FiCheck /> : <FiX />}
-                          </span>
-                        </span>
-                      </label>
-                    </div>
-
-                    <div className="toggle-group">
-                      <div className="toggle-info">
-                        <h4>Email Notifications</h4>
-                        <p>Send notifications via email</p>
-                      </div>
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          name="emailNotifications"
-                          checked={settings.emailNotifications}
-                          onChange={handleChange}
-                        />
-                        <span className="toggle-slider">
-                          <span className="toggle-button">
-                            {settings.emailNotifications ? <FiCheck /> : <FiX />}
-                          </span>
-                        </span>
-                      </label>
-                    </div>
-
-                    <div className="toggle-group">
-                      <div className="toggle-info">
-                        <h4>SMS Notifications</h4>
-                        <p>Send notifications via SMS</p>
-                      </div>
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          name="smsNotifications"
-                          checked={settings.smsNotifications}
-                          onChange={handleChange}
-                        />
-                        <span className="toggle-slider">
-                          <span className="toggle-button">
-                            {settings.smsNotifications ? <FiCheck /> : <FiX />}
-                          </span>
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'security' && (
-                <div className="settings-section">
-                  <div className="section-header">
-                    <h2>Security Settings</h2>
-                    <p>Configure security and authentication options</p>
-                  </div>
-
-                  <div className="settings-grid">
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiClock className="label-icon" />
-                        Session Timeout (minutes)
-                      </label>
-                      <input
-                        type="number"
-                        className="enhanced-input"
-                        name="sessionTimeout"
-                        value={settings.sessionTimeout}
-                        onChange={handleChange}
-                        min="5"
-                        max="120"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="toggle-settings">
-                    <div className="toggle-group">
-                      <div className="toggle-info">
-                        <h4>Password Policy</h4>
-                        <p>Enforce strong password requirements</p>
-                      </div>
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          name="passwordPolicy"
-                          checked={settings.passwordPolicy}
-                          onChange={handleChange}
-                        />
-                        <span className="toggle-slider">
-                          <span className="toggle-button">
-                            {settings.passwordPolicy ? <FiCheck /> : <FiX />}
-                          </span>
-                        </span>
-                      </label>
-                    </div>
-
-                    <div className="toggle-group">
-                      <div className="toggle-info">
-                        <h4>Two-Factor Authentication</h4>
-                        <p>Require 2FA for admin accounts</p>
-                      </div>
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          name="twoFactorAuth"
-                          checked={settings.twoFactorAuth}
-                          onChange={handleChange}
-                        />
-                        <span className="toggle-slider">
-                          <span className="toggle-button">
-                            {settings.twoFactorAuth ? <FiCheck /> : <FiX />}
-                          </span>
-                        </span>
-                      </label>
-                    </div>
-
-                    <div className="toggle-group">
-                      <div className="toggle-info">
-                        <h4>API Access</h4>
-                        <p>Allow external API access</p>
-                      </div>
-                      <label className="toggle-switch">
-                        <input
-                          type="checkbox"
-                          name="apiAccess"
-                          checked={settings.apiAccess}
-                          onChange={handleChange}
-                        />
-                        <span className="toggle-slider">
-                          <span className="toggle-button">
-                            {settings.apiAccess ? <FiCheck /> : <FiX />}
-                          </span>
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'system' && (
-                <div className="settings-section">
-                  <div className="section-header">
-                    <h2>System Settings</h2>
-                    <p>Configure system-level options and maintenance</p>
-                  </div>
-
-                  <div className="settings-grid">
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiDatabase className="label-icon" />
-                        Backup Frequency
-                      </label>
-                      <select
-                        className="enhanced-select"
-                        name="backupFrequency"
-                        value={settings.backupFrequency}
-                        onChange={handleChange}
-                      >
-                        <option value="hourly">Hourly</option>
-                        <option value="daily">Daily</option>
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                      </select>
-                    </div>
-
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiGlobe className="label-icon" />
-                        Language
-                      </label>
-                      <select
-                        className="enhanced-select"
-                        name="language"
-                        value={settings.language}
-                        onChange={handleChange}
-                      >
-                        <option value="en">English</option>
-                        <option value="ur">Urdu</option>
-                        <option value="ar">Arabic</option>
-                        <option value="es">Spanish</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === 'appearance' && (
-                <div className="settings-section">
-                  <div className="section-header">
-                    <h2>Appearance Settings</h2>
-                    <p>Customize the look and feel of your system</p>
-                  </div>
-
-                  <div className="settings-grid">
-                    <div className="setting-group">
-                      <label className="setting-label">
-                        <FiMonitor className="label-icon" />
-                        Theme
-                      </label>
-                      <select
-                        className="enhanced-select"
-                        name="theme"
-                        value={settings.theme}
-                        onChange={handleChange}
-                      >
-                        <option value="light">Light Theme</option>
-                        <option value="dark">Dark Theme</option>
-                        <option value="auto">Auto (System)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="theme-preview">
-                    <h4>Theme Preview</h4>
-                    <div className="preview-cards">
-                      <div className={`preview-card ${settings.theme}`}>
-                        <div className="preview-header">
-                          <div className="preview-title">Sample Card</div>
-                          <div className="preview-actions">
-                            <div className="preview-btn"></div>
-                            <div className="preview-btn"></div>
-                          </div>
-                        </div>
-                        <div className="preview-content">
-                          <div className="preview-text"></div>
-                          <div className="preview-text short"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+        <div className="simple-form-actions" style={{ marginTop: '30px' }}>
+          <button 
+            onClick={handleSave}
+            className="simple-btn simple-btn-primary"
+            disabled={loading}
+          >
+            {loading ? 'Saving...' : 'Save Settings'}
+          </button>
+          <button 
+            onClick={fetchSettings}
+            className="simple-btn simple-btn-secondary"
+          >
+            Reset
+          </button>
         </div>
       </div>
     </div>
   );
 };
 
-export default AdminSettings;
+export default Setting;

@@ -2,25 +2,13 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  FiEye, FiStar, FiTrendingUp, FiUsers, FiTarget, FiTable,
-  FiRefreshCw, FiSearch, FiFilter, FiGrid, FiList, FiMapPin,
-  FiCheckCircle, FiXCircle, FiBarChart, FiActivity, FiPlus
-} from "react-icons/fi";
-import { tableRecommendationService } from "../../services/tableRecommendationService";
-import "./AdminManageRooms.css";
-import "./AdminViewTables.css";
+import "./simple-admin.css";
 
 const AdminViewTables = () => {
-  const [tables, setTables] = useState([]);
-  const [filteredTables, setFilteredTables] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [tableAnalytics, setTableAnalytics] = useState({});
-  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [viewMode, setViewMode] = useState("grid");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [tables, setTables] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -31,292 +19,139 @@ const AdminViewTables = () => {
       navigate("/login");
       return;
     }
-    
+
     fetchTables();
-    fetchTableAnalytics();
   }, [navigate]);
 
   const fetchTables = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
       const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      const response = await axios.get(`${apiUrl}/tables`);
-      console.log("Fetched tables:", response.data);
+      const response = await axios.get(`${apiUrl}/tables`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setTables(response.data);
-      setFilteredTables(response.data);
-      toast.success("Tables loaded successfully");
     } catch (error) {
       console.error("Error fetching tables:", error);
-      if (error.response?.status === 401 || error.response?.status === 403) {
+      if (error.response?.status === 401) {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
-        toast.error("Session expired. Please login again.");
         navigate("/login");
-        return;
       }
-      toast.error(error.response?.data?.message || "Failed to fetch tables");
+      toast.error("Failed to fetch tables");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchTableAnalytics = async () => {
-    setLoadingAnalytics(true);
-    try {
-      const response = await tableRecommendationService.getAdminDashboard();
-      if (response.success) {
-        // Create a map of table analytics for easy lookup
-        const analyticsMap = {};
-        response.analytics.popularTables?.forEach(table => {
-          analyticsMap[table._id] = {
-            totalInteractions: table.totalInteractions,
-            uniqueUsers: table.uniqueUsers,
-            avgRating: table.avgRating
-          };
+  const handleDelete = async (tableId) => {
+    if (window.confirm('Are you sure you want to delete this table?')) {
+      try {
+        const token = localStorage.getItem("token");
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        await axios.delete(`${apiUrl}/tables/${tableId}`, {
+          headers: { Authorization: `Bearer ${token}` }
         });
-        setTableAnalytics(analyticsMap);
+        toast.success("Table deleted successfully");
+        fetchTables();
+      } catch (error) {
+        console.error("Error deleting table:", error);
+        toast.error("Failed to delete table");
       }
-    } catch (error) {
-      console.error("Error fetching table analytics:", error);
-      // Don't show error toast for analytics as it's supplementary data
-    } finally {
-      setLoadingAnalytics(false);
     }
   };
 
+  const filteredTables = tables.filter(table =>
+    table.tableNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+    table.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    table.type?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+
   return (
-    <div className="enhanced-view-tables-module-container">
-      {/* Enhanced Header */}
-      <div className="enhanced-tables-header">
-        <div className="header-content">
-          <div className="title-section">
-            <div className="title-wrapper">
-              <div className="title-icon">
-                <FiTable />
-              </div>
-              <div className="title-text">
-                <h1 className="page-title">Table Analytics</h1>
-                <p className="page-subtitle">Monitor table performance and customer preferences</p>
-              </div>
-            </div>
-
-            {/* Statistics Cards */}
-            <div className="stats-cards">
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <FiTable />
-                </div>
-                <div className="stat-content">
-                  <div className="stat-number">{tables.length}</div>
-                  <div className="stat-label">Total Tables</div>
-                </div>
-              </div>
-
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <FiCheckCircle />
-                </div>
-                <div className="stat-content">
-                  <div className="stat-number">
-                    {tables.filter(t => t.status === 'Available').length}
-                  </div>
-                  <div className="stat-label">Available Tables</div>
-                </div>
-              </div>
-
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <FiActivity />
-                </div>
-                <div className="stat-content">
-                  <div className="stat-number">
-                    {Object.values(tableAnalytics).reduce((sum, t) => sum + (t.totalInteractions || 0), 0)}
-                  </div>
-                  <div className="stat-label">Total Interactions</div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Controls Section */}
-          <div className="controls-section">
-            <div className="search-controls">
-              <div className="search-box">
-                <FiSearch className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Search tables..."
-                  className="search-input"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="view-controls">
-              <button
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-              >
-                <FiGrid />
-                <span>Grid</span>
-              </button>
-              <button
-                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-              >
-                <FiList />
-                <span>List</span>
-              </button>
-            </div>
-
-            <div className="action-controls">
-              <button className="action-btn primary" onClick={() => navigate('/admin/add-table')}>
-                <FiPlus />
-                <span>Add Table</span>
-              </button>
-              <button
-                className="action-btn secondary"
-                onClick={fetchTableAnalytics}
-                disabled={loadingAnalytics}
-              >
-                <FiRefreshCw className={loadingAnalytics ? 'spinning' : ''} />
-                <span>Refresh</span>
-              </button>
-            </div>
-          </div>
-        </div>
+    <div className="simple-admin-container">
+      <div className="simple-admin-header">
+        <h1>View Tables</h1>
+        <p>All tables in simple table format</p>
       </div>
 
-      {/* Enhanced Tabs */}
-      <div className="enhanced-tabs">
-        <div className="tabs-container">
-          <button className="tab-btn active">
-            <FiTable className="tab-icon" />
-            <span className="tab-text">All Tables</span>
+      <div className="simple-admin-controls">
+        <input
+          type="text"
+          placeholder="Search tables..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="simple-search-input"
+        />
+        <button 
+          onClick={() => navigate('/admin/add-table')}
+          className="simple-btn simple-btn-primary"
+        >
+          Add New Table
+        </button>
+      </div>
+
+      <div className="simple-table-container">
+        <table className="simple-table">
+          <thead>
+            <tr>
+              <th>Table Number</th>
+              <th>Capacity</th>
+              <th>Location</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredTables.map(table => (
+              <tr key={table._id}>
+                <td>{table.tableNumber}</td>
+                <td>{table.capacity} people</td>
+                <td>{table.location}</td>
+                <td>{table.type}</td>
+                <td>
+                  <span className={`simple-status simple-status-${table.status?.toLowerCase()}`}>
+                    {table.status}
+                  </span>
+                </td>
+                <td className="simple-description">{table.description}</td>
+                <td>
+                  <div className="simple-actions">
+                    <button 
+                      onClick={() => navigate(`/admin/update-table/${table._id}`)}
+                      className="simple-btn simple-btn-small"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(table._id)}
+                      className="simple-btn simple-btn-small simple-btn-danger"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {filteredTables.length === 0 && (
+        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <p>No tables found.</p>
+          <button 
+            onClick={() => navigate('/admin/add-table')}
+            className="simple-btn simple-btn-primary"
+          >
+            Add First Table
           </button>
         </div>
-      </div>
-
-      {/* Enhanced Content */}
-      <div className="enhanced-content">
-        <div className={`tables-container ${viewMode}-view`}>
-          {loading ? (
-            <div className="enhanced-loading">
-              <div className="loading-spinner">
-                <div className="spinner-ring"></div>
-                <div className="spinner-ring"></div>
-                <div className="spinner-ring"></div>
-              </div>
-              <p className="loading-text">Loading tables...</p>
-            </div>
-          ) : filteredTables.length > 0 ? (
-            <div className="enhanced-tables-grid">
-              {filteredTables.map((table) => {
-                const analytics = tableAnalytics[table._id] || {};
-                return (
-                  <div key={table._id} className={`enhanced-table-card ${viewMode}-card`}>
-                    <div className="table-image-container">
-                      <img
-                        src={table.image ? `${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${table.image}` : "/images/placeholder-table.jpg"}
-                        alt={`Table ${table.tableNumber || table.tableName}`}
-                        className="table-image"
-                        onError={(e) => {
-                          e.target.src = "/images/placeholder-table.jpg";
-                          e.target.onerror = null;
-                        }}
-                      />
-                      <div className="image-overlay">
-                        <div className="overlay-actions">
-                          <button className="action-btn view-btn">
-                            <FiEye />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="table-badges">
-                        <span className={`status-badge ${table.status === 'Available' ? 'available' : 'occupied'}`}>
-                          {table.status}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="table-content">
-                      <div className="table-header">
-                        <div className="table-title">
-                          <h3 className="table-number">Table {table.tableNumber || table.tableName}</h3>
-                          <span className="table-type">{table.tableType || 'Standard'}</span>
-                        </div>
-                        <div className="table-capacity">
-                          <span className="capacity-amount">{table.capacity}</span>
-                          <span className="capacity-period">seats</span>
-                        </div>
-                      </div>
-
-                      <p className="table-description">{table.description || 'Comfortable dining table for your guests'}</p>
-
-                      <div className="table-stats">
-                        <div className="stat-item">
-                          <FiUsers className="stat-icon capacity" />
-                          <span className="stat-value">{table.capacity}</span>
-                          <span className="stat-label">seats</span>
-                        </div>
-                        {analytics.totalInteractions > 0 && (
-                          <div className="stat-item">
-                            <FiActivity className="stat-icon interactions" />
-                            <span className="stat-value">{analytics.totalInteractions}</span>
-                            <span className="stat-label">interactions</span>
-                          </div>
-                        )}
-                        {analytics.avgRating > 0 && (
-                          <div className="stat-item">
-                            <FiStar className="stat-icon rating" />
-                            <span className="stat-value">{analytics.avgRating.toFixed(1)}</span>
-                            <span className="stat-label">rating</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="table-features">
-                        <div className="feature-tag">
-                          <FiMapPin className="feature-icon" />
-                          <span className="feature-text">{table.location || 'Main Hall'}</span>
-                        </div>
-                        <div className="feature-tag">
-                          <FiTable className="feature-icon" />
-                          <span className="feature-text">{table.tableType || 'Standard'}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="enhanced-empty-state">
-              <div className="empty-icon">
-                <FiTable />
-              </div>
-              <div className="empty-content">
-                <h3 className="empty-title">No tables found</h3>
-                <p className="empty-description">
-                  {searchTerm
-                    ? 'Try adjusting your search criteria'
-                    : 'Add some tables to see them listed here'
-                  }
-                </p>
-                {!searchTerm && (
-                  <button className="empty-action-btn" onClick={() => navigate('/admin/add-table')}>
-                    <FiPlus />
-                    Add New Table
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 };

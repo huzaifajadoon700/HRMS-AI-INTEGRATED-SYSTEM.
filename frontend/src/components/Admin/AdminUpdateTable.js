@@ -1,289 +1,266 @@
 import React, { useState, useEffect } from "react";
-import { Card, Form, Button, Spinner, Table } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  FiEdit, FiSave, FiRefreshCw, FiTable, FiUsers, FiMapPin,
-  FiImage, FiCheck, FiX, FiGrid, FiList, FiSearch
-} from "react-icons/fi";
-import "./AdminManageRooms.css";
-import "./AdminUpdateTable.css";
+import "./simple-admin.css";
 
 const AdminUpdateTable = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
-  const [image, setImage] = useState(null);
-  const [imageUrl, setImageUrl] = useState("");
   const [formData, setFormData] = useState({
-    tableName: "",
+    tableNumber: "",
     tableType: "",
     capacity: "",
     status: "Available",
+    location: "",
+    description: ""
   });
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    
+    if (!token || role !== "admin") {
+      toast.error("Please login as admin to access this page");
+      navigate("/login");
+      return;
+    }
+    
     fetchTables();
-  }, []);
+  }, [navigate]);
 
   const fetchTables = async () => {
     try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
       const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      const response = await axios.get(`${apiUrl}/tables`);
+      const response = await axios.get(`${apiUrl}/tables`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       setTables(response.data);
     } catch (error) {
       console.error("Error fetching tables:", error);
       toast.error("Failed to fetch tables");
-    }
-  };
-
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-  };
-
-  const handleSelectTable = (table) => {
-    setSelectedTable(table);
-    setImage(null);
-    setImageUrl(table.image || ""); // Pre-fill with current image URL
-    setFormData({
-      tableName: table.tableName,
-      tableType: table.tableType,
-      capacity: table.capacity,
-      status: table.status,
-    });
-  };
-
-  const handleUpdateTable = async (e) => {
-    e.preventDefault();
-    if (!selectedTable) {
-      toast.warning("Please select a table to update");
-      return;
-    }
-
-    setLoading(true);
-    const data = new FormData();
-    data.append("tableName", formData.tableName);
-    data.append("tableType", formData.tableType);
-    data.append("capacity", formData.capacity);
-    data.append("status", formData.status);
-    if (image) {
-      data.append("image", image);
-    } else if (imageUrl.trim()) {
-      data.append("imageUrl", imageUrl.trim());
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      const response = await axios.put(
-        `${apiUrl}/tables/${selectedTable._id}`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "multipart/form-data"
-          },
-        }
-      );
-
-      toast.success("Table updated successfully!");
-      setSelectedTable(null);
-      setFormData({
-        tableName: "",
-        tableType: "",
-        capacity: "",
-        status: "Available",
-      });
-      setImage(null);
-      setImageUrl("");
-      
-      // Reset file input
-      const fileInput = document.getElementById("table-image");
-      if (fileInput) fileInput.value = "";
-      
-      // Update tables list
-      fetchTables();
-    } catch (error) {
-      console.error("Error updating table:", error);
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        toast.error("Session expired. Please login again.");
-        navigate("/login");
-        return;
-      }
-      toast.error(error.response?.data?.message || "Failed to update table");
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="enhanced-update-table-module-container">
-    <div className="admin-manage-tables p-4">
-      <h2 className="page-title mb-4">Update Table</h2>
+  const handleSelectTable = (table) => {
+    setSelectedTable(table);
+    setFormData({
+      tableNumber: table.tableNumber || "",
+      tableType: table.tableType || "",
+      capacity: table.capacity || "",
+      status: table.status || "Available",
+      location: table.location || "",
+      description: table.description || ""
+    });
+  };
 
-      <div className="row">
-        <div className="col-md-6 mb-4">
-          <Card className="cosmic-card">
-            <Card.Header className="cosmic-card-header">
-              <h5 className="mb-0">Select Table to Update</h5>
-            </Card.Header>
-            <Card.Body className="cosmic-card-body">
-              <Table striped bordered hover responsive className="cosmic-table">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Capacity</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tables.map((table) => (
-                    <tr key={table._id}>
-                      <td>{table.tableName}</td>
-                      <td>{table.tableType}</td>
-                      <td>{table.capacity}</td>
-                      <td>
-                        <Button
-                          variant="primary"
-                          size="sm"
-                          onClick={() => handleSelectTable(table)}
-                        >
-                          Select
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card.Body>
-          </Card>
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedTable) return;
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      
+      await axios.put(`${apiUrl}/tables/${selectedTable._id}`, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      toast.success("Table updated successfully!");
+      setSelectedTable(null);
+      setFormData({
+        tableNumber: "",
+        tableType: "",
+        capacity: "",
+        status: "Available",
+        location: "",
+        description: ""
+      });
+      fetchTables();
+    } catch (error) {
+      console.error("Error updating table:", error);
+      toast.error("Failed to update table");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+
+  return (
+    <div className="simple-admin-container">
+      <div className="simple-admin-header">
+        <h1>Update Table</h1>
+        <p>Select a table to update its details</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+        {/* Table Selection */}
+        <div className="simple-table-container">
+          <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+            <h3 style={{ margin: 0, color: '#000000' }}>Select Table to Update</h3>
+          </div>
+          <div style={{ padding: '20px' }}>
+            {tables.length > 0 ? (
+              <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                {tables.map((table) => (
+                  <div 
+                    key={table._id}
+                    onClick={() => handleSelectTable(table)}
+                    style={{ 
+                      cursor: 'pointer',
+                      padding: '15px',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '8px',
+                      marginBottom: '10px',
+                      backgroundColor: selectedTable?._id === table._id ? '#f0f9ff' : '#ffffff'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <h6 style={{ margin: '0 0 5px 0', color: '#000000' }}>Table {table.tableNumber}</h6>
+                        <p style={{ margin: '0 0 5px 0', color: '#000000', fontSize: '14px' }}>{table.tableType}</p>
+                        <small style={{ color: '#059669' }}>Capacity: {table.capacity} people</small>
+                      </div>
+                      <span className={`simple-status simple-status-${table.status?.toLowerCase()}`}>
+                        {table.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <p style={{ color: '#000000' }}>No tables found</p>
+                <small style={{ color: '#000000' }}>Add some tables first to update them</small>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="col-md-6">
-          <Card className="cosmic-card">
-            <Card.Header className="cosmic-card-header">
-              <h5 className="mb-0">Update Table Details</h5>
-            </Card.Header>
-            <Card.Body className="cosmic-card-body">
-              <Form onSubmit={handleUpdateTable} encType="multipart/form-data">
-                <Form.Group className="mb-3">
-                  <Form.Label>Table Name</Form.Label>
-                  <Form.Control
-                    type="text"
-                    className="cosmic-input"
-                    value={formData.tableName}
-                    onChange={(e) =>
-                      setFormData({ ...formData, tableName: e.target.value })
-                    }
-                    placeholder="Enter table name"
+        {/* Update Form */}
+        <div className="simple-table-container">
+          <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+            <h3 style={{ margin: 0, color: '#000000' }}>Update Table Details</h3>
+          </div>
+          <div style={{ padding: '20px' }}>
+            {selectedTable ? (
+              <form onSubmit={handleSubmit} className="simple-form">
+                <div className="simple-form-row">
+                  <input
+                    type="number"
+                    name="tableNumber"
+                    placeholder="Table Number"
+                    value={formData.tableNumber}
+                    onChange={handleInputChange}
                     required
                   />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Table Type</Form.Label>
-                  <Form.Select
-                    className="cosmic-input"
+                  <select
+                    name="tableType"
                     value={formData.tableType}
-                    onChange={(e) =>
-                      setFormData({ ...formData, tableType: e.target.value })
-                    }
+                    onChange={handleInputChange}
                     required
                   >
-                    <option value="">Choose...</option>
-                    <option value="indoor">Indoor</option>
-                    <option value="outdoor">Outdoor</option>
-                    <option value="private">Private</option>
-                  </Form.Select>
-                </Form.Group>
+                    <option value="">Select Table Type</option>
+                    <option value="Regular">Regular</option>
+                    <option value="VIP">VIP</option>
+                    <option value="Outdoor">Outdoor</option>
+                    <option value="Private">Private</option>
+                    <option value="Bar">Bar</option>
+                  </select>
+                </div>
 
-                <Form.Group className="mb-3">
-                  <Form.Label>Capacity</Form.Label>
-                  <Form.Control
+                <div className="simple-form-row">
+                  <input
                     type="number"
-                    className="cosmic-input"
+                    name="capacity"
+                    placeholder="Capacity (number of people)"
                     value={formData.capacity}
-                    onChange={(e) =>
-                      setFormData({ ...formData, capacity: e.target.value })
-                    }
-                    placeholder="Enter capacity"
+                    onChange={handleInputChange}
                     required
                   />
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Status</Form.Label>
-                  <Form.Select
-                    className="cosmic-input"
+                  <select
+                    name="status"
                     value={formData.status}
-                    onChange={(e) =>
-                      setFormData({ ...formData, status: e.target.value })
-                    }
+                    onChange={handleInputChange}
+                    required
                   >
                     <option value="Available">Available</option>
-                    <option value="Booked">Booked</option>
+                    <option value="Occupied">Occupied</option>
                     <option value="Reserved">Reserved</option>
-                  </Form.Select>
-                </Form.Group>
-
-                <Form.Group className="mb-3">
-                  <Form.Label>Image URL</Form.Label>
-                  <Form.Control
-                    type="url"
-                    value={imageUrl}
-                    onChange={(e) => setImageUrl(e.target.value)}
-                    className="cosmic-input"
-                    placeholder="https://images.unsplash.com/... or any table image URL"
-                  />
-                  <small className="text-muted">Paste an image URL for instant update</small>
-                </Form.Group>
-
-                <Form.Group className="mb-4">
-                  <Form.Label>OR Upload File</Form.Label>
-                  <Form.Control
-                    type="file"
-                    className="cosmic-input"
-                    id="table-image"
-                    accept="image/jpeg, image/png"
-                    onChange={handleImageChange}
-                  />
-                  <small className="text-muted">File upload (works in development only)</small>
-                </Form.Group>
-
-                <div className="text-center">
-                  <Button
-                    type="submit"
-                    className="cosmic-btn-update"
-                    disabled={loading || !selectedTable}
-                  >
-                    {loading ? (
-                      <>
-                        <Spinner
-                          as="span"
-                          animation="border"
-                          size="sm"
-                          role="status"
-                          aria-hidden="true"
-                          className="me-2"
-                        />
-                        Updating Table...
-                      </>
-                    ) : (
-                      "Update Table"
-                    )}
-                  </Button>
+                    <option value="Maintenance">Maintenance</option>
+                  </select>
                 </div>
-              </Form>
-            </Card.Body>
-          </Card>
+
+                <div className="simple-form-row">
+                  <input
+                    type="text"
+                    name="location"
+                    placeholder="Location (e.g., Main Hall, Terrace, etc.)"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                  />
+                  <div></div>
+                </div>
+
+                <textarea
+                  name="description"
+                  placeholder="Table Description (optional)"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  rows="4"
+                />
+
+                <div className="simple-form-actions">
+                  <button 
+                    type="submit" 
+                    className="simple-btn simple-btn-primary"
+                    disabled={loading}
+                  >
+                    {loading ? 'Updating...' : 'Update Table'}
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => {
+                      setSelectedTable(null);
+                      setFormData({
+                        tableNumber: "",
+                        tableType: "",
+                        capacity: "",
+                        status: "Available",
+                        location: "",
+                        description: ""
+                      });
+                    }}
+                    className="simple-btn simple-btn-secondary"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <p style={{ color: '#000000' }}>Select a table from the list to update its details</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
     </div>
   );
 };

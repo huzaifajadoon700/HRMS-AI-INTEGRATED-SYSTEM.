@@ -1,53 +1,61 @@
-/* Modern Contact Page CSS */
+/* Clean Contact Page CSS - shadcn/ui inspired */
 .modern-contact-page {
   width: 100%;
   min-height: 100vh;
-  background: #0a192f;
-  color: #ffffff;
+  background: var(--primary-bg);
+  color: var(--text-primary);
   overflow-x: hidden;
   margin-top: 80px;
+  padding: var(--spacing-2xl) 0;
 }
 
 /* Success Page */
 .contact-success-page {
   width: 100%;
   min-height: 100vh;
-  background: #0a192f;
+  background: var(--primary-bg);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .success-container {
   text-align: center;
-  padding: 3rem;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+  padding: var(--spacing-2xl);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
   max-width: 500px;
-  margin: 2rem;
+  margin: var(--spacing-xl);
 }
 
 .success-animation {
-  margin-bottom: 2rem;
+  margin-bottom: var(--spacing-xl);
 }
 
 .success-icon {
-  font-size: 4rem;
-  color: #4CAF50;
+  font-size: var(--font-size-4xl);
+  color: #22c55e;
   animation: successPulse 2s infinite;
 }
 
 @keyframes successPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.1); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 .success-container h1 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-md);
+  color: var(--text-primary);
+  font-weight: 700;
   color: #64ffda;
 }
 
@@ -101,7 +109,11 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, rgba(100, 255, 218, 0.1) 0%, transparent 70%);
+  background: radial-gradient(
+    circle at center,
+    rgba(100, 255, 218, 0.1) 0%,
+    transparent 70%
+  );
 }
 
 .hero-content {
@@ -158,7 +170,7 @@
 }
 
 .contact-method-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -708,7 +720,11 @@ textarea.form-control {
 .success-container {
   max-width: 500px;
   padding: 3rem 2rem;
-  background: linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%);
+  background: linear-gradient(
+    145deg,
+    rgba(17, 34, 64, 0.6) 0%,
+    rgba(26, 35, 50, 0.4) 100%
+  );
   backdrop-filter: blur(20px);
   border: 1px solid rgba(100, 255, 218, 0.2);
   border-radius: 20px;
@@ -721,12 +737,13 @@ textarea.form-control {
 
 .success-icon {
   font-size: 4rem;
-  color: #4CAF50;
+  color: #4caf50;
   animation: successPulse 2s ease-in-out infinite;
 }
 
 @keyframes successPulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -783,7 +800,7 @@ textarea.form-control {
 }
 
 .form-control.success {
-  border-color: #4CAF50;
+  border-color: #4caf50;
   background: rgba(76, 175, 80, 0.1);
 }
 
@@ -797,7 +814,7 @@ textarea.form-control {
 }
 
 .success-text {
-  color: #4CAF50;
+  color: #4caf50;
   font-size: 0.8rem;
   margin-top: 0.5rem;
   display: flex;
@@ -817,7 +834,7 @@ textarea.form-control {
 }
 
 .submit-btn.loading::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -831,6 +848,10 @@ textarea.form-control {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

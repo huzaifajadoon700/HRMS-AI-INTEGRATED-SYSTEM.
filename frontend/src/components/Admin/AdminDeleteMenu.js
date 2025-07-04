@@ -1,18 +1,14 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Container,  Button, Spinner, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import "./AdminManageRooms.css";
-import "./AdminDeleteMenu.css";
+import "./simple-admin.css";
 
 const AdminDeleteMenu = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [menuItems, setMenuItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [deleting, setDeleting] = useState(false);
+  const [deletingItemId, setDeletingItemId] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -20,9 +16,10 @@ const AdminDeleteMenu = () => {
 
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
-      navigate("/admin/login");
+      navigate("/login");
       return;
     }
+
     fetchMenuItems();
   }, [navigate]);
 
@@ -38,12 +35,14 @@ const AdminDeleteMenu = () => {
       }
 
       console.log("Fetching menu items...");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/menus`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
 
       console.log("Menu items response:", response.data);
@@ -71,174 +70,118 @@ const AdminDeleteMenu = () => {
     }
   };
 
-  const handleDelete = async () => {
-    if (!selectedItem) return;
+  const handleDeleteItem = async (itemId) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this menu item? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
 
+    setDeletingItemId(itemId);
     try {
-      setDeleting(true);
       const token = localStorage.getItem("token");
-
-      // Check if user is authenticated
-      if (!token) {
-        toast.error("Please login to delete menu items");
-        navigate("/admin/login");
-        return;
-      }
-
-      console.log("Deleting menu item:", selectedItem._id);
-
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      const response = await axios.delete(`${apiUrl}/menus/${selectedItem._id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
+      await axios.delete(`${apiUrl}/menus/${itemId}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      console.log("Delete response:", response);
-      toast.success("Menu item deleted successfully");
-
-      // Refresh the menu items list
-      await fetchMenuItems();
-      setShowDeleteModal(false);
-      setSelectedItem(null);
+      toast.success("Menu item deleted successfully!");
+      fetchMenuItems();
     } catch (error) {
       console.error("Error deleting menu item:", error);
-
       if (error.response?.status === 401 || error.response?.status === 403) {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
         toast.error("Session expired. Please login again.");
-        navigate("/admin/login");
+        navigate("/login");
         return;
       }
-
-      toast.error(error.response?.data?.message || "Error deleting menu item");
+      toast.error(
+        error.response?.data?.message || "Failed to delete menu item"
+      );
     } finally {
-      setDeleting(false);
+      setDeletingItemId(null);
     }
   };
 
-  if (loading) {
+  if (loading)
     return (
-      <div className="loading-container">
-        <Spinner animation="border" variant="primary" />
+      <div className="simple-admin-container">
+        <p>Loading...</p>
       </div>
     );
-  }
 
   return (
-    <div className="enhanced-delete-menu-module-container">
-    <Container fluid className="delete-menu-container">
-      <div className="delete-menu-header">
-        <h2>Delete Menu Items</h2>
+    <div className="simple-admin-container">
+      <div className="simple-admin-header">
+        <h1>Delete Menu Items</h1>
+        <p>Select a menu item to remove it from the system</p>
       </div>
 
-      {menuItems.length === 0 ? (
-        <div className="no-items-message">
-          <h4>No menu items found</h4>
-          <p>There are no menu items available to delete.</p>
-        </div>
-      ) : (
-        <div className="menu-items-grid">
-          {menuItems.map((item) => (
-            <div key={item._id} className="menu-item-card">
-              <div className="menu-item-image">
-                <img
-                  src={
-                    item.image
-                      ? (item.image.startsWith('http://') || item.image.startsWith('https://'))
-                        ? item.image
-                        : `${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${item.image}`
-                      : "/placeholder-food.jpg"
-                  }
-                  alt={item.name}
-                  onError={(e) => {
-                    e.target.src = "/placeholder-food.jpg";
-                    e.target.onerror = null;
-                  }}
-                />
-              </div>
-              <div className="menu-item-info">
-                <h4>{item.name}</h4>
-                <p className="item-category">{item.category}</p>
-                <p className="item-price">Rs. {item.price?.toFixed(0) || '0'}</p>
-                <p className="item-availability">
-                  Status: <span className={item.availability ? 'available' : 'unavailable'}>
-                    {item.availability ? 'Available' : 'Unavailable'}
+      <div className="simple-table-container">
+        <table className="simple-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Description</th>
+              <th>Ingredients</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {menuItems.map((item) => (
+              <tr key={item._id}>
+                <td>
+                  {item.image ? (
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="simple-room-image"
+                    />
+                  ) : (
+                    <div className="simple-no-image">No Image</div>
+                  )}
+                </td>
+                <td>{item.name}</td>
+                <td>{item.category}</td>
+                <td>Rs. {item.price}</td>
+                <td>
+                  <span
+                    className={`simple-status simple-status-${item.status?.toLowerCase()}`}
+                  >
+                    {item.status}
                   </span>
-                </p>
-                <Button
-                  variant="danger"
-                  className="delete-button"
-                  size="lg"
-                  onClick={() => {
-                    console.log("Delete button clicked for item:", item);
-                    setSelectedItem(item);
-                    setShowDeleteModal(true);
-                  }}
-                >
-                  🗑️ DELETE THIS ITEM
-                </Button>
-              </div>
-            </div>
-          ))}
+                </td>
+                <td className="simple-description">{item.description}</td>
+                <td className="simple-description">{item.ingredients}</td>
+                <td>
+                  <button
+                    onClick={() => handleDeleteItem(item._id)}
+                    className="simple-btn simple-btn-small simple-btn-danger"
+                    disabled={deletingItemId === item._id}
+                  >
+                    {deletingItemId === item._id ? "Deleting..." : "Delete"}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {menuItems.length === 0 && (
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
+          <p>No menu items found.</p>
         </div>
       )}
-
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        className="delete-modal"
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete "{selectedItem?.name}"? This action cannot be undone.
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowDeleteModal(false)}
-            disabled={deleting}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="danger"
-            size="lg"
-            onClick={handleDelete}
-            disabled={deleting}
-            style={{
-              background: 'linear-gradient(135deg, #dc3545 0%, #ff4757 100%)',
-              border: '2px solid #dc3545',
-              fontWeight: '700',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              padding: '0.75rem 2rem'
-            }}
-          >
-            {deleting ? (
-              <>
-                <Spinner
-                  as="span"
-                  animation="border"
-                  size="sm"
-                  role="status"
-                  aria-hidden="true"
-                  className="me-2"
-                />
-                DELETING...
-              </>
-            ) : (
-              "🗑️ YES, DELETE IT!"
-            )}
-          </Button>
-        </Modal.Footer>
-      </Modal>
-    </Container>
     </div>
   );
 };

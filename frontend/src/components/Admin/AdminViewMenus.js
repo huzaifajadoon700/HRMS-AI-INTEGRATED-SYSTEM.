@@ -1,326 +1,167 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
-import { FaEdit, FaTrash, FaToggleOn, FaToggleOff } from "react-icons/fa";
-import {
-  FiCoffee, FiSearch, FiFilter, FiGrid, FiList, FiRefreshCw,
-  FiEye, FiEdit, FiTrash, FiToggleLeft, FiToggleRight, FiPlus,
-  FiDollarSign, FiStar, FiClock, FiCheck, FiX, FiTrendingUp
-} from "react-icons/fi";
-import { getMenuImageUrl, handleImageError } from "../../utils/imageUtils";
-import "./AdminManageRooms.css";
-import "./AdminViewMenus.css";
+import "./simple-admin.css";
 
 const AdminViewMenus = () => {
-  const [menuItems, setMenuItems] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
-  const [viewMode, setViewMode] = useState('grid');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState('name');
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [menus, setMenus] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    fetchMenuItems();
-  }, [selectedCategory]);
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
+    
+    if (!token || role !== "admin") {
+      toast.error("Please login as admin to access this page");
+      navigate("/login");
+      return;
+    }
 
-  const fetchMenuItems = async () => {
-    setLoading(true);
+    fetchMenus();
+  }, [navigate]);
+
+  const fetchMenus = async () => {
     try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
       const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      const url = selectedCategory === "all"
-        ? `${apiUrl}/menus`
-        : `${apiUrl}/menus/category/${selectedCategory}`;
-      
-      const response = await axios.get(url);
-      setMenuItems(response.data);
+      const response = await axios.get(`${apiUrl}/menus`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMenus(response.data);
     } catch (error) {
-      toast.error("Failed to fetch menu items");
+      console.error("Error fetching menus:", error);
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        navigate("/login");
+      }
+      toast.error("Failed to fetch menus");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteItem = async (id) => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      await axios.delete(`${apiUrl}/menus/${id}`);
-      setMenuItems(menuItems.filter(item => item._id !== id));
-      toast.success("Menu item deleted successfully");
-      setShowDeleteModal(false);
-    } catch (error) {
-      toast.error("Error deleting menu item");
+  const handleDelete = async (menuId) => {
+    if (window.confirm('Are you sure you want to delete this menu item?')) {
+      try {
+        const token = localStorage.getItem("token");
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        await axios.delete(`${apiUrl}/menus/${menuId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        toast.success("Menu item deleted successfully");
+        fetchMenus();
+      } catch (error) {
+        console.error("Error deleting menu:", error);
+        toast.error("Failed to delete menu item");
+      }
     }
   };
 
-  const handleAvailabilityToggle = async (id, currentStatus) => {
-    try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      const response = await axios.patch(`${apiUrl}/menus/${id}/toggle-availability`);
-      setMenuItems(menuItems.map(item => item._id === id ? response.data : item));
-      toast.success("Availability updated successfully");
-    } catch (error) {
-      toast.error("Error updating availability");
-    }
-  };
+  const filteredMenus = menus.filter(menu =>
+    menu.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    menu.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    menu.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-
-
-  // Filter and sort menu items
-  const filteredMenuItems = menuItems.filter(item => {
-    const matchesSearch = item.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.category?.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesSearch;
-  }).sort((a, b) => {
-    switch (sortBy) {
-      case 'price': return a.price - b.price;
-      case 'name': return a.name.localeCompare(b.name);
-      case 'category': return a.category.localeCompare(b.category);
-      default: return 0;
-    }
-  });
+  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
 
   return (
-    <div className="enhanced-view-menus-module-container">
-      <div className="enhanced-menus-header">
-        <div className="header-content">
-          <div className="title-section">
-            <div className="title-wrapper">
-              <div className="title-icon">
-                <FiCoffee />
-              </div>
-              <div className="title-text">
-                <h1 className="page-title">Menu Management</h1>
-                <p className="page-subtitle">Manage food items and categories</p>
-              </div>
-            </div>
-
-            <div className="header-stats">
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <FiCoffee />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-value">{menuItems.length}</span>
-                  <span className="stat-label">Total Items</span>
-                </div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <FiCheck />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-value">{menuItems.filter(item => item.availability === true).length}</span>
-                  <span className="stat-label">Available</span>
-                </div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <FiTrendingUp />
-                </div>
-                <div className="stat-content">
-                  <span className="stat-value">{new Set(menuItems.map(item => item.category)).size}</span>
-                  <span className="stat-label">Categories</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="controls-section">
-            <div className="search-controls">
-              <div className="search-box">
-                <FiSearch className="search-icon" />
-                <input
-                  type="text"
-                  placeholder="Search menu items..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="search-input"
-                />
-              </div>
-
-              <div className="filter-controls">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="all">All Categories</option>
-                  <option value="appetizers">Appetizers</option>
-                  <option value="main-course">Main Course</option>
-                  <option value="desserts">Desserts</option>
-                  <option value="beverages">Beverages</option>
-                </select>
-
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="name">Sort by Name</option>
-                  <option value="price">Sort by Price</option>
-                  <option value="category">Sort by Category</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="view-controls">
-              <button
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-              >
-                <FiGrid />
-              </button>
-              <button
-                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-              >
-                <FiList />
-              </button>
-              <button
-                className="refresh-btn"
-                onClick={fetchMenuItems}
-              >
-                <FiRefreshCw />
-              </button>
-            </div>
-          </div>
-        </div>
+    <div className="simple-admin-container">
+      <div className="simple-admin-header">
+        <h1>View Menu Items</h1>
+        <p>All menu items in simple table format</p>
       </div>
 
-      <div className="enhanced-content">
-        <div className={`menus-container ${viewMode}-view`}>
-          {loading ? (
-            <div className="enhanced-loading">
-              <div className="loading-spinner">
-                <div className="spinner-ring"></div>
-                <div className="spinner-ring"></div>
-                <div className="spinner-ring"></div>
-              </div>
-              <p className="loading-text">Loading menu items...</p>
-            </div>
-          ) : filteredMenuItems.length > 0 ? (
-            <div className="enhanced-menus-grid">
-              {filteredMenuItems.map((item) => (
-                <div key={item._id} className={`enhanced-menu-card ${viewMode}-card`}>
-                  <div className="menu-image-container">
-                    <img
-                      src={getMenuImageUrl(item.image)}
-                      alt={item.name}
-                      className="menu-image"
-                      onError={(e) => handleImageError(e, "/images/placeholder-menu.jpg")}
-                    />
-                    <div className="image-overlay">
-                      <div className="overlay-actions">
-                        <button className="action-btn view-btn">
-                          <FiEye />
-                        </button>
-                        <button
-                          className="action-btn edit-btn"
-                          onClick={() => window.location.href = `/admin/update-menu/${item._id}`}
-                        >
-                          <FiEdit />
-                        </button>
-                        <button
-                          className="action-btn delete-btn"
-                          onClick={() => {
-                            setItemToDelete(item);
-                            setShowDeleteModal(true);
-                          }}
-                        >
-                          <FiTrash />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="menu-badges">
-                      <span className={`status-badge ${item.availability === true ? 'available' : 'unavailable'}`}>
-                        {item.availability === true ? 'Available' : 'Unavailable'}
-                      </span>
-                      <span className="category-badge">
-                        {item.category}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="menu-content">
-                    <div className="menu-header">
-                      <div className="menu-title">
-                        <h3 className="menu-name">{item.name}</h3>
-                        <span className="menu-category">{item.category}</span>
-                      </div>
-                      <div className="menu-price">
-                        <span className="price-amount">Rs. {parseFloat(item.price).toFixed(0)}</span>
-                      </div>
-                    </div>
-
-                    <p className="menu-description">{item.description}</p>
-
-                    <div className="menu-actions">
-                      <button
-                        className={`availability-toggle ${item.availability === true ? 'available' : 'unavailable'}`}
-                        onClick={() => handleAvailabilityToggle(item._id, item.availability)}
-                      >
-                        {item.availability === true ? <FiToggleRight /> : <FiToggleLeft />}
-                        <span>{item.availability === true ? 'Available' : 'Unavailable'}</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="enhanced-empty-state">
-              <div className="empty-icon">
-                <FiCoffee />
-              </div>
-              <div className="empty-content">
-                <h3 className="empty-title">No menu items found</h3>
-                <p className="empty-description">
-                  {selectedCategory === "all"
-                    ? searchQuery
-                      ? 'Try adjusting your search criteria or filters'
-                      : 'Add some menu items to get started'
-                    : `No items found in ${selectedCategory} category`}
-                </p>
-                {!searchQuery && selectedCategory === 'all' && (
-                  <button className="empty-action-btn">
-                    <FiPlus />
-                    Add New Menu Item
-                  </button>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+      <div className="simple-admin-controls">
+        <input
+          type="text"
+          placeholder="Search menu items..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="simple-search-input"
+        />
+        <button 
+          onClick={() => navigate('/admin/add-menu')}
+          className="simple-btn simple-btn-primary"
+        >
+          Add New Menu Item
+        </button>
       </div>
 
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-        <Modal.Header closeButton className="border-0">
-          <Modal.Title>Confirm Delete</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete <strong>{itemToDelete?.name}</strong>?
-          <br />
-          This action cannot be undone.
-        </Modal.Body>
-        <Modal.Footer className="border-0">
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
-          </Button>
-          <Button 
-            variant="danger" 
-            onClick={() => handleDeleteItem(itemToDelete?._id)}
+      <div className="simple-table-container">
+        <table className="simple-table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Description</th>
+              <th>Ingredients</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredMenus.map(menu => (
+              <tr key={menu._id}>
+                <td>
+                  {menu.image ? (
+                    <img src={menu.image} alt={menu.name} className="simple-room-image" />
+                  ) : (
+                    <div className="simple-no-image">No Image</div>
+                  )}
+                </td>
+                <td>{menu.name}</td>
+                <td>{menu.category}</td>
+                <td>Rs. {menu.price}</td>
+                <td>
+                  <span className={`simple-status simple-status-${menu.status?.toLowerCase()}`}>
+                    {menu.status}
+                  </span>
+                </td>
+                <td className="simple-description">{menu.description}</td>
+                <td className="simple-description">{menu.ingredients}</td>
+                <td>
+                  <div className="simple-actions">
+                    <button 
+                      onClick={() => navigate(`/admin/update-menu/${menu._id}`)}
+                      className="simple-btn simple-btn-small"
+                    >
+                      Edit
+                    </button>
+                    <button 
+                      onClick={() => handleDelete(menu._id)}
+                      className="simple-btn simple-btn-small simple-btn-danger"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {filteredMenus.length === 0 && (
+        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <p>No menu items found.</p>
+          <button 
+            onClick={() => navigate('/admin/add-menu')}
+            className="simple-btn simple-btn-primary"
           >
-            Delete Item
-          </Button>
-        </Modal.Footer>
-      </Modal>
+            Add First Menu Item
+          </button>
+        </div>
+      )}
     </div>
   );
 };
 
-export default AdminViewMenus; 
+export default AdminViewMenus;

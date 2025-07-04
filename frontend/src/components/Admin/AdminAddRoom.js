@@ -1,543 +1,151 @@
-  import React, { useState, useEffect } from "react";
-  import axios from "axios";
-  import { useNavigate } from "react-router-dom";
-  import { toast } from "react-toastify";
-  import {
-    FiImage, FiPlus, FiHome, FiDollarSign, FiUsers, FiMapPin,
-    FiWifi, FiTv, FiCoffee, FiTruck, FiEye, FiCheck, FiX,
-    FiUpload, FiSave, FiRefreshCw, FiEdit, FiLayers, FiHeart
-  } from "react-icons/fi";
-  import "./AdminAddRoom.css";
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "./simple-admin.css";
 
-  const AdminAddRoom = () => {
-    const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const [imagePreview, setImagePreview] = useState(null);
-    const [imageUrl, setImageUrl] = useState("");
-    const [formData, setFormData] = useState({
-      roomNumber: "",
-      roomType: "",
-      price: "",
-      status: "Available",
-      description: "",
-      image: null,
-      capacity: "",
-      amenities: [],
-      floor: "",
-      size: "",
-      bedType: "",
-      smokingAllowed: false,
-      petFriendly: false
+const AdminAddRoom = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    roomNumber: '',
+    roomType: '',
+    capacity: '',
+    price: '',
+    status: 'Available',
+    description: '',
+    image: ''
+  });
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     });
-
-    useEffect(() => {
-      const token = localStorage.getItem("token");
-      const role = localStorage.getItem("role");
-      
-      if (!token || role !== "admin") {
-        toast.error("Please login as admin to access this page");
-        navigate("/login");
-        return;
-      }
-    }, [navigate]);
-
-    const handleInputChange = (e) => {
-      const { name, value, type, checked } = e.target;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value,
-      }));
-    };
-
-    const handleAmenityChange = (amenity) => {
-      setFormData((prev) => ({
-        ...prev,
-        amenities: prev.amenities.includes(amenity)
-          ? prev.amenities.filter(a => a !== amenity)
-          : [...prev.amenities, amenity]
-      }));
-    };
-
-    const handleImageChange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        if (!file.type.startsWith("image/")) {
-          toast.error("Please upload a valid image file");
-          return;
-        }
-        if (file.size > 5000000) {
-          toast.error("Image size should not exceed 5MB");
-          return;
-        }
-        setFormData((prev) => ({
-          ...prev,
-          image: file,
-        }));
-        
-        // Create image preview
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setImagePreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-      }
-    };
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      
-      if (!formData.roomNumber || !formData.roomType || !formData.price || !formData.description || !formData.capacity) {
-        toast.error("Please fill in all required fields (Room Number, Type, Price, Description, Capacity)");
-        return;
-      }
-
-      const submitData = new FormData();
-      Object.keys(formData).forEach(key => {
-        if (formData[key] !== null && formData[key] !== '') {
-          if (key === 'amenities') {
-            submitData.append(key, JSON.stringify(formData[key]));
-          } else {
-            submitData.append(key, formData[key]);
-          }
-        }
-      });
-
-      // Add image URL if provided
-      if (imageUrl.trim()) {
-        submitData.append('imageUrl', imageUrl.trim());
-      }
-
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-        const response = await axios.post(
-          `${apiUrl}/rooms`,
-          submitData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
-
-        toast.success("Room added successfully!");
-        setFormData({
-          roomNumber: "",
-          roomType: "",
-          price: "",
-          status: "Available",
-          description: "",
-          image: null,
-          capacity: "",
-          amenities: [],
-          floor: "",
-          size: "",
-          bedType: "",
-          smokingAllowed: false,
-          petFriendly: false
-        });
-        setImagePreview(null);
-        setImageUrl("");
-        
-        // Reset the file input
-        const fileInput = document.querySelector('input[type="file"]');
-        if (fileInput) {
-          fileInput.value = "";
-        }
-      } catch (error) {
-        console.error("Error adding room:", error);
-        
-        if (error.response?.status === 401 || error.response?.status === 403) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("role");
-          toast.error("Session expired. Please login again.");
-          navigate("/login");
-          return;
-        }
-        
-        const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to add room";
-        toast.error(errorMessage);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    return (
-      <div className="enhanced-add-room-module-container">
-        <div className="enhanced-add-room-header">
-          <div className="header-content">
-            <div className="title-section">
-              <div className="title-wrapper">
-                <div className="title-icon">
-                  <FiPlus />
-                </div>
-                <div className="title-text">
-                  <h1 className="page-title">Add New Room</h1>
-                  <p className="page-subtitle">Create a new room listing with detailed information</p>
-                </div>
-              </div>
-
-              <div className="header-actions">
-                <button
-                  className="action-btn secondary"
-                  onClick={() => window.history.back()}
-                >
-                  <FiX />
-                  <span>Cancel</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="enhanced-add-room-content">
-          <div className="content-container">
-            <div className="form-section">
-              <div className="form-card">
-                <div className="form-header">
-                  <h2 className="form-title">Room Details</h2>
-                  <p className="form-subtitle">Enter the basic information for the new room</p>
-                </div>
-
-                <form className="enhanced-room-form" onSubmit={handleSubmit}>
-                  <div className="form-grid">
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiHome className="label-icon" />
-                        Room Number
-                        <span className="required">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="roomNumber"
-                        className="enhanced-input"
-                        placeholder="e.g., 101, A-205"
-                        value={formData.roomNumber}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiHome className="label-icon" />
-                        Room Type
-                        <span className="required">*</span>
-                      </label>
-                      <select
-                        name="roomType"
-                        className="enhanced-select"
-                        value={formData.roomType}
-                        onChange={handleInputChange}
-                        required
-                      >
-                        <option value="">Select Room Type</option>
-                        <option value="Single">Single Room</option>
-                        <option value="Double">Double Room</option>
-                        <option value="Twin">Twin Room</option>
-                        <option value="Suite">Suite</option>
-                        <option value="Deluxe">Deluxe Room</option>
-                        <option value="Family">Family Room</option>
-                        <option value="Presidential">Presidential Suite</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiDollarSign className="label-icon" />
-                        Price per Night (PKR)
-                        <span className="required">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        name="price"
-                        className="enhanced-input"
-                        placeholder="Enter price in Pakistani Rupees"
-                        value={formData.price}
-                        onChange={handleInputChange}
-                        min="1000"
-                        step="100"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiUsers className="label-icon" />
-                        Capacity (Guests)
-                        <span className="required">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        name="capacity"
-                        className="enhanced-input"
-                        placeholder="Maximum number of guests"
-                        value={formData.capacity}
-                        onChange={handleInputChange}
-                        min="1"
-                        max="10"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiEdit className="label-icon" />
-                        Description
-                        <span className="required">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="description"
-                        className="enhanced-input"
-                        placeholder="Describe the room features and amenities"
-                        value={formData.description}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Additional Details Section */}
-                  <div className="form-section-divider">
-                    <h3 className="section-title">Additional Details</h3>
-                    <p className="section-subtitle">Optional information to enhance the room listing</p>
-                  </div>
-
-                  <div className="form-grid">
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiMapPin className="label-icon" />
-                        Floor
-                      </label>
-                      <input
-                        type="number"
-                        name="floor"
-                        className="enhanced-input"
-                        placeholder="Floor number"
-                        value={formData.floor}
-                        onChange={handleInputChange}
-                        min="1"
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiHome className="label-icon" />
-                        Room Size (sq ft)
-                      </label>
-                      <input
-                        type="number"
-                        name="size"
-                        className="enhanced-input"
-                        placeholder="Room size in square feet"
-                        value={formData.size}
-                        onChange={handleInputChange}
-                        min="100"
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiHome className="label-icon" />
-                        Bed Type
-                      </label>
-                      <select
-                        name="bedType"
-                        className="enhanced-select"
-                        value={formData.bedType}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select Bed Type</option>
-                        <option value="Single">Single Bed</option>
-                        <option value="Double">Double Bed</option>
-                        <option value="Queen">Queen Bed</option>
-                        <option value="King">King Bed</option>
-                        <option value="Twin">Twin Beds</option>
-                        <option value="Sofa Bed">Sofa Bed</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Amenities Section */}
-                  <div className="form-section-divider">
-                    <h3 className="section-title">Amenities & Features</h3>
-                    <p className="section-subtitle">Select available amenities for this room</p>
-                  </div>
-
-                  <div className="amenities-section">
-                    <div className="amenities-grid">
-                      {[
-                        { name: 'WiFi', icon: FiWifi },
-                        { name: 'AC', icon: FiHome },
-                        { name: 'TV', icon: FiTv },
-                        { name: 'Minibar', icon: FiCoffee },
-                        { name: 'Balcony', icon: FiHome },
-                        { name: 'Sea View', icon: FiEye },
-                        { name: 'City View', icon: FiEye },
-                        { name: 'Room Service', icon: FiHome },
-                        { name: 'Jacuzzi', icon: FiHome },
-                        { name: 'Kitchen', icon: FiCoffee },
-                        { name: 'Workspace', icon: FiHome },
-                        { name: 'Parking', icon: FiTruck }
-                      ].map(amenity => {
-                        const IconComponent = amenity.icon;
-                        return (
-                          <label key={amenity.name} className="amenity-checkbox">
-                            <input
-                              type="checkbox"
-                              checked={formData.amenities.includes(amenity.name)}
-                              onChange={() => handleAmenityChange(amenity.name)}
-                              className="checkbox-input"
-                            />
-                            <div className="checkbox-custom">
-                              <FiCheck className="check-icon" />
-                            </div>
-                            <IconComponent className="amenity-icon" />
-                            <span className="amenity-text">{amenity.name}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiHome className="label-icon" />
-                        Smoking Allowed
-                      </label>
-                      <select
-                        name="smokingAllowed"
-                        className="enhanced-select"
-                        value={formData.smokingAllowed}
-                        onChange={handleInputChange}
-                      >
-                        <option value={false}>No</option>
-                        <option value={true}>Yes</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiHeart className="label-icon" />
-                        Pet Friendly
-                      </label>
-                      <select
-                        name="petFriendly"
-                        className="enhanced-select"
-                        value={formData.petFriendly}
-                        onChange={handleInputChange}
-                      >
-                        <option value={false}>No</option>
-                        <option value={true}>Yes</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiImage className="label-icon" />
-                        Image URL
-                      </label>
-                      <input
-                        type="url"
-                        value={imageUrl}
-                        onChange={(e) => {
-                          setImageUrl(e.target.value);
-                          if (e.target.value) {
-                            setImagePreview(e.target.value);
-                          }
-                        }}
-                        className="enhanced-input"
-                        placeholder="https://images.unsplash.com/..."
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label className="form-label">
-                        <FiUpload className="label-icon" />
-                        Upload File
-                      </label>
-                      <input
-                        type="file"
-                        name="image"
-                        className="enhanced-input"
-                        onChange={handleImageChange}
-                        accept="image/*"
-                      />
-                    </div>
-
-                  <div className="form-actions">
-                    <button type="submit" className="enhanced-btn enhanced-btn-primary" disabled={loading}>
-                      {loading ? (
-                        <>
-                          <FiRefreshCw className="spinner" />
-                          <span>Adding Room...</span>
-                        </>
-                      ) : (
-                        <>
-                          <FiSave />
-                          <span>Add Room</span>
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-
-            <div className="room-preview-section">
-              <div className="preview-card">
-                <h3>Room Preview</h3>
-                {imagePreview ? (
-                  <div className="image-preview">
-                    <img src={imagePreview} alt="Room Preview" />
-                  </div>
-                ) : (
-                  <div className="preview-placeholder">
-                    <FiImage className="preview-icon" />
-                    <p>Upload an image to see preview</p>
-                  </div>
-                )}
-                <div className="preview-details">
-                  <div className="preview-item">
-                    <span>Room Number:</span>
-                    <span>{formData.roomNumber || 'N/A'}</span>
-                  </div>
-                  <div className="preview-item">
-                    <span>Type:</span>
-                    <span>{formData.roomType || 'N/A'}</span>
-                  </div>
-                  <div className="preview-item">
-                    <span>Price:</span>
-                    <span>{formData.price ? `Rs. ${parseInt(formData.price).toLocaleString('en-PK')}/night` : 'N/A'}</span>
-                  </div>
-                  <div className="preview-item">
-                    <span>Capacity:</span>
-                    <span>{formData.capacity ? `${formData.capacity} guests` : 'N/A'}</span>
-                  </div>
-                  <div className="preview-item">
-                    <span>Bed Type:</span>
-                    <span>{formData.bedType || 'N/A'}</span>
-                  </div>
-                  <div className="preview-item">
-                    <span>Floor:</span>
-                    <span>{formData.floor || 'N/A'}</span>
-                  </div>
-                  {formData.amenities.length > 0 && (
-                    <div className="preview-item">
-                      <span>Amenities:</span>
-                      <span>{formData.amenities.join(', ')}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
   };
 
-  export default AdminAddRoom;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      
+      await axios.post(`${apiUrl}/rooms`, formData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success("Room added successfully");
+      navigate('/admin/view-rooms');
+    } catch (error) {
+      console.error("Error adding room:", error);
+      toast.error("Failed to add room");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="simple-admin-container">
+      <div className="simple-admin-header">
+        <h1>Add New Room</h1>
+        <p>Add a new room to the system</p>
+      </div>
+
+      <div className="simple-form-container">
+        <form onSubmit={handleSubmit} className="simple-form">
+          <div className="simple-form-row">
+            <input
+              type="number"
+              name="roomNumber"
+              placeholder="Room Number"
+              value={formData.roomNumber}
+              onChange={handleInputChange}
+              required
+            />
+            <select
+              name="roomType"
+              value={formData.roomType}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Select Room Type</option>
+              <option value="Single">Single</option>
+              <option value="Double">Double</option>
+              <option value="Suite">Suite</option>
+              <option value="Deluxe">Deluxe</option>
+              <option value="Family">Family</option>
+            </select>
+          </div>
+
+          <div className="simple-form-row">
+            <input
+              type="number"
+              name="capacity"
+              placeholder="Capacity (number of people)"
+              value={formData.capacity}
+              onChange={handleInputChange}
+              required
+            />
+            <input
+              type="number"
+              name="price"
+              placeholder="Price per night"
+              value={formData.price}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+
+          <div className="simple-form-row">
+            <select
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="Available">Available</option>
+              <option value="Occupied">Occupied</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+            <input
+              type="url"
+              name="image"
+              placeholder="Image URL (optional)"
+              value={formData.image}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <textarea
+            name="description"
+            placeholder="Room Description"
+            value={formData.description}
+            onChange={handleInputChange}
+            rows="4"
+          />
+
+          <div className="simple-form-actions">
+            <button 
+              type="submit" 
+              className="simple-btn simple-btn-primary"
+              disabled={loading}
+            >
+              {loading ? 'Adding...' : 'Add Room'}
+            </button>
+            <button 
+              type="button" 
+              onClick={() => navigate('/admin/view-rooms')}
+              className="simple-btn simple-btn-secondary"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AdminAddRoom;

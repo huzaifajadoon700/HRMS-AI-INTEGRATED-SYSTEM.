@@ -1,0 +1,333 @@
+/* ========== Bootstrap Component Overrides - Clean Minimal Theme ========== */
+
+/* Bootstrap Card Overrides */
+.card {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-sm) !important;
+  color: var(--text-primary) !important;
+  transition: var(--transition-normal) !important;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md) !important;
+  transform: translateY(-1px);
+}
+
+.card-header {
+  background: var(--secondary-bg) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  padding: var(--spacing-lg) !important;
+}
+
+.card-body {
+  padding: var(--spacing-lg) !important;
+  color: var(--text-primary) !important;
+}
+
+.card-footer {
+  background: var(--secondary-bg) !important;
+  border-top: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+  padding: var(--spacing-lg) !important;
+}
+
+.card-title {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  margin-bottom: var(--spacing-md) !important;
+}
+
+.card-text {
+  color: var(--text-secondary) !important;
+  line-height: 1.6;
+}
+
+/* Bootstrap Button Overrides */
+.btn {
+  border-radius: var(--radius-md) !important;
+  font-weight: 500 !important;
+  font-size: var(--font-size-sm) !important;
+  padding: 0.5rem 1rem !important;
+  transition: var(--transition-normal) !important;
+  border: 1px solid transparent !important;
+}
+
+.btn-primary {
+  background: var(--accent-primary) !important;
+  border-color: var(--accent-primary) !important;
+  color: white !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+  color: white !important;
+  box-shadow: var(--shadow-md) !important;
+  transform: none !important;
+}
+
+.btn-outline-primary {
+  background: transparent !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background: var(--hover-bg) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.btn-secondary {
+  background: var(--secondary-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+  background: var(--hover-bg) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Bootstrap Form Overrides */
+.form-control {
+  background: var(--primary-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  font-size: var(--font-size-sm) !important;
+  padding: 0.5rem 0.75rem !important;
+  transition: var(--transition-normal) !important;
+}
+
+.form-control:focus {
+  background: var(--primary-bg) !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1) !important;
+  color: var(--text-primary) !important;
+  outline: none !important;
+}
+
+.form-control::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1;
+}
+
+.form-label {
+  color: var(--text-primary) !important;
+  font-weight: 500 !important;
+  font-size: var(--font-size-sm) !important;
+  margin-bottom: var(--spacing-sm) !important;
+}
+
+.form-select {
+  background: var(--primary-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text-primary) !important;
+  font-size: var(--font-size-sm) !important;
+}
+
+.form-select:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.1) !important;
+  outline: none !important;
+}
+
+/* Bootstrap Table Overrides */
+.table {
+  color: var(--text-primary) !important;
+  background: var(--card-bg) !important;
+  border-radius: var(--radius-lg) !important;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm) !important;
+}
+
+.table th {
+  background: var(--secondary-bg) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: var(--spacing-md) !important;
+}
+
+.table td {
+  color: var(--text-secondary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: var(--spacing-md) !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+  background: var(--secondary-bg) !important;
+}
+
+.table-hover tbody tr:hover {
+  background: var(--hover-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Bootstrap Modal Overrides */
+.modal-content {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.modal-header {
+  background: var(--secondary-bg) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  padding: var(--spacing-lg) !important;
+}
+
+.modal-title {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+}
+
+.modal-body {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  padding: var(--spacing-lg) !important;
+}
+
+.modal-footer {
+  background: var(--secondary-bg) !important;
+  border-top: 1px solid var(--border-color) !important;
+  padding: var(--spacing-lg) !important;
+}
+
+.btn-close {
+  filter: invert(1);
+  opacity: 0.6;
+}
+
+.btn-close:hover {
+  opacity: 1;
+}
+
+/* Bootstrap Navbar Overrides */
+.navbar {
+  background: var(--primary-bg) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-sm) !important;
+  backdrop-filter: blur(8px);
+}
+
+.navbar-brand {
+  color: var(--text-primary) !important;
+  font-weight: 700 !important;
+  font-size: var(--font-size-lg) !important;
+}
+
+.navbar-brand:hover {
+  color: var(--accent-primary) !important;
+}
+
+.navbar-nav .nav-link {
+  color: var(--text-secondary) !important;
+  font-weight: 500 !important;
+  font-size: var(--font-size-sm) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  border-radius: var(--radius-md) !important;
+  transition: var(--transition-normal) !important;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link:focus {
+  color: var(--text-primary) !important;
+  background: var(--hover-bg) !important;
+}
+
+.navbar-nav .nav-link.active {
+  color: var(--accent-primary) !important;
+  background: var(--hover-bg) !important;
+}
+
+/* Bootstrap Alert Overrides */
+.alert {
+  border-radius: var(--radius-md) !important;
+  border: 1px solid var(--border-color) !important;
+  padding: var(--spacing-md) !important;
+}
+
+.alert-primary {
+  background: rgba(15, 23, 42, 0.1) !important;
+  border-color: var(--accent-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+.alert-success {
+  background: rgba(34, 197, 94, 0.1) !important;
+  border-color: #22c55e !important;
+  color: var(--text-primary) !important;
+}
+
+.alert-danger {
+  background: rgba(239, 68, 68, 0.1) !important;
+  border-color: #ef4444 !important;
+  color: var(--text-primary) !important;
+}
+
+.alert-warning {
+  background: rgba(245, 158, 11, 0.1) !important;
+  border-color: #f59e0b !important;
+  color: var(--text-primary) !important;
+}
+
+/* Bootstrap Badge Overrides */
+.badge {
+  border-radius: var(--radius-sm) !important;
+  font-weight: 500 !important;
+  font-size: var(--font-size-xs) !important;
+}
+
+.badge.bg-primary {
+  background: var(--accent-primary) !important;
+  color: white !important;
+}
+
+.badge.bg-secondary {
+  background: var(--text-muted) !important;
+  color: white !important;
+}
+
+/* Bootstrap Dropdown Overrides */
+.dropdown-menu {
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: var(--spacing-sm) !important;
+}
+
+.dropdown-item {
+  color: var(--text-secondary) !important;
+  padding: var(--spacing-sm) var(--spacing-md) !important;
+  border-radius: var(--radius-sm) !important;
+  transition: var(--transition-normal) !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background: var(--hover-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.dropdown-item.active {
+  background: var(--accent-primary) !important;
+  color: white !important;
+}
