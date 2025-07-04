@@ -8,12 +8,12 @@ const AdminViewMenus = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [menus, setMenus] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
@@ -27,9 +27,11 @@ const AdminViewMenus = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/menus`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setMenus(response.data);
     } catch (error) {
@@ -46,12 +48,14 @@ const AdminViewMenus = () => {
   };
 
   const handleDelete = async (menuId) => {
-    if (window.confirm('Are you sure you want to delete this menu item?')) {
+    if (window.confirm("Are you sure you want to delete this menu item?")) {
       try {
         const token = localStorage.getItem("token");
-        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const apiUrl =
+          process.env.REACT_APP_API_BASE_URL ||
+          "https://hrms-bace.vercel.app/api";
         await axios.delete(`${apiUrl}/menus/${menuId}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Menu item deleted successfully");
         fetchMenus();
@@ -62,13 +66,19 @@ const AdminViewMenus = () => {
     }
   };
 
-  const filteredMenus = menus.filter(menu =>
-    menu.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    menu.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    menu.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredMenus = menus.filter(
+    (menu) =>
+      menu.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      menu.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      menu.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  if (loading)
+    return (
+      <div className="simple-admin-container">
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="simple-admin-container">
@@ -85,8 +95,8 @@ const AdminViewMenus = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="simple-search-input"
         />
-        <button 
-          onClick={() => navigate('/admin/add-menu')}
+        <button
+          onClick={() => navigate("/admin/add-menu")}
           className="simple-btn simple-btn-primary"
         >
           Add New Menu Item
@@ -108,11 +118,15 @@ const AdminViewMenus = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredMenus.map(menu => (
+            {filteredMenus.map((menu) => (
               <tr key={menu._id}>
                 <td>
                   {menu.image ? (
-                    <img src={menu.image} alt={menu.name} className="simple-room-image" />
+                    <img
+                      src={menu.image}
+                      alt={menu.name}
+                      className="simple-room-image"
+                    />
                   ) : (
                     <div className="simple-no-image">No Image</div>
                   )}
@@ -121,27 +135,21 @@ const AdminViewMenus = () => {
                 <td>{menu.category}</td>
                 <td>Rs. {menu.price}</td>
                 <td>
-                  <span className={`simple-status simple-status-${menu.status?.toLowerCase()}`}>
+                  <span
+                    className={`simple-status simple-status-${menu.status?.toLowerCase()}`}
+                  >
                     {menu.status}
                   </span>
                 </td>
                 <td className="simple-description">{menu.description}</td>
                 <td className="simple-description">{menu.ingredients}</td>
                 <td>
-                  <div className="simple-actions">
-                    <button 
-                      onClick={() => navigate(`/admin/update-menu/${menu._id}`)}
-                      className="simple-btn simple-btn-small"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(menu._id)}
-                      className="simple-btn simple-btn-small simple-btn-danger"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => handleDelete(menu._id)}
+                    className="simple-btn simple-btn-small simple-btn-danger"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -150,10 +158,10 @@ const AdminViewMenus = () => {
       </div>
 
       {filteredMenus.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No menu items found.</p>
-          <button 
-            onClick={() => navigate('/admin/add-menu')}
+          <button
+            onClick={() => navigate("/admin/add-menu")}
             className="simple-btn simple-btn-primary"
           >
             Add First Menu Item

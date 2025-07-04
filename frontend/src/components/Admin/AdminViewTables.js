@@ -8,12 +8,12 @@ const AdminViewTables = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [tables, setTables] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
@@ -27,9 +27,11 @@ const AdminViewTables = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/tables`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setTables(response.data);
     } catch (error) {
@@ -46,12 +48,14 @@ const AdminViewTables = () => {
   };
 
   const handleDelete = async (tableId) => {
-    if (window.confirm('Are you sure you want to delete this table?')) {
+    if (window.confirm("Are you sure you want to delete this table?")) {
       try {
         const token = localStorage.getItem("token");
-        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const apiUrl =
+          process.env.REACT_APP_API_BASE_URL ||
+          "https://hrms-bace.vercel.app/api";
         await axios.delete(`${apiUrl}/tables/${tableId}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Table deleted successfully");
         fetchTables();
@@ -62,13 +66,22 @@ const AdminViewTables = () => {
     }
   };
 
-  const filteredTables = tables.filter(table =>
-    table.tableNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-    table.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    table.type?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredTables = tables.filter(
+    (table) =>
+      table.tableNumber
+        ?.toString()
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      table.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      table.type?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  if (loading)
+    return (
+      <div className="simple-admin-container">
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="simple-admin-container">
@@ -85,8 +98,8 @@ const AdminViewTables = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="simple-search-input"
         />
-        <button 
-          onClick={() => navigate('/admin/add-table')}
+        <button
+          onClick={() => navigate("/admin/add-table")}
           className="simple-btn simple-btn-primary"
         >
           Add New Table
@@ -107,33 +120,27 @@ const AdminViewTables = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredTables.map(table => (
+            {filteredTables.map((table) => (
               <tr key={table._id}>
                 <td>{table.tableNumber}</td>
                 <td>{table.capacity} people</td>
                 <td>{table.location}</td>
-                <td>{table.type}</td>
+                <td>{table.tableType}</td>
                 <td>
-                  <span className={`simple-status simple-status-${table.status?.toLowerCase()}`}>
+                  <span
+                    className={`simple-status simple-status-${table.status?.toLowerCase()}`}
+                  >
                     {table.status}
                   </span>
                 </td>
                 <td className="simple-description">{table.description}</td>
                 <td>
-                  <div className="simple-actions">
-                    <button 
-                      onClick={() => navigate(`/admin/update-table/${table._id}`)}
-                      className="simple-btn simple-btn-small"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(table._id)}
-                      className="simple-btn simple-btn-small simple-btn-danger"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => handleDelete(table._id)}
+                    className="simple-btn simple-btn-small simple-btn-danger"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -142,10 +149,10 @@ const AdminViewTables = () => {
       </div>
 
       {filteredTables.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No tables found.</p>
-          <button 
-            onClick={() => navigate('/admin/add-table')}
+          <button
+            onClick={() => navigate("/admin/add-table")}
             className="simple-btn simple-btn-primary"
           >
             Add First Table

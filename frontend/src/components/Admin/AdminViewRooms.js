@@ -8,12 +8,12 @@ const AdminViewRooms = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [rooms, setRooms] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
@@ -27,9 +27,11 @@ const AdminViewRooms = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/rooms`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setRooms(response.data);
     } catch (error) {
@@ -46,12 +48,14 @@ const AdminViewRooms = () => {
   };
 
   const handleDelete = async (roomId) => {
-    if (window.confirm('Are you sure you want to delete this room?')) {
+    if (window.confirm("Are you sure you want to delete this room?")) {
       try {
         const token = localStorage.getItem("token");
-        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const apiUrl =
+          process.env.REACT_APP_API_BASE_URL ||
+          "https://hrms-bace.vercel.app/api";
         await axios.delete(`${apiUrl}/rooms/${roomId}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Room deleted successfully");
         fetchRooms();
@@ -62,13 +66,22 @@ const AdminViewRooms = () => {
     }
   };
 
-  const filteredRooms = rooms.filter(room =>
-    room.roomNumber?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.roomType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    room.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRooms = rooms.filter(
+    (room) =>
+      room.roomNumber
+        ?.toString()
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      room.roomType?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      room.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  if (loading)
+    return (
+      <div className="simple-admin-container">
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="simple-admin-container">
@@ -85,8 +98,8 @@ const AdminViewRooms = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="simple-search-input"
         />
-        <button 
-          onClick={() => navigate('/admin/add-room')}
+        <button
+          onClick={() => navigate("/admin/add-room")}
           className="simple-btn simple-btn-primary"
         >
           Add New Room
@@ -108,11 +121,15 @@ const AdminViewRooms = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredRooms.map(room => (
+            {filteredRooms.map((room) => (
               <tr key={room._id}>
                 <td>
                   {room.image ? (
-                    <img src={room.image} alt={room.roomType} className="simple-room-image" />
+                    <img
+                      src={room.image}
+                      alt={room.roomType}
+                      className="simple-room-image"
+                    />
                   ) : (
                     <div className="simple-no-image">No Image</div>
                   )}
@@ -122,26 +139,20 @@ const AdminViewRooms = () => {
                 <td>{room.capacity} people</td>
                 <td>Rs. {room.price}/night</td>
                 <td>
-                  <span className={`simple-status simple-status-${room.status?.toLowerCase()}`}>
+                  <span
+                    className={`simple-status simple-status-${room.status?.toLowerCase()}`}
+                  >
                     {room.status}
                   </span>
                 </td>
                 <td className="simple-description">{room.description}</td>
                 <td>
-                  <div className="simple-actions">
-                    <button 
-                      onClick={() => navigate(`/admin/update-room/${room._id}`)}
-                      className="simple-btn simple-btn-small"
-                    >
-                      Edit
-                    </button>
-                    <button 
-                      onClick={() => handleDelete(room._id)}
-                      className="simple-btn simple-btn-small simple-btn-danger"
-                    >
-                      Delete
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => handleDelete(room._id)}
+                    className="simple-btn simple-btn-small simple-btn-danger"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
@@ -150,10 +161,10 @@ const AdminViewRooms = () => {
       </div>
 
       {filteredRooms.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No rooms found.</p>
-          <button 
-            onClick={() => navigate('/admin/add-room')}
+          <button
+            onClick={() => navigate("/admin/add-room")}
             className="simple-btn simple-btn-primary"
           >
             Add First Room

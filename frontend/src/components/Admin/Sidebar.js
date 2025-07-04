@@ -360,10 +360,10 @@ const Sidebar = () => {
       >
         {/* Sidebar Header */}
         <div className="sidebar-header">
-          <div className="sidebar-logo">D</div>
+          <div className="sidebar-logo">H</div>
           {!isSidebarCollapsed && (
             <div>
-              <h3 className="sidebar-title">Delisas</h3>
+              <h3 className="sidebar-title">HRMS</h3>
               <p className="sidebar-subtitle">Dashboard</p>
             </div>
           )}
