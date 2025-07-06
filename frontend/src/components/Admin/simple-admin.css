@@ -560,6 +560,22 @@
     grid-template-columns: 1fr !important;
   }
 
+  /* Settings page tab navigation mobile improvements */
+  .simple-btn {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Hotel branding page mobile improvements */
+  .logo-preview-container {
+    margin-top: 10px !important;
+  }
+
+  .logo-preview-container img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
   /* Smaller gaps for very small screens */
   .simple-admin-controls {
     gap: 8px;

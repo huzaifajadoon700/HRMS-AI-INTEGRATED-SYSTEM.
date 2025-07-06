@@ -7,43 +7,43 @@ import "./simple-admin.css";
 const Setting = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('general');
+  const [activeTab, setActiveTab] = useState("general");
   const [settings, setSettings] = useState({
     // General Settings
-    hotelName: '',
-    hotelAddress: '',
-    hotelPhone: '',
-    hotelEmail: '',
-    currency: 'PKR',
-    timezone: 'Asia/Karachi',
-    
+    hotelName: "",
+    hotelAddress: "",
+    hotelPhone: "",
+    hotelEmail: "",
+    currency: "PKR",
+    timezone: "Asia/Karachi",
+
     // Booking Settings
-    checkInTime: '14:00',
-    checkOutTime: '12:00',
+    checkInTime: "14:00",
+    checkOutTime: "12:00",
     maxAdvanceBooking: 365,
-    cancellationPolicy: '24 hours',
-    
+    cancellationPolicy: "24 hours",
+
     // Payment Settings
     taxRate: 16,
     serviceCharge: 10,
-    paymentMethods: ['Cash', 'Card', 'Bank Transfer'],
-    
+    paymentMethods: ["Cash", "Card", "Bank Transfer"],
+
     // Notification Settings
     emailNotifications: true,
     smsNotifications: false,
     bookingConfirmation: true,
     paymentReminders: true,
-    
+
     // System Settings
     maintenanceMode: false,
-    backupFrequency: 'daily',
-    sessionTimeout: 30
+    backupFrequency: "daily",
+    sessionTimeout: 30,
   });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
@@ -56,9 +56,11 @@ const Setting = () => {
   const fetchSettings = async () => {
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/settings`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setSettings({ ...settings, ...response.data });
     } catch (error) {
@@ -71,7 +73,7 @@ const Setting = () => {
     const { name, value, type, checked } = e.target;
     setSettings({
       ...settings,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     });
   };
 
@@ -79,12 +81,14 @@ const Setting = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
+
       await axios.put(`${apiUrl}/settings`, settings, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       toast.success("Settings saved successfully");
     } catch (error) {
       console.error("Error saving settings:", error);
@@ -199,11 +203,14 @@ const Setting = () => {
           onChange={handleInputChange}
         />
       </div>
-      <div style={{ marginTop: '20px' }}>
+      <div style={{ marginTop: "20px" }}>
         <h4>Payment Methods</h4>
-        <div style={{ display: 'flex', gap: '20px', marginTop: '10px' }}>
-          {['Cash', 'Card', 'Bank Transfer', 'Online Payment'].map(method => (
-            <label key={method} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: "flex", gap: "20px", marginTop: "10px" }}>
+          {["Cash", "Card", "Bank Transfer", "Online Payment"].map((method) => (
+            <label
+              key={method}
+              style={{ display: "flex", alignItems: "center", gap: "8px" }}
+            >
               <input
                 type="checkbox"
                 checked={settings.paymentMethods.includes(method)}
@@ -211,12 +218,14 @@ const Setting = () => {
                   if (e.target.checked) {
                     setSettings({
                       ...settings,
-                      paymentMethods: [...settings.paymentMethods, method]
+                      paymentMethods: [...settings.paymentMethods, method],
                     });
                   } else {
                     setSettings({
                       ...settings,
-                      paymentMethods: settings.paymentMethods.filter(m => m !== method)
+                      paymentMethods: settings.paymentMethods.filter(
+                        (m) => m !== method
+                      ),
                     });
                   }
                 }}
@@ -232,14 +241,17 @@ const Setting = () => {
   const renderNotificationSettings = () => (
     <div className="simple-form">
       <h3>Notification Settings</h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
         {[
-          { key: 'emailNotifications', label: 'Email Notifications' },
-          { key: 'smsNotifications', label: 'SMS Notifications' },
-          { key: 'bookingConfirmation', label: 'Booking Confirmation' },
-          { key: 'paymentReminders', label: 'Payment Reminders' }
-        ].map(item => (
-          <label key={item.key} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          { key: "emailNotifications", label: "Email Notifications" },
+          { key: "smsNotifications", label: "SMS Notifications" },
+          { key: "bookingConfirmation", label: "Booking Confirmation" },
+          { key: "paymentReminders", label: "Payment Reminders" },
+        ].map((item) => (
+          <label
+            key={item.key}
+            style={{ display: "flex", alignItems: "center", gap: "12px" }}
+          >
             <input
               type="checkbox"
               name={item.key}
@@ -261,19 +273,38 @@ const Setting = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div style={{ marginBottom: '30px' }}>
-        <div style={{ display: 'flex', gap: '10px', borderBottom: '1px solid #e5e7eb' }}>
+      <div style={{ marginBottom: "30px" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: window.innerWidth <= 768 ? "5px" : "10px",
+            borderBottom: "1px solid #e5e7eb",
+            overflowX: "auto",
+            paddingBottom: "5px",
+          }}
+        >
           {[
-            { key: 'general', label: 'General' },
-            { key: 'booking', label: 'Booking' },
-            { key: 'payment', label: 'Payment' },
-            { key: 'notifications', label: 'Notifications' }
-          ].map(tab => (
+            { key: "general", label: "General" },
+            { key: "booking", label: "Booking" },
+            { key: "payment", label: "Payment" },
+            { key: "notifications", label: "Notifications" },
+          ].map((tab) => (
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`simple-btn ${activeTab === tab.key ? 'simple-btn-primary' : 'simple-btn-secondary'}`}
-              style={{ borderRadius: '0', borderBottom: 'none' }}
+              className={`simple-btn ${
+                activeTab === tab.key
+                  ? "simple-btn-primary"
+                  : "simple-btn-secondary"
+              }`}
+              style={{
+                borderRadius: "0",
+                borderBottom: "none",
+                minWidth: window.innerWidth <= 768 ? "80px" : "auto",
+                fontSize: window.innerWidth <= 768 ? "12px" : "14px",
+                padding: window.innerWidth <= 768 ? "8px 12px" : "10px 16px",
+                whiteSpace: "nowrap",
+              }}
             >
               {tab.label}
             </button>
@@ -283,20 +314,20 @@ const Setting = () => {
 
       {/* Tab Content */}
       <div className="simple-form-container">
-        {activeTab === 'general' && renderGeneralSettings()}
-        {activeTab === 'booking' && renderBookingSettings()}
-        {activeTab === 'payment' && renderPaymentSettings()}
-        {activeTab === 'notifications' && renderNotificationSettings()}
+        {activeTab === "general" && renderGeneralSettings()}
+        {activeTab === "booking" && renderBookingSettings()}
+        {activeTab === "payment" && renderPaymentSettings()}
+        {activeTab === "notifications" && renderNotificationSettings()}
 
-        <div className="simple-form-actions" style={{ marginTop: '30px' }}>
-          <button 
+        <div className="simple-form-actions" style={{ marginTop: "30px" }}>
+          <button
             onClick={handleSave}
             className="simple-btn simple-btn-primary"
             disabled={loading}
           >
-            {loading ? 'Saving...' : 'Save Settings'}
+            {loading ? "Saving..." : "Save Settings"}
           </button>
-          <button 
+          <button
             onClick={fetchSettings}
             className="simple-btn simple-btn-secondary"
           >
