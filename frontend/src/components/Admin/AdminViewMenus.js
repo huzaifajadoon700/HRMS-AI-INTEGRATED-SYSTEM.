@@ -103,54 +103,102 @@ const AdminViewMenus = () => {
         </button>
       </div>
 
-      <div className="simple-table-container">
-        <table className="simple-table">
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
+      <div
+        className="simple-table-container"
+        style={{ overflowX: "auto", width: "100%" }}
+      >
+        <table
+          className="simple-table"
+          style={{ minWidth: "1000px", width: "100%" }}
+        >
           <thead>
             <tr>
-              <th className="hide-mobile">Image</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th className="hide-mobile">Description</th>
-              <th className="hide-mobile">Ingredients</th>
-              <th>Actions</th>
+              <th style={{ minWidth: "100px" }}>Image</th>
+              <th style={{ minWidth: "150px" }}>Name</th>
+              <th style={{ minWidth: "120px" }}>Category</th>
+              <th style={{ minWidth: "100px" }}>Price</th>
+              <th style={{ minWidth: "100px" }}>Status</th>
+              <th style={{ minWidth: "200px" }}>Description</th>
+              <th style={{ minWidth: "200px" }}>Ingredients</th>
+              <th style={{ minWidth: "120px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredMenus.map((menu) => (
               <tr key={menu._id}>
-                <td className="hide-mobile">
+                <td style={{ minWidth: "100px" }}>
                   {menu.image ? (
                     <img
                       src={menu.image}
                       alt={menu.name}
                       className="simple-room-image"
+                      style={{
+                        width: "60px",
+                        height: "40px",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                      }}
                     />
                   ) : (
-                    <div className="simple-no-image">No Image</div>
+                    <div
+                      className="simple-no-image"
+                      style={{ fontSize: "12px", color: "#6b7280" }}
+                    >
+                      No Image
+                    </div>
                   )}
                 </td>
-                <td>{menu.name}</td>
-                <td>{menu.category}</td>
-                <td>Rs. {menu.price}</td>
-                <td>
+                <td style={{ minWidth: "150px" }}>{menu.name}</td>
+                <td style={{ minWidth: "120px" }}>{menu.category}</td>
+                <td style={{ minWidth: "100px" }}>Rs. {menu.price}</td>
+                <td style={{ minWidth: "100px" }}>
                   <span
                     className={`simple-status simple-status-${menu.status?.toLowerCase()}`}
                   >
                     {menu.status}
                   </span>
                 </td>
-                <td className="hide-mobile simple-description">
+                <td
+                  style={{
+                    minWidth: "200px",
+                    maxWidth: "200px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {menu.description}
                 </td>
-                <td className="hide-mobile simple-description">
+                <td
+                  style={{
+                    minWidth: "200px",
+                    maxWidth: "200px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {menu.ingredients}
                 </td>
-                <td>
+                <td style={{ minWidth: "120px" }}>
                   <button
                     onClick={() => handleDelete(menu._id)}
                     className="simple-btn simple-btn-small simple-btn-danger"
+                    style={{ whiteSpace: "nowrap" }}
                   >
                     Delete
                   </button>

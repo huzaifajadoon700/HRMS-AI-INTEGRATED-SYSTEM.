@@ -126,6 +126,13 @@
   gap: 16px;
 }
 
+/* Responsive two-column layout */
+.responsive-two-column {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+}
+
 .simple-form input,
 .simple-form select,
 .simple-form textarea {
@@ -546,6 +553,11 @@
   /* Stack form elements vertically */
   .simple-form-row {
     grid-template-columns: 1fr;
+  }
+
+  /* Force all two-column layouts to single column on mobile */
+  .responsive-two-column {
+    grid-template-columns: 1fr !important;
   }
 
   /* Smaller gaps for very small screens */

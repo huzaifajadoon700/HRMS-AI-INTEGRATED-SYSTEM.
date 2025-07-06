@@ -126,24 +126,46 @@ const AdminOrders = () => {
         </button>
       </div>
 
-      <div className="simple-table-container">
-        <table className="simple-table">
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
+      <div
+        className="simple-table-container"
+        style={{ overflowX: "auto", width: "100%" }}
+      >
+        <table
+          className="simple-table"
+          style={{ minWidth: "900px", width: "100%" }}
+        >
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th className="hide-mobile">Items</th>
-              <th>Total Amount</th>
-              <th>Status</th>
-              <th className="hide-mobile">Date</th>
-              <th>Actions</th>
+              <th style={{ minWidth: "120px" }}>Order ID</th>
+              <th style={{ minWidth: "180px" }}>Customer</th>
+              <th style={{ minWidth: "200px" }}>Items</th>
+              <th style={{ minWidth: "120px" }}>Total Amount</th>
+              <th style={{ minWidth: "100px" }}>Status</th>
+              <th style={{ minWidth: "120px" }}>Date</th>
+              <th style={{ minWidth: "160px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
-                <td>#{order.orderNumber || order._id.slice(-8)}</td>
-                <td>
+                <td style={{ minWidth: "120px" }}>
+                  #{order.orderNumber || order._id.slice(-8)}
+                </td>
+                <td style={{ minWidth: "180px" }}>
                   <div>
                     <div style={{ fontWeight: "bold" }}>
                       {order.customerName || order.customer?.name || "N/A"}
@@ -153,24 +175,42 @@ const AdminOrders = () => {
                     </div>
                   </div>
                 </td>
-                <td className="hide-mobile">
+                <td
+                  style={{
+                    minWidth: "200px",
+                    maxWidth: "200px",
+                    overflow: "hidden",
+                  }}
+                >
                   <div style={{ maxWidth: "200px" }}>
                     {order.items?.map((item, index) => (
-                      <div key={index} style={{ fontSize: "12px" }}>
+                      <div
+                        key={index}
+                        style={{
+                          fontSize: "12px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
                         {item.name} x{item.quantity}
                       </div>
                     )) || "No items"}
                   </div>
                 </td>
-                <td>Rs. {order.totalAmount || order.totalPrice || 0}</td>
-                <td>
+                <td style={{ minWidth: "120px" }}>
+                  Rs. {order.totalAmount || order.totalPrice || 0}
+                </td>
+                <td style={{ minWidth: "100px" }}>
                   <span
                     className={`simple-status ${getStatusColor(order.status)}`}
                   >
                     {order.status || "Pending"}
                   </span>
                 </td>
-                <td className="hide-mobile">{formatDate(order.createdAt)}</td>
+                <td style={{ minWidth: "120px" }}>
+                  {formatDate(order.createdAt)}
+                </td>
                 <td>
                   <div className="simple-actions">
                     {order.status === "pending" && (

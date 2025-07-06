@@ -131,13 +131,7 @@ const AdminUpdateMenu = () => {
         </button>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: window.innerWidth <= 768 ? "1fr" : "1fr 1fr",
-          gap: "30px",
-        }}
-      >
+      <div className="responsive-two-column">
         {/* Menu Selection */}
         <div className="simple-table-container">
           <div style={{ padding: "20px", borderBottom: "1px solid #e5e7eb" }}>
