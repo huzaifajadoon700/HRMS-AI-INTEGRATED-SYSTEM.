@@ -8,25 +8,25 @@ const AdminCustomerManagement = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('All Status');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All Status");
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    city: '',
-    country: '',
-    status: 'Active',
-    membershipType: 'Regular'
+    name: "",
+    email: "",
+    phone: "",
+    address: "",
+    city: "",
+    country: "",
+    status: "Active",
+    membershipType: "Regular",
   });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
@@ -40,9 +40,11 @@ const AdminCustomerManagement = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/customers`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setCustomers(response.data);
     } catch (error) {
@@ -61,7 +63,7 @@ const AdminCustomerManagement = () => {
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -69,18 +71,26 @@ const AdminCustomerManagement = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      const url = editingCustomer ? `${apiUrl}/customers/${editingCustomer._id}` : `${apiUrl}/customers`;
-      const method = editingCustomer ? 'PUT' : 'POST';
-      
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
+      const url = editingCustomer
+        ? `${apiUrl}/customers/${editingCustomer._id}`
+        : `${apiUrl}/customers`;
+      const method = editingCustomer ? "PUT" : "POST";
+
       await axios({
         method,
         url,
         data: formData,
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
-      toast.success(editingCustomer ? "Customer updated successfully" : "Customer added successfully");
+
+      toast.success(
+        editingCustomer
+          ? "Customer updated successfully"
+          : "Customer added successfully"
+      );
       fetchCustomers();
       resetForm();
     } catch (error) {
@@ -96,12 +106,14 @@ const AdminCustomerManagement = () => {
   };
 
   const handleDelete = async (customerId) => {
-    if (window.confirm('Are you sure you want to delete this customer?')) {
+    if (window.confirm("Are you sure you want to delete this customer?")) {
       try {
         const token = localStorage.getItem("token");
-        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const apiUrl =
+          process.env.REACT_APP_API_BASE_URL ||
+          "https://hrms-bace.vercel.app/api";
         await axios.delete(`${apiUrl}/customers/${customerId}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Customer deleted successfully");
         fetchCustomers();
@@ -114,28 +126,35 @@ const AdminCustomerManagement = () => {
 
   const resetForm = () => {
     setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      address: '',
-      city: '',
-      country: '',
-      status: 'Active',
-      membershipType: 'Regular'
+      name: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      country: "",
+      status: "Active",
+      membershipType: "Regular",
     });
     setEditingCustomer(null);
     setShowAddForm(false);
   };
 
-  const filteredCustomers = customers.filter(customer => {
-    const matchesSearch = customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         customer.phone?.includes(searchTerm);
-    const matchesStatus = statusFilter === 'All Status' || customer.status === statusFilter;
+  const filteredCustomers = customers.filter((customer) => {
+    const matchesSearch =
+      customer.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.phone?.includes(searchTerm);
+    const matchesStatus =
+      statusFilter === "All Status" || customer.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  if (loading)
+    return (
+      <div className="simple-admin-container">
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="simple-admin-container">
@@ -145,7 +164,7 @@ const AdminCustomerManagement = () => {
       </div>
 
       <div className="simple-admin-controls">
-        <div style={{ display: 'flex', gap: '16px', flex: 1 }}>
+        <div style={{ display: "flex", gap: "16px", flex: 1 }}>
           <input
             type="text"
             placeholder="Search customers..."
@@ -157,7 +176,7 @@ const AdminCustomerManagement = () => {
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="simple-search-input"
-            style={{ maxWidth: '200px' }}
+            style={{ maxWidth: "200px" }}
           >
             <option value="All Status">All Status</option>
             <option value="Active">Active</option>
@@ -165,7 +184,7 @@ const AdminCustomerManagement = () => {
             <option value="VIP">VIP</option>
           </select>
         </div>
-        <button 
+        <button
           onClick={() => setShowAddForm(true)}
           className="simple-btn simple-btn-primary"
         >
@@ -175,7 +194,7 @@ const AdminCustomerManagement = () => {
 
       {showAddForm && (
         <div className="simple-form-container">
-          <h3>{editingCustomer ? 'Edit Customer' : 'Add New Customer'}</h3>
+          <h3>{editingCustomer ? "Edit Customer" : "Add New Customer"}</h3>
           <form onSubmit={handleSubmit} className="simple-form">
             <div className="simple-form-row">
               <input
@@ -253,9 +272,13 @@ const AdminCustomerManagement = () => {
             />
             <div className="simple-form-actions">
               <button type="submit" className="simple-btn simple-btn-primary">
-                {editingCustomer ? 'Update Customer' : 'Add Customer'}
+                {editingCustomer ? "Update Customer" : "Add Customer"}
               </button>
-              <button type="button" onClick={resetForm} className="simple-btn simple-btn-secondary">
+              <button
+                type="button"
+                onClick={resetForm}
+                className="simple-btn simple-btn-secondary"
+              >
                 Cancel
               </button>
             </div>
@@ -269,37 +292,39 @@ const AdminCustomerManagement = () => {
             <tr>
               <th>Name</th>
               <th>Email</th>
-              <th>Phone</th>
-              <th>City</th>
-              <th>Country</th>
-              <th>Membership</th>
+              <th className="hide-mobile">Phone</th>
+              <th className="hide-mobile">City</th>
+              <th className="hide-mobile">Country</th>
+              <th className="hide-mobile">Membership</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers.map(customer => (
+            {filteredCustomers.map((customer) => (
               <tr key={customer._id}>
                 <td>{customer.name}</td>
                 <td>{customer.email}</td>
                 <td>{customer.phone}</td>
-                <td>{customer.city || 'N/A'}</td>
-                <td>{customer.country || 'N/A'}</td>
+                <td>{customer.city || "N/A"}</td>
+                <td>{customer.country || "N/A"}</td>
                 <td>{customer.membershipType}</td>
                 <td>
-                  <span className={`simple-status simple-status-${customer.status?.toLowerCase()}`}>
+                  <span
+                    className={`simple-status simple-status-${customer.status?.toLowerCase()}`}
+                  >
                     {customer.status}
                   </span>
                 </td>
                 <td>
                   <div className="simple-actions">
-                    <button 
+                    <button
                       onClick={() => handleEdit(customer)}
                       className="simple-btn simple-btn-small"
                     >
                       Edit
                     </button>
-                    <button 
+                    <button
                       onClick={() => handleDelete(customer._id)}
                       className="simple-btn simple-btn-small simple-btn-danger"
                     >
@@ -314,9 +339,9 @@ const AdminCustomerManagement = () => {
       </div>
 
       {filteredCustomers.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No customers found.</p>
-          <button 
+          <button
             onClick={() => setShowAddForm(true)}
             className="simple-btn simple-btn-primary"
           >
