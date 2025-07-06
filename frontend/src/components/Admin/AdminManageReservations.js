@@ -13,13 +13,13 @@ const AdminManageReservations = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
       return;
     }
-    
+
     fetchReservations();
   }, [navigate]);
 
@@ -27,14 +27,16 @@ const AdminManageReservations = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/reservations`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
-      
+
       setReservations(response.data);
       toast.success("Reservations loaded successfully");
     } catch (error) {
@@ -51,22 +53,32 @@ const AdminManageReservations = () => {
   };
 
   const handleDeleteReservation = async (reservationId) => {
-    if (!window.confirm("Are you sure you want to delete this reservation? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this reservation? This action cannot be undone."
+      )
+    ) {
       return;
     }
-    
+
     setDeletingReservationId(reservationId);
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       await axios.delete(`${apiUrl}/reservations/${reservationId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
 
-      setReservations(prevReservations => prevReservations.filter(reservation => reservation._id !== reservationId));
+      setReservations((prevReservations) =>
+        prevReservations.filter(
+          (reservation) => reservation._id !== reservationId
+        )
+      );
       toast.success("Reservation deleted successfully");
     } catch (error) {
       console.error("Error deleting reservation:", error);
@@ -82,30 +94,35 @@ const AdminManageReservations = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
   const formatTime = (timeString) => {
-    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(`2000-01-01T${timeString}`).toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getReservationStatus = (reservation) => {
     const today = new Date();
     const reservationDate = new Date(reservation.reservationDate);
-    
-    if (reservationDate.toDateString() === today.toDateString()) return 'today';
-    if (reservationDate > today) return 'upcoming';
-    return 'past';
+
+    if (reservationDate.toDateString() === today.toDateString()) return "today";
+    if (reservationDate > today) return "upcoming";
+    return "past";
   };
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  if (loading)
+    return (
+      <div className="simple-admin-container">
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="simple-admin-container">
@@ -115,55 +132,94 @@ const AdminManageReservations = () => {
       </div>
 
       <div className="simple-admin-controls">
-        <button 
+        <button
           onClick={fetchReservations}
           disabled={loading}
           className="simple-btn simple-btn-primary"
         >
-          {loading ? 'Loading...' : 'Refresh Reservations'}
+          {loading ? "Loading..." : "Refresh Reservations"}
         </button>
       </div>
 
-      <div className="simple-table-container">
-        <table className="simple-table">
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
+      <div
+        className="simple-table-container"
+        style={{ overflowX: "auto", width: "100%" }}
+      >
+        <table
+          className="simple-table"
+          style={{ minWidth: "900px", width: "100%" }}
+        >
           <thead>
             <tr>
-              <th>Reservation ID</th>
-              <th>Customer</th>
-              <th>Table</th>
-              <th>Date</th>
-              <th>Time</th>
-              <th>Guests</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th style={{ minWidth: "140px" }}>Reservation ID</th>
+              <th style={{ minWidth: "150px" }}>Customer</th>
+              <th style={{ minWidth: "100px" }}>Table</th>
+              <th style={{ minWidth: "120px" }}>Date</th>
+              <th style={{ minWidth: "100px" }}>Time</th>
+              <th style={{ minWidth: "80px" }}>Guests</th>
+              <th style={{ minWidth: "100px" }}>Status</th>
+              <th style={{ minWidth: "160px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {reservations.map(reservation => (
+            {reservations.map((reservation) => (
               <tr key={reservation._id}>
                 <td>#{reservation._id.slice(-8)}</td>
                 <td>
                   <div>
-                    <div style={{ fontWeight: 'bold' }}>{reservation.customerName || reservation.customer?.name || 'N/A'}</div>
-                    <div style={{ fontSize: '12px', color: '#666' }}>{reservation.customerEmail || reservation.customer?.email || ''}</div>
+                    <div style={{ fontWeight: "bold" }}>
+                      {reservation.customerName ||
+                        reservation.customer?.name ||
+                        "N/A"}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#666" }}>
+                      {reservation.customerEmail ||
+                        reservation.customer?.email ||
+                        ""}
+                    </div>
                   </div>
                 </td>
-                <td>Table {reservation.tableNumber || reservation.table?.tableNumber || 'N/A'}</td>
+                <td>
+                  Table{" "}
+                  {reservation.tableNumber ||
+                    reservation.table?.tableNumber ||
+                    "N/A"}
+                </td>
                 <td>{formatDate(reservation.reservationDate)}</td>
-                <td>{formatTime(reservation.reservationTime || '12:00')}</td>
+                <td>{formatTime(reservation.reservationTime || "12:00")}</td>
                 <td>{reservation.numberOfGuests || reservation.guests || 1}</td>
                 <td>
-                  <span className={`simple-status simple-status-${getReservationStatus(reservation)}`}>
+                  <span
+                    className={`simple-status simple-status-${getReservationStatus(
+                      reservation
+                    )}`}
+                  >
                     {getReservationStatus(reservation)}
                   </span>
                 </td>
                 <td>
-                  <button 
+                  <button
                     onClick={() => handleDeleteReservation(reservation._id)}
                     className="simple-btn simple-btn-small simple-btn-danger"
                     disabled={deletingReservationId === reservation._id}
                   >
-                    {deletingReservationId === reservation._id ? 'Deleting...' : 'Delete'}
+                    {deletingReservationId === reservation._id
+                      ? "Deleting..."
+                      : "Delete"}
                   </button>
                 </td>
               </tr>
@@ -173,7 +229,7 @@ const AdminManageReservations = () => {
       </div>
 
       {reservations.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No reservations found.</p>
         </div>
       )}

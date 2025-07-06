@@ -21,7 +21,9 @@ const AdminManageTables = () => {
 
   const fetchTables = async () => {
     try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/tables`);
       setTables(response.data);
     } catch (error) {
@@ -56,7 +58,9 @@ const AdminManageTables = () => {
       data.append("image", image);
     }
     try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       await axios.post(`${apiUrl}/tables/add`, data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -96,12 +100,12 @@ const AdminManageTables = () => {
       data.append("image", image);
     }
     try {
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      await axios.put(
-        `${apiUrl}/tables/${selectedTable._id}`,
-        data,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
+      await axios.put(`${apiUrl}/tables/${selectedTable._id}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       alert("Table updated successfully!");
       fetchTables();
       setShowUpdateModal(false);
@@ -114,7 +118,9 @@ const AdminManageTables = () => {
   const handleDeleteTable = async (id) => {
     if (window.confirm("Are you sure you want to delete this table?")) {
       try {
-        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+        const apiUrl =
+          process.env.REACT_APP_API_BASE_URL ||
+          "https://hrms-bace.vercel.app/api";
         await axios.delete(`${apiUrl}/tables/${id}`);
         fetchTables();
       } catch (error) {
@@ -132,7 +138,11 @@ const AdminManageTables = () => {
     <div className="admin-manage-tables">
       <div className="header">
         <h2 className="cosmic-title">Manage Tables</h2>
-        <Button variant="cosmic" onClick={handleShowAddTable} className="cosmic-button">
+        <Button
+          variant="cosmic"
+          onClick={handleShowAddTable}
+          className="cosmic-button"
+        >
           <i className="bi bi-plus-circle"></i> Add Table
         </Button>
       </div>
@@ -176,7 +186,9 @@ const AdminManageTables = () => {
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="table-capacity">Capacity (Number of Guests)</label>
+                <label htmlFor="table-capacity">
+                  Capacity (Number of Guests)
+                </label>
                 <input
                   type="number"
                   className="form-control cosmic-input"
@@ -237,31 +249,49 @@ const AdminManageTables = () => {
         </div>
       )}
 
-      <div className="table-responsive cosmic-table-container">
-        <table className="table cosmic-table">
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
+      <div
+        className="simple-table-container"
+        style={{ overflowX: "auto", width: "100%" }}
+      >
+        <table
+          className="simple-table"
+          style={{ minWidth: "900px", width: "100%" }}
+        >
           <thead>
             <tr>
-              <th>Table ID</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Capacity</th>
-              <th>Status</th>
-              <th>Image</th>
-              <th>Actions</th>
+              <th style={{ minWidth: "150px" }}>Table ID</th>
+              <th style={{ minWidth: "120px" }}>Name</th>
+              <th style={{ minWidth: "100px" }}>Type</th>
+              <th style={{ minWidth: "100px" }}>Capacity</th>
+              <th style={{ minWidth: "100px" }}>Status</th>
+              <th style={{ minWidth: "100px" }}>Image</th>
+              <th style={{ minWidth: "160px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {tables.map((table) => (
               <tr key={table._id}>
-                <td>{table._id}</td>
-                <td>{table.tableName}</td>
-                <td>{table.tableType}</td>
-                <td>{table.capacity}</td>
-                <td>
+                <td style={{ minWidth: "150px" }}>{table._id}</td>
+                <td style={{ minWidth: "120px" }}>{table.tableName}</td>
+                <td style={{ minWidth: "100px" }}>{table.tableType}</td>
+                <td style={{ minWidth: "100px" }}>{table.capacity}</td>
+                <td style={{ minWidth: "100px" }}>
                   <span
-                    className={`badge cosmic-badge ${
-                      table.status === "Available" ? "available" : "unavailable"
-                    }`}
+                    className={`simple-status simple-status-${table.status?.toLowerCase()}`}
                   >
                     {table.status}
                   </span>
@@ -269,7 +299,10 @@ const AdminManageTables = () => {
                 <td>
                   {table.image && (
                     <img
-                      src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${table.image}`}
+                      src={`${
+                        process.env.REACT_APP_API_URL ||
+                        "https://hrms-bace.vercel.app"
+                      }${table.image}`}
                       alt={table.tableName}
                       className="cosmic-table-image"
                     />
@@ -308,23 +341,41 @@ const AdminManageTables = () => {
       </div>
 
       {/* Table Details Modal */}
-      <Modal show={showDetailsModal} onHide={() => setShowDetailsModal(false)} centered className="cosmic-modal">
+      <Modal
+        show={showDetailsModal}
+        onHide={() => setShowDetailsModal(false)}
+        centered
+        className="cosmic-modal"
+      >
         <Modal.Header closeButton className="cosmic-modal-header">
           <Modal.Title>Table Details</Modal.Title>
         </Modal.Header>
         <Modal.Body className="cosmic-modal-body">
           {selectedTable && (
             <div>
-              <p><strong>Table ID:</strong> {selectedTable._id}</p>
-              <p><strong>Name:</strong> {selectedTable.tableName}</p>
-              <p><strong>Type:</strong> {selectedTable.tableType}</p>
-              <p><strong>Capacity:</strong> {selectedTable.capacity}</p>
-              <p><strong>Status:</strong> {selectedTable.status}</p>
+              <p>
+                <strong>Table ID:</strong> {selectedTable._id}
+              </p>
+              <p>
+                <strong>Name:</strong> {selectedTable.tableName}
+              </p>
+              <p>
+                <strong>Type:</strong> {selectedTable.tableType}
+              </p>
+              <p>
+                <strong>Capacity:</strong> {selectedTable.capacity}
+              </p>
+              <p>
+                <strong>Status:</strong> {selectedTable.status}
+              </p>
               <p>
                 <strong>Image:</strong>
                 {selectedTable.image && (
                   <img
-                    src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${selectedTable.image}`}
+                    src={`${
+                      process.env.REACT_APP_API_URL ||
+                      "https://hrms-bace.vercel.app"
+                    }${selectedTable.image}`}
                     alt="Table"
                     className="img-fluid cosmic-modal-img mt-2 rounded"
                   />
@@ -334,14 +385,22 @@ const AdminManageTables = () => {
           )}
         </Modal.Body>
         <Modal.Footer className="cosmic-modal-footer">
-          <Button variant="secondary" onClick={() => setShowDetailsModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowDetailsModal(false)}
+          >
             Close
           </Button>
         </Modal.Footer>
       </Modal>
 
       {/* Update Table Modal */}
-      <Modal show={showUpdateModal} onHide={() => setShowUpdateModal(false)} centered className="cosmic-modal">
+      <Modal
+        show={showUpdateModal}
+        onHide={() => setShowUpdateModal(false)}
+        centered
+        className="cosmic-modal"
+      >
         <Modal.Header closeButton className="cosmic-modal-header">
           <Modal.Title>Update Table</Modal.Title>
         </Modal.Header>
@@ -378,7 +437,9 @@ const AdminManageTables = () => {
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="update-table-capacity">Capacity (Number of Guests)</label>
+                <label htmlFor="update-table-capacity">
+                  Capacity (Number of Guests)
+                </label>
                 <input
                   type="number"
                   className="form-control cosmic-input"
@@ -406,7 +467,9 @@ const AdminManageTables = () => {
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="update-table-image">Upload New Image (optional)</label>
+                <label htmlFor="update-table-image">
+                  Upload New Image (optional)
+                </label>
                 <input
                   type="file"
                   className="form-control cosmic-input"

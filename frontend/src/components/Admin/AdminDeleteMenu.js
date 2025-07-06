@@ -122,18 +122,38 @@ const AdminDeleteMenu = () => {
         <p>Select a menu item to remove it from the system</p>
       </div>
 
-      <div className="simple-table-container">
-        <table className="simple-table">
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
+      <div
+        className="simple-table-container"
+        style={{ overflowX: "auto", width: "100%" }}
+      >
+        <table
+          className="simple-table"
+          style={{ minWidth: "1100px", width: "100%" }}
+        >
           <thead>
             <tr>
-              <th>Image</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Description</th>
-              <th>Ingredients</th>
-              <th>Actions</th>
+              <th style={{ minWidth: "100px" }}>Image</th>
+              <th style={{ minWidth: "150px" }}>Name</th>
+              <th style={{ minWidth: "120px" }}>Category</th>
+              <th style={{ minWidth: "100px" }}>Price</th>
+              <th style={{ minWidth: "100px" }}>Status</th>
+              <th style={{ minWidth: "200px" }}>Description</th>
+              <th style={{ minWidth: "200px" }}>Ingredients</th>
+              <th style={{ minWidth: "120px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>

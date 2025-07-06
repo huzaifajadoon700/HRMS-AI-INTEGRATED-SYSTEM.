@@ -13,13 +13,13 @@ const AdminDeleteTable = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
       return;
     }
-    
+
     fetchTables();
   }, [navigate]);
 
@@ -27,9 +27,11 @@ const AdminDeleteTable = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/tables`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setTables(response.data);
     } catch (error) {
@@ -41,16 +43,22 @@ const AdminDeleteTable = () => {
   };
 
   const handleDeleteTable = async (tableId) => {
-    if (!window.confirm("Are you sure you want to delete this table? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this table? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
     setDeletingTableId(tableId);
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       await axios.delete(`${apiUrl}/tables/${tableId}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       toast.success("Table deleted successfully!");
@@ -70,7 +78,12 @@ const AdminDeleteTable = () => {
     }
   };
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  if (loading)
+    return (
+      <div className="simple-admin-container">
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="simple-admin-container">
@@ -79,39 +92,71 @@ const AdminDeleteTable = () => {
         <p>Select a table to remove it from the system</p>
       </div>
 
-      <div className="simple-table-container">
-        <table className="simple-table">
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
+      <div
+        className="simple-table-container"
+        style={{ overflowX: "auto", width: "100%" }}
+      >
+        <table
+          className="simple-table"
+          style={{ minWidth: "900px", width: "100%" }}
+        >
           <thead>
             <tr>
-              <th>Table Number</th>
-              <th>Table Type</th>
-              <th>Capacity</th>
-              <th>Status</th>
-              <th>Location</th>
-              <th>Description</th>
-              <th>Actions</th>
+              <th style={{ minWidth: "120px" }}>Table Number</th>
+              <th style={{ minWidth: "120px" }}>Table Type</th>
+              <th style={{ minWidth: "100px" }}>Capacity</th>
+              <th style={{ minWidth: "100px" }}>Status</th>
+              <th style={{ minWidth: "120px" }}>Location</th>
+              <th style={{ minWidth: "200px" }}>Description</th>
+              <th style={{ minWidth: "120px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {tables.map(table => (
+            {tables.map((table) => (
               <tr key={table._id}>
-                <td>{table.tableNumber}</td>
-                <td>{table.tableType}</td>
-                <td>{table.capacity} people</td>
-                <td>
-                  <span className={`simple-status simple-status-${table.status?.toLowerCase()}`}>
+                <td style={{ minWidth: "120px" }}>{table.tableNumber}</td>
+                <td style={{ minWidth: "120px" }}>{table.tableType}</td>
+                <td style={{ minWidth: "100px" }}>{table.capacity} people</td>
+                <td style={{ minWidth: "100px" }}>
+                  <span
+                    className={`simple-status simple-status-${table.status?.toLowerCase()}`}
+                  >
                     {table.status}
                   </span>
                 </td>
-                <td>{table.location}</td>
-                <td className="simple-description">{table.description}</td>
+                <td style={{ minWidth: "120px" }}>{table.location}</td>
+                <td
+                  style={{
+                    minWidth: "200px",
+                    maxWidth: "200px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {table.description}
+                </td>
                 <td>
-                  <button 
+                  <button
                     onClick={() => handleDeleteTable(table._id)}
                     className="simple-btn simple-btn-small simple-btn-danger"
                     disabled={deletingTableId === table._id}
                   >
-                    {deletingTableId === table._id ? 'Deleting...' : 'Delete'}
+                    {deletingTableId === table._id ? "Deleting..." : "Delete"}
                   </button>
                 </td>
               </tr>
@@ -121,7 +166,7 @@ const AdminDeleteTable = () => {
       </div>
 
       {tables.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No tables found.</p>
         </div>
       )}

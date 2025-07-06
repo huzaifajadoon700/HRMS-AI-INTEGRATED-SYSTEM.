@@ -109,18 +109,38 @@ const AdminDeleteRoom = () => {
         <p>Select a room to remove it from the system</p>
       </div>
 
-      <div className="simple-table-container">
-        <table className="simple-table">
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
+      <div
+        className="simple-table-container"
+        style={{ overflowX: "auto", width: "100%" }}
+      >
+        <table
+          className="simple-table"
+          style={{ minWidth: "1000px", width: "100%" }}
+        >
           <thead>
             <tr>
-              <th>Image</th>
-              <th>Room Number</th>
-              <th>Room Type</th>
-              <th>Capacity</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Description</th>
-              <th>Actions</th>
+              <th style={{ minWidth: "100px" }}>Image</th>
+              <th style={{ minWidth: "120px" }}>Room Number</th>
+              <th style={{ minWidth: "120px" }}>Room Type</th>
+              <th style={{ minWidth: "100px" }}>Capacity</th>
+              <th style={{ minWidth: "120px" }}>Price</th>
+              <th style={{ minWidth: "100px" }}>Status</th>
+              <th style={{ minWidth: "200px" }}>Description</th>
+              <th style={{ minWidth: "120px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
