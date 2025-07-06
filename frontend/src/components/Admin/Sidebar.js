@@ -296,6 +296,7 @@ const Sidebar = () => {
   ];
 
   const renderContent = () => {
+    console.log("Current selectedModule:", selectedModule);
     switch (selectedModule) {
       case "Dashboard":
         return <Dashboardmodule />;
@@ -447,6 +448,12 @@ const Sidebar = () => {
                         }}
                         onClick={(e) => {
                           e.preventDefault();
+                          console.log(
+                            "Menu clicked:",
+                            item.name,
+                            "Component:",
+                            item.component || item.name
+                          );
                           if (hasSubmenu) {
                             toggleDropdown(item.name);
                           } else {
@@ -535,6 +542,12 @@ const Sidebar = () => {
                                 }}
                                 onClick={(e) => {
                                   e.preventDefault();
+                                  console.log(
+                                    "Submenu clicked:",
+                                    subItem.name,
+                                    "Component:",
+                                    subItem.component
+                                  );
                                   setSelectedModule(subItem.component);
                                   if (isMobile) {
                                     setIsMobileMenuOpen(false);

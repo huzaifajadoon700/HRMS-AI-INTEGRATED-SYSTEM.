@@ -578,16 +578,50 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: 8px;
+    /* Add scrollbar styling for better UX */
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db #f9fafb;
+  }
+
+  .simple-table-container::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .simple-table-container::-webkit-scrollbar-track {
+    background: #f9fafb;
+    border-radius: 4px;
+  }
+
+  .simple-table-container::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+  }
+
+  .simple-table-container::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
   }
 
   /* Better button spacing on mobile */
   .simple-admin-controls {
     flex-wrap: wrap;
+    gap: 12px;
   }
 
   .simple-admin-controls > * {
     flex: 1;
     min-width: 120px;
+  }
+
+  /* Ensure buttons don't overflow */
+  .simple-admin-controls button {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Better flex behavior for search controls */
+  .simple-admin-controls > div {
+    min-width: 0; /* Allow flex items to shrink */
   }
 
   /* Mobile-friendly status badges */

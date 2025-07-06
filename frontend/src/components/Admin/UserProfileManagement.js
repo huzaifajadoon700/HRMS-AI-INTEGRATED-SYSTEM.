@@ -332,6 +332,20 @@ const UserProfileManagement = () => {
         </div>
       )}
 
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
       <div
         className="simple-table-container"
         style={{ overflowX: "auto", width: "100%" }}
