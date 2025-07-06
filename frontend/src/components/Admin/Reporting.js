@@ -1,23 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  Container,
-  Row,
-  Col,
-  Card,
-  Button,
-  Table,
-  Spinner,
-} from "react-bootstrap";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "./simple-admin.css";
 
 // Register Chart.js components
 ChartJS.register(
@@ -59,7 +43,15 @@ const ReportingAnalytics = () => {
 
   const prepareChart = (data) => {
     const newChartData = {
-      labels: ["Week 1", "Week 2", "Week 3", "Week 4", "Week 5", "Week 6", "Week 7"],
+      labels: [
+        "Week 1",
+        "Week 2",
+        "Week 3",
+        "Week 4",
+        "Week 5",
+        "Week 6",
+        "Week 7",
+      ],
       datasets: [
         {
           label: "Bookings",
@@ -87,115 +79,126 @@ const ReportingAnalytics = () => {
     setChartData(newChartData);
   };
 
-  const calculateTotal = (data) => data.reduce((total, value) => total + value, 0);
+  const calculateTotal = (data) =>
+    data.reduce((total, value) => total + value, 0);
 
   return (
     <div className="enhanced-reporting-analytics-module-container">
-    <Container>
-      <Row>
-        {/* Analytics Cards */}
-        <Col md={4}>
-          <Card className="mb-4">
-            <Card.Body>
-              <Card.Title>Total Bookings</Card.Title>
-              {loading ? (
-                <Spinner animation="border" size="sm" />
-              ) : (
-                <Card.Text>{calculateTotal(analyticsData.bookings)}</Card.Text>
-              )}
-              <Button variant="success" disabled={loading}>View Details</Button>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={4}>
-          <Card className="mb-4">
-            <Card.Body>
-              <Card.Title>Total Revenue</Card.Title>
-              {loading ? (
-                <Spinner animation="border" size="sm" />
-              ) : (
-                <Card.Text>${calculateTotal(analyticsData.revenue)}</Card.Text>
-              )}
-              <Button variant="info" disabled={loading}>View Details</Button>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={4}>
-          <Card className="mb-4">
-            <Card.Body>
-              <Card.Title>Active Users</Card.Title>
-              {loading ? (
-                <Spinner animation="border" size="sm" />
-              ) : (
-                <Card.Text>{calculateTotal(analyticsData.users)}</Card.Text>
-              )}
-              <Button variant="primary" disabled={loading}>View Details</Button>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+      <Container>
+        <Row>
+          {/* Analytics Cards */}
+          <Col md={4}>
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Total Bookings</Card.Title>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  <Card.Text>
+                    {calculateTotal(analyticsData.bookings)}
+                  </Card.Text>
+                )}
+                <Button variant="success" disabled={loading}>
+                  View Details
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={4}>
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Total Revenue</Card.Title>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  <Card.Text>
+                    ${calculateTotal(analyticsData.revenue)}
+                  </Card.Text>
+                )}
+                <Button variant="info" disabled={loading}>
+                  View Details
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={4}>
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Active Users</Card.Title>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  <Card.Text>{calculateTotal(analyticsData.users)}</Card.Text>
+                )}
+                <Button variant="primary" disabled={loading}>
+                  View Details
+                </Button>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
 
-      {/* Charts Section */}
-      <Row>
-        <Col>
-          <Card className="mb-4">
-            <Card.Body>
-              <Card.Title>Bookings, Revenue, and Users Trends</Card.Title>
-              {loading ? (
-                <p>Loading chart data...</p>
-              ) : (
-                <Bar
-                  data={chartData}
-                  options={{
-                    responsive: true,
-                    plugins: {
-                      legend: {
-                        position: "top",
+        {/* Charts Section */}
+        <Row>
+          <Col>
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Bookings, Revenue, and Users Trends</Card.Title>
+                {loading ? (
+                  <p>Loading chart data...</p>
+                ) : (
+                  <Bar
+                    data={chartData}
+                    options={{
+                      responsive: true,
+                      plugins: {
+                        legend: {
+                          position: "top",
+                        },
+                        title: {
+                          display: true,
+                          text: "Weekly Analysis",
+                        },
                       },
-                      title: {
-                        display: true,
-                        text: "Weekly Analysis",
-                      },
-                    },
-                  }}
-                />
-              )}
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
+                    }}
+                  />
+                )}
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
 
-      {/* Table Section */}
-      <Row>
-        <Col>
-          <Card className="mb-4">
-            <Card.Body>
-              <Card.Title>Bookings & Revenue Summary</Card.Title>
-              <Table striped bordered hover responsive>
-                <thead>
-                  <tr>
-                    <th>Week</th>
-                    <th>Bookings</th>
-                    <th>Revenue</th>
-                    <th>Active Users</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {analyticsData.bookings.map((_, index) => (
-                    <tr key={index}>
-                      <td>Week {index + 1}</td>
-                      <td>{analyticsData.bookings[index]}</td>
-                      <td>${analyticsData.revenue[index]}</td>
-                      <td>{analyticsData.users[index]}</td>
+        {/* Table Section */}
+        <Row>
+          <Col>
+            <Card className="mb-4">
+              <Card.Body>
+                <Card.Title>Bookings & Revenue Summary</Card.Title>
+                <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>Week</th>
+                      <th>Bookings</th>
+                      <th>Revenue</th>
+                      <th>Active Users</th>
                     </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+                  </thead>
+                  <tbody>
+                    {analyticsData.bookings.map((_, index) => (
+                      <tr key={index}>
+                        <td>Week {index + 1}</td>
+                        <td>{analyticsData.bookings[index]}</td>
+                        <td>${analyticsData.revenue[index]}</td>
+                        <td>{analyticsData.users[index]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 };

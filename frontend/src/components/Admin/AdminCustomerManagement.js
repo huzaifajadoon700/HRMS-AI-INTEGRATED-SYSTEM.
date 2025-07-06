@@ -305,10 +305,10 @@ const AdminCustomerManagement = () => {
               <tr key={customer._id}>
                 <td>{customer.name}</td>
                 <td>{customer.email}</td>
-                <td>{customer.phone}</td>
-                <td>{customer.city || "N/A"}</td>
-                <td>{customer.country || "N/A"}</td>
-                <td>{customer.membershipType}</td>
+                <td className="hide-mobile">{customer.phone}</td>
+                <td className="hide-mobile">{customer.city || "N/A"}</td>
+                <td className="hide-mobile">{customer.country || "N/A"}</td>
+                <td className="hide-mobile">{customer.membershipType}</td>
                 <td>
                   <span
                     className={`simple-status simple-status-${customer.status?.toLowerCase()}`}
