@@ -3,15 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./simple-admin.css";
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+// Simple reporting component without complex charts
 
 const ReportingAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState({
