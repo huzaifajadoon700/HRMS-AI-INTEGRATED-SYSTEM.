@@ -103,8 +103,11 @@ const TableRecommendationAnalytics = () => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: "20px",
+          gridTemplateColumns:
+            window.innerWidth <= 768
+              ? "repeat(auto-fit, minmax(200px, 1fr))"
+              : "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: window.innerWidth <= 768 ? "15px" : "20px",
           marginBottom: "30px",
         }}
       >
@@ -150,46 +153,67 @@ const TableRecommendationAnalytics = () => {
       </div>
 
       {/* Table List */}
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
       <div className="simple-table-container">
         <div style={{ padding: "20px", borderBottom: "1px solid #e5e7eb" }}>
           <h3 style={{ margin: 0, color: "#000000" }}>
             Table Performance Analysis
           </h3>
         </div>
-        <table className="simple-table">
-          <thead>
-            <tr>
-              <th>Table Number</th>
-              <th>Table Type</th>
-              <th>Capacity</th>
-              <th>Location</th>
-              <th>Status</th>
-              <th>Performance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tables.map((table) => (
-              <tr key={table._id}>
-                <td>Table {table.tableNumber}</td>
-                <td>{table.tableType}</td>
-                <td>{table.capacity} people</td>
-                <td>{table.location}</td>
-                <td>
-                  <span
-                    className={`simple-status simple-status-${table.status?.toLowerCase()}`}
-                  >
-                    {table.status}
-                  </span>
-                </td>
-                <td>
-                  <span className="simple-status simple-status-available">
-                    {table.status === "Available" ? "Good" : "Busy"}
-                  </span>
-                </td>
+        <div style={{ overflowX: "auto", width: "100%" }}>
+          <table
+            className="simple-table"
+            style={{ minWidth: "800px", width: "100%" }}
+          >
+            <thead>
+              <tr>
+                <th style={{ minWidth: "140px" }}>Table Number</th>
+                <th style={{ minWidth: "120px" }}>Table Type</th>
+                <th style={{ minWidth: "100px" }}>Capacity</th>
+                <th style={{ minWidth: "120px" }}>Location</th>
+                <th style={{ minWidth: "100px" }}>Status</th>
+                <th style={{ minWidth: "120px" }}>Performance</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tables.map((table) => (
+                <tr key={table._id}>
+                  <td style={{ minWidth: "140px" }}>
+                    Table {table.tableNumber}
+                  </td>
+                  <td style={{ minWidth: "120px" }}>{table.tableType}</td>
+                  <td style={{ minWidth: "100px" }}>{table.capacity} people</td>
+                  <td style={{ minWidth: "120px" }}>{table.location}</td>
+                  <td style={{ minWidth: "100px" }}>
+                    <span
+                      className={`simple-status simple-status-${table.status?.toLowerCase()}`}
+                    >
+                      {table.status}
+                    </span>
+                  </td>
+                  <td style={{ minWidth: "120px" }}>
+                    <span className="simple-status simple-status-available">
+                      {table.status === "Available" ? "Good" : "Busy"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {tables.length === 0 && (
