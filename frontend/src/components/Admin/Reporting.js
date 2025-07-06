@@ -3,194 +3,161 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "./simple-admin.css";
 
-// Simple reporting component without complex charts
-
 const ReportingAnalytics = () => {
-  const [analyticsData, setAnalyticsData] = useState({
-    bookings: [],
-    revenue: [],
-    users: [],
-  });
-  const [chartData, setChartData] = useState({});
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [reportData, setReportData] = useState({
+    totalBookings: 156,
+    totalRevenue: 45780,
+    totalUsers: 89,
+    averageOrderValue: 520,
+    monthlyGrowth: 12.5,
+    popularItems: [
+      { name: "Deluxe Room", bookings: 45, revenue: 22500 },
+      { name: "Standard Room", bookings: 67, revenue: 16750 },
+      { name: "Suite Room", bookings: 23, revenue: 18400 },
+      { name: "Family Room", bookings: 21, revenue: 12600 }
+    ],
+    recentOrders: [
+      { id: "ORD001", customer: "John Doe", amount: 750, date: "2024-01-15", status: "Completed" },
+      { id: "ORD002", customer: "Jane Smith", amount: 450, date: "2024-01-14", status: "Pending" },
+      { id: "ORD003", customer: "Mike Johnson", amount: 890, date: "2024-01-13", status: "Completed" },
+      { id: "ORD004", customer: "Sarah Wilson", amount: 320, date: "2024-01-12", status: "Cancelled" }
+    ]
+  });
 
   useEffect(() => {
-    fetchAnalyticsData();
-  }, []);
+    const token = localStorage.getItem("token");
+    const role = localStorage.getItem("role");
 
-  const fetchAnalyticsData = () => {
-    const mockData = {
-      bookings: [10, 15, 20, 25, 30, 35, 40],
-      revenue: [500, 700, 800, 1000, 1200, 1500, 1800],
-      users: [100, 120, 140, 160, 180, 200, 220],
-    };
+    if (!token || role !== "admin") {
+      toast.error("Please login as admin to access this page");
+      navigate("/login");
+      return;
+    }
 
-    // Simulate a loading delay
+    // Simulate data loading
     setTimeout(() => {
-      setAnalyticsData(mockData);
-      prepareChart(mockData);
       setLoading(false);
     }, 1000);
-  };
+  }, [navigate]);
 
-  const prepareChart = (data) => {
-    const newChartData = {
-      labels: [
-        "Week 1",
-        "Week 2",
-        "Week 3",
-        "Week 4",
-        "Week 5",
-        "Week 6",
-        "Week 7",
-      ],
-      datasets: [
-        {
-          label: "Bookings",
-          data: data.bookings,
-          backgroundColor: "rgba(75, 192, 192, 0.6)",
-          borderColor: "rgba(75, 192, 192, 1)",
-          borderWidth: 1,
-        },
-        {
-          label: "Revenue",
-          data: data.revenue,
-          backgroundColor: "rgba(153, 102, 255, 0.6)",
-          borderColor: "rgba(153, 102, 255, 1)",
-          borderWidth: 1,
-        },
-        {
-          label: "Users",
-          data: data.users,
-          backgroundColor: "rgba(255, 99, 132, 0.6)",
-          borderColor: "rgba(255, 99, 132, 1)",
-          borderWidth: 1,
-        },
-      ],
-    };
-    setChartData(newChartData);
-  };
-
-  const calculateTotal = (data) =>
-    data.reduce((total, value) => total + value, 0);
+  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
 
   return (
-    <div className="enhanced-reporting-analytics-module-container">
-      <Container>
-        <Row>
-          {/* Analytics Cards */}
-          <Col md={4}>
-            <Card className="mb-4">
-              <Card.Body>
-                <Card.Title>Total Bookings</Card.Title>
-                {loading ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  <Card.Text>
-                    {calculateTotal(analyticsData.bookings)}
-                  </Card.Text>
-                )}
-                <Button variant="success" disabled={loading}>
-                  View Details
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col md={4}>
-            <Card className="mb-4">
-              <Card.Body>
-                <Card.Title>Total Revenue</Card.Title>
-                {loading ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  <Card.Text>
-                    ${calculateTotal(analyticsData.revenue)}
-                  </Card.Text>
-                )}
-                <Button variant="info" disabled={loading}>
-                  View Details
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col md={4}>
-            <Card className="mb-4">
-              <Card.Body>
-                <Card.Title>Active Users</Card.Title>
-                {loading ? (
-                  <Spinner animation="border" size="sm" />
-                ) : (
-                  <Card.Text>{calculateTotal(analyticsData.users)}</Card.Text>
-                )}
-                <Button variant="primary" disabled={loading}>
-                  View Details
-                </Button>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+    <div className="simple-admin-container">
+      <div className="simple-admin-header">
+        <h1>Business Analytics & Reports</h1>
+        <p>Comprehensive overview of your business performance</p>
+      </div>
 
-        {/* Charts Section */}
-        <Row>
-          <Col>
-            <Card className="mb-4">
-              <Card.Body>
-                <Card.Title>Bookings, Revenue, and Users Trends</Card.Title>
-                {loading ? (
-                  <p>Loading chart data...</p>
-                ) : (
-                  <Bar
-                    data={chartData}
-                    options={{
-                      responsive: true,
-                      plugins: {
-                        legend: {
-                          position: "top",
-                        },
-                        title: {
-                          display: true,
-                          text: "Weekly Analysis",
-                        },
-                      },
-                    }}
-                  />
-                )}
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+      <div className="simple-admin-controls">
+        <button className="simple-btn simple-btn-primary">Export PDF</button>
+        <button className="simple-btn simple-btn-secondary">Export Excel</button>
+        <button className="simple-btn simple-btn-secondary">Print Report</button>
+      </div>
 
-        {/* Table Section */}
-        <Row>
-          <Col>
-            <Card className="mb-4">
-              <Card.Body>
-                <Card.Title>Bookings & Revenue Summary</Card.Title>
-                <Table striped bordered hover responsive>
-                  <thead>
-                    <tr>
-                      <th>Week</th>
-                      <th>Bookings</th>
-                      <th>Revenue</th>
-                      <th>Active Users</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {analyticsData.bookings.map((_, index) => (
-                      <tr key={index}>
-                        <td>Week {index + 1}</td>
-                        <td>{analyticsData.bookings[index]}</td>
-                        <td>${analyticsData.revenue[index]}</td>
-                        <td>{analyticsData.users[index]}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+      {/* Summary Stats */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+        <div className="simple-table-container" style={{ padding: '20px', textAlign: 'center' }}>
+          <h3 style={{ color: '#000000', margin: '0 0 10px 0' }}>{reportData.totalBookings}</h3>
+          <p style={{ color: '#000000', margin: 0 }}>Total Bookings</p>
+        </div>
+        
+        <div className="simple-table-container" style={{ padding: '20px', textAlign: 'center' }}>
+          <h3 style={{ color: '#000000', margin: '0 0 10px 0' }}>Rs. {reportData.totalRevenue.toLocaleString()}</h3>
+          <p style={{ color: '#000000', margin: 0 }}>Total Revenue</p>
+        </div>
+        
+        <div className="simple-table-container" style={{ padding: '20px', textAlign: 'center' }}>
+          <h3 style={{ color: '#000000', margin: '0 0 10px 0' }}>{reportData.totalUsers}</h3>
+          <p style={{ color: '#000000', margin: 0 }}>Total Users</p>
+        </div>
+        
+        <div className="simple-table-container" style={{ padding: '20px', textAlign: 'center' }}>
+          <h3 style={{ color: '#000000', margin: '0 0 10px 0' }}>Rs. {reportData.averageOrderValue}</h3>
+          <p style={{ color: '#000000', margin: 0 }}>Average Order Value</p>
+        </div>
+      </div>
+
+      {/* Popular Items */}
+      <div className="simple-table-container">
+        <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+          <h3 style={{ margin: 0, color: '#000000' }}>Popular Items Performance</h3>
+        </div>
+        <table className="simple-table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Bookings</th>
+              <th className="hide-mobile">Revenue</th>
+              <th>Performance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reportData.popularItems.map((item, index) => (
+              <tr key={index}>
+                <td>{item.name}</td>
+                <td>{item.bookings}</td>
+                <td className="hide-mobile">Rs. {item.revenue.toLocaleString()}</td>
+                <td>
+                  <span className="simple-status simple-status-available">
+                    {item.bookings > 40 ? 'Excellent' : item.bookings > 25 ? 'Good' : 'Average'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Recent Orders */}
+      <div className="simple-table-container" style={{ marginTop: '30px' }}>
+        <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+          <h3 style={{ margin: 0, color: '#000000' }}>Recent Orders</h3>
+        </div>
+        <table className="simple-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th className="hide-mobile">Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reportData.recentOrders.map(order => (
+              <tr key={order.id}>
+                <td>{order.id}</td>
+                <td>{order.customer}</td>
+                <td>Rs. {order.amount}</td>
+                <td className="hide-mobile">{order.date}</td>
+                <td>
+                  <span className={`simple-status simple-status-${order.status.toLowerCase()}`}>
+                    {order.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Key Insights */}
+      <div className="simple-table-container" style={{ marginTop: '30px' }}>
+        <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+          <h3 style={{ margin: 0, color: '#000000' }}>Key Business Insights</h3>
+        </div>
+        <div style={{ padding: '20px' }}>
+          <ul style={{ color: '#000000', lineHeight: '1.8' }}>
+            <li><strong>Revenue Growth:</strong> Monthly growth rate of {reportData.monthlyGrowth}% indicates strong business performance</li>
+            <li><strong>Popular Services:</strong> Deluxe and Standard rooms are the most booked items</li>
+            <li><strong>Customer Base:</strong> {reportData.totalUsers} active users with average order value of Rs. {reportData.averageOrderValue}</li>
+            <li><strong>Order Status:</strong> Most orders are completed successfully with minimal cancellations</li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
