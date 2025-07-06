@@ -77,6 +77,7 @@ const Sidebar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState(3);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -87,7 +88,9 @@ const Sidebar = () => {
 
     // Handle window resize for mobile responsiveness
     const handleResize = () => {
-      if (window.innerWidth > 768) {
+      const mobile = window.innerWidth <= 768;
+      setIsMobile(mobile);
+      if (!mobile) {
         // Close mobile menu when switching to desktop
         setIsMobileMenuOpen(false);
       }
@@ -387,7 +390,7 @@ const Sidebar = () => {
             </div>
           )}
           {/* Mobile Close Button */}
-          {window.innerWidth <= 768 && isMobileMenuOpen && (
+          {isMobile && isMobileMenuOpen && (
             <button
               className="mobile-close-btn"
               onClick={() => setIsMobileMenuOpen(false)}
@@ -572,7 +575,7 @@ const Sidebar = () => {
                 </div>
                 {!isSidebarCollapsed && (
                   <div className="user-info">
-                    <p className="user-name">{userName || "Default Admin"}</p>
+                    <p className="user-name">{userName || "Admin"}</p>
                     <p className="user-role">ADMINISTRATOR</p>
                   </div>
                 )}
@@ -633,31 +636,34 @@ const Sidebar = () => {
               <FiMenu />
             </button>
             <div>
-              <h1 className="header-title">Hi, {userName || "Sarah"}!</h1>
-              <p className="header-subtitle">
-                Whole data about your business here.
-              </p>
+              <h1 className="header-title">Hi, Admin!</h1>
+              <p className="header-subtitle">Welcome to your dashboard</p>
             </div>
           </div>
 
           <div className="header-right">
-            <div className="header-search">
-              <FiSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Global search..."
-                className="search-input"
-              />
-            </div>
+            {/* Hide search and notifications on mobile for cleaner look */}
+            {!isMobile && (
+              <>
+                <div className="header-search">
+                  <FiSearch className="search-icon" />
+                  <input
+                    type="text"
+                    placeholder="Global search..."
+                    className="search-input"
+                  />
+                </div>
 
-            <div className="header-actions">
-              <button className="header-btn">
-                <FiBell />
-              </button>
-              <button className="header-btn">
-                <FiMail />
-              </button>
-            </div>
+                <div className="header-actions">
+                  <button className="header-btn">
+                    <FiBell />
+                  </button>
+                  <button className="header-btn">
+                    <FiMail />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </header>
 
