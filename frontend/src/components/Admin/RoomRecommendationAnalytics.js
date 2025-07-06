@@ -82,97 +82,197 @@ const RoomRecommendationAnalytics = () => {
         <p>Simple and clear room management analytics</p>
       </div>
 
+      <div className="simple-admin-controls">
+        <button
+          onClick={fetchRoomAnalytics}
+          className="simple-btn simple-btn-primary"
+          disabled={loading}
+        >
+          {loading ? "Loading..." : "Refresh Analytics"}
+        </button>
+      </div>
+
       {/* Simple Stats Cards */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-          gap: "20px",
+          gridTemplateColumns:
+            window.innerWidth <= 768
+              ? "repeat(auto-fit, minmax(200px, 1fr))"
+              : "repeat(auto-fit, minmax(250px, 1fr))",
+          gap: window.innerWidth <= 768 ? "15px" : "20px",
           marginBottom: "30px",
         }}
       >
         <div
           className="simple-table-container"
-          style={{ padding: "20px", textAlign: "center" }}
+          style={{
+            padding: window.innerWidth <= 768 ? "15px" : "20px",
+            textAlign: "center",
+          }}
         >
-          <h3 style={{ color: "#000000", margin: "0 0 10px 0" }}>
+          <h3
+            style={{
+              color: "#000000",
+              margin: "0 0 10px 0",
+              fontSize: window.innerWidth <= 768 ? "24px" : "32px",
+            }}
+          >
             {analytics.totalRooms}
           </h3>
-          <p style={{ color: "#000000", margin: 0 }}>Total Rooms Available</p>
+          <p
+            style={{
+              color: "#000000",
+              margin: 0,
+              fontSize: window.innerWidth <= 768 ? "13px" : "16px",
+            }}
+          >
+            Total Rooms Available
+          </p>
         </div>
 
         <div
           className="simple-table-container"
-          style={{ padding: "20px", textAlign: "center" }}
+          style={{
+            padding: window.innerWidth <= 768 ? "15px" : "20px",
+            textAlign: "center",
+          }}
         >
-          <h3 style={{ color: "#000000", margin: "0 0 10px 0" }}>
+          <h3
+            style={{
+              color: "#000000",
+              margin: "0 0 10px 0",
+              fontSize: window.innerWidth <= 768 ? "24px" : "32px",
+            }}
+          >
             {analytics.totalBookings}
           </h3>
-          <p style={{ color: "#000000", margin: 0 }}>Total Bookings Made</p>
+          <p
+            style={{
+              color: "#000000",
+              margin: 0,
+              fontSize: window.innerWidth <= 768 ? "13px" : "16px",
+            }}
+          >
+            Total Bookings Made
+          </p>
         </div>
 
         <div
           className="simple-table-container"
-          style={{ padding: "20px", textAlign: "center" }}
+          style={{
+            padding: window.innerWidth <= 768 ? "15px" : "20px",
+            textAlign: "center",
+          }}
         >
-          <h3 style={{ color: "#000000", margin: "0 0 10px 0" }}>
+          <h3
+            style={{
+              color: "#000000",
+              margin: "0 0 10px 0",
+              fontSize: window.innerWidth <= 768 ? "24px" : "32px",
+            }}
+          >
             {analytics.averageRating}/5
           </h3>
-          <p style={{ color: "#000000", margin: 0 }}>Average Room Rating</p>
+          <p
+            style={{
+              color: "#000000",
+              margin: 0,
+              fontSize: window.innerWidth <= 768 ? "13px" : "16px",
+            }}
+          >
+            Average Room Rating
+          </p>
         </div>
 
         <div
           className="simple-table-container"
-          style={{ padding: "20px", textAlign: "center" }}
+          style={{
+            padding: window.innerWidth <= 768 ? "15px" : "20px",
+            textAlign: "center",
+          }}
         >
-          <h3 style={{ color: "#000000", margin: "0 0 10px 0" }}>
+          <h3
+            style={{
+              color: "#000000",
+              margin: "0 0 10px 0",
+              fontSize: window.innerWidth <= 768 ? "20px" : "32px",
+            }}
+          >
             {analytics.popularRoomType}
           </h3>
-          <p style={{ color: "#000000", margin: 0 }}>Most Popular Room Type</p>
+          <p
+            style={{
+              color: "#000000",
+              margin: 0,
+              fontSize: window.innerWidth <= 768 ? "13px" : "16px",
+            }}
+          >
+            Most Popular Room Type
+          </p>
         </div>
       </div>
 
       {/* Room List Table */}
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
       <div className="simple-table-container">
         <div style={{ padding: "20px", borderBottom: "1px solid #e5e7eb" }}>
           <h3 style={{ margin: 0, color: "#000000" }}>
             Room Performance Analysis
           </h3>
         </div>
-        <table className="simple-table">
-          <thead>
-            <tr>
-              <th>Room Number</th>
-              <th>Room Type</th>
-              <th>Capacity</th>
-              <th>Price per Night</th>
-              <th>Status</th>
-              <th>Performance</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rooms.map((room) => (
-              <tr key={room._id}>
-                <td>Room {room.roomNumber}</td>
-                <td>{room.roomType}</td>
-                <td>{room.capacity} people</td>
-                <td>Rs. {room.price}</td>
-                <td>
-                  <span
-                    className={`simple-status simple-status-${room.status?.toLowerCase()}`}
-                  >
-                    {room.status}
-                  </span>
-                </td>
-                <td>
-                  <span className="simple-status simple-status-available">
-                    {room.status === "Available" ? "Good" : "Busy"}
-                  </span>
-                </td>
+        <div style={{ overflowX: "auto", width: "100%" }}>
+          <table
+            className="simple-table"
+            style={{ minWidth: "800px", width: "100%" }}
+          >
+            <thead>
+              <tr>
+                <th style={{ minWidth: "140px" }}>Room Number</th>
+                <th style={{ minWidth: "120px" }}>Room Type</th>
+                <th style={{ minWidth: "100px" }}>Capacity</th>
+                <th style={{ minWidth: "140px" }}>Price per Night</th>
+                <th style={{ minWidth: "100px" }}>Status</th>
+                <th style={{ minWidth: "120px" }}>Performance</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rooms.map((room) => (
+                <tr key={room._id}>
+                  <td style={{ minWidth: "140px" }}>Room {room.roomNumber}</td>
+                  <td style={{ minWidth: "120px" }}>{room.roomType}</td>
+                  <td style={{ minWidth: "100px" }}>{room.capacity} people</td>
+                  <td style={{ minWidth: "140px" }}>Rs. {room.price}</td>
+                  <td style={{ minWidth: "100px" }}>
+                    <span
+                      className={`simple-status simple-status-${room.status?.toLowerCase()}`}
+                    >
+                      {room.status}
+                    </span>
+                  </td>
+                  <td style={{ minWidth: "120px" }}>
+                    <span className="simple-status simple-status-available">
+                      {room.status === "Available" ? "Good" : "Busy"}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {rooms.length === 0 && (
