@@ -10,12 +10,13 @@ const AdminUpdateTable = () => {
   const [tables, setTables] = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
   const [formData, setFormData] = useState({
-    tableNumber: "",
+    tableName: "",
     tableType: "",
     capacity: "",
     status: "Available",
     location: "",
     description: "",
+    imageUrl: "",
   });
 
   useEffect(() => {
@@ -53,12 +54,13 @@ const AdminUpdateTable = () => {
   const handleSelectTable = (table) => {
     setSelectedTable(table);
     setFormData({
-      tableNumber: table.tableNumber || "",
+      tableName: table.tableName || "",
       tableType: table.tableType || "",
       capacity: table.capacity || "",
       status: table.status || "Available",
       location: table.location || "",
       description: table.description || "",
+      imageUrl: table.image || "",
     });
   };
 
@@ -88,12 +90,13 @@ const AdminUpdateTable = () => {
       toast.success("Table updated successfully!");
       setSelectedTable(null);
       setFormData({
-        tableNumber: "",
+        tableName: "",
         tableType: "",
         capacity: "",
         status: "Available",
         location: "",
         description: "",
+        imageUrl: "",
       });
       fetchTables();
     } catch (error) {
@@ -154,7 +157,7 @@ const AdminUpdateTable = () => {
                     >
                       <div>
                         <h6 style={{ margin: "0 0 5px 0", color: "#000000" }}>
-                          Table {table.tableNumber}
+                          {table.tableName}
                         </h6>
                         <p
                           style={{
@@ -201,10 +204,10 @@ const AdminUpdateTable = () => {
               <form onSubmit={handleSubmit} className="simple-form">
                 <div className="simple-form-row">
                   <input
-                    type="number"
-                    name="tableNumber"
-                    placeholder="Table Number"
-                    value={formData.tableNumber}
+                    type="text"
+                    name="tableName"
+                    placeholder="Table Name"
+                    value={formData.tableName}
                     onChange={handleInputChange}
                     required
                   />
@@ -215,11 +218,14 @@ const AdminUpdateTable = () => {
                     required
                   >
                     <option value="">Select Table Type</option>
-                    <option value="Regular">Regular</option>
+                    <option value="indoor">Indoor</option>
+                    <option value="outdoor">Outdoor</option>
+                    <option value="private">Private</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Premium">Premium</option>
                     <option value="VIP">VIP</option>
-                    <option value="Outdoor">Outdoor</option>
-                    <option value="Private">Private</option>
-                    <option value="Bar">Bar</option>
+                    <option value="Booth">Booth</option>
+                    <option value="Counter">Counter</option>
                   </select>
                 </div>
 
@@ -239,9 +245,8 @@ const AdminUpdateTable = () => {
                     required
                   >
                     <option value="Available">Available</option>
-                    <option value="Occupied">Occupied</option>
+                    <option value="Booked">Booked</option>
                     <option value="Reserved">Reserved</option>
-                    <option value="Maintenance">Maintenance</option>
                   </select>
                 </div>
 
@@ -264,6 +269,17 @@ const AdminUpdateTable = () => {
                   rows="4"
                 />
 
+                <div className="simple-form-row">
+                  <input
+                    type="url"
+                    name="imageUrl"
+                    placeholder="Image URL (e.g., https://example.com/table.jpg)"
+                    value={formData.imageUrl}
+                    onChange={handleInputChange}
+                  />
+                  <div></div>
+                </div>
+
                 <div className="simple-form-actions">
                   <button
                     type="submit"
@@ -277,12 +293,13 @@ const AdminUpdateTable = () => {
                     onClick={() => {
                       setSelectedTable(null);
                       setFormData({
-                        tableNumber: "",
+                        tableName: "",
                         tableType: "",
                         capacity: "",
                         status: "Available",
                         location: "",
                         description: "",
+                        imageUrl: "",
                       });
                     }}
                     className="simple-btn simple-btn-secondary"

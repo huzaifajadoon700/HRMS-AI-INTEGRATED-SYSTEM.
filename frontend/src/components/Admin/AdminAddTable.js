@@ -8,12 +8,13 @@ const AdminAddTable = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
-    tableNumber: "",
+    tableName: "",
     capacity: "",
     status: "Available",
     location: "",
     description: "",
     tableType: "",
+    imageUrl: "",
   });
 
   useEffect(() => {
@@ -47,9 +48,9 @@ const AdminAddTable = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.tableNumber || !formData.capacity || !formData.location) {
+    if (!formData.tableName || !formData.capacity || !formData.tableType) {
       toast.error(
-        "Please fill in all required fields (Table Number, Capacity, Location)"
+        "Please fill in all required fields (Table Name, Capacity, Table Type)"
       );
       return;
     }
@@ -109,10 +110,10 @@ const AdminAddTable = () => {
         <form onSubmit={handleSubmit} className="simple-form">
           <div className="simple-form-row">
             <input
-              type="number"
-              name="tableNumber"
-              placeholder="Table Number"
-              value={formData.tableNumber}
+              type="text"
+              name="tableName"
+              placeholder="Table Name"
+              value={formData.tableName}
               onChange={handleInputChange}
               required
             />
@@ -123,11 +124,14 @@ const AdminAddTable = () => {
               required
             >
               <option value="">Select Table Type</option>
-              <option value="Regular">Regular</option>
+              <option value="indoor">Indoor</option>
+              <option value="outdoor">Outdoor</option>
+              <option value="private">Private</option>
+              <option value="Standard">Standard</option>
+              <option value="Premium">Premium</option>
               <option value="VIP">VIP</option>
-              <option value="Outdoor">Outdoor</option>
-              <option value="Private">Private</option>
-              <option value="Bar">Bar</option>
+              <option value="Booth">Booth</option>
+              <option value="Counter">Counter</option>
             </select>
           </div>
 
@@ -147,9 +151,8 @@ const AdminAddTable = () => {
               required
             >
               <option value="Available">Available</option>
-              <option value="Occupied">Occupied</option>
+              <option value="Booked">Booked</option>
               <option value="Reserved">Reserved</option>
-              <option value="Maintenance">Maintenance</option>
             </select>
           </div>
 
@@ -172,17 +175,28 @@ const AdminAddTable = () => {
             rows="4"
           />
 
+          <div className="simple-form-row">
+            <input
+              type="url"
+              name="imageUrl"
+              placeholder="Image URL (e.g., https://example.com/table.jpg)"
+              value={formData.imageUrl}
+              onChange={handleInputChange}
+            />
+            <div></div>
+          </div>
+
           <div className="simple-form-actions">
             <button
               type="submit"
               className="simple-btn simple-btn-primary"
               disabled={loading}
             >
-              {loading ? 'Adding...' : 'Add Table'}
+              {loading ? "Adding..." : "Add Table"}
             </button>
             <button
               type="button"
-              onClick={() => navigate('/admin/view-tables')}
+              onClick={() => navigate("/admin/view-tables")}
               className="simple-btn simple-btn-secondary"
             >
               Cancel

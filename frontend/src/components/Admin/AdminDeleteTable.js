@@ -116,7 +116,8 @@ const AdminDeleteTable = () => {
         >
           <thead>
             <tr>
-              <th style={{ minWidth: "120px" }}>Table Number</th>
+              <th style={{ minWidth: "100px" }}>Image</th>
+              <th style={{ minWidth: "120px" }}>Table Name</th>
               <th style={{ minWidth: "120px" }}>Table Type</th>
               <th style={{ minWidth: "100px" }}>Capacity</th>
               <th style={{ minWidth: "100px" }}>Status</th>
@@ -128,7 +129,41 @@ const AdminDeleteTable = () => {
           <tbody>
             {tables.map((table) => (
               <tr key={table._id}>
-                <td style={{ minWidth: "120px" }}>{table.tableNumber}</td>
+                <td style={{ minWidth: "100px" }}>
+                  {table.image ? (
+                    <img
+                      src={
+                        table.image.startsWith("http")
+                          ? table.image
+                          : `${
+                              process.env.REACT_APP_API_URL ||
+                              "https://hrms-bace.vercel.app"
+                            }${table.image}`
+                      }
+                      alt={table.tableName}
+                      className="simple-room-image"
+                      style={{
+                        width: "60px",
+                        height: "40px",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                      }}
+                      onError={(e) => {
+                        e.target.src =
+                          "https://via.placeholder.com/60x40/e5e7eb/9ca3af?text=No+Image";
+                        e.target.onerror = null;
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className="simple-no-image"
+                      style={{ fontSize: "12px", color: "#6b7280" }}
+                    >
+                      No Image
+                    </div>
+                  )}
+                </td>
+                <td style={{ minWidth: "120px" }}>{table.tableName}</td>
                 <td style={{ minWidth: "120px" }}>{table.tableType}</td>
                 <td style={{ minWidth: "100px" }}>{table.capacity} people</td>
                 <td style={{ minWidth: "100px" }}>

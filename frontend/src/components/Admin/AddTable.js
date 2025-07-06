@@ -17,6 +17,7 @@ const AdminManageTables = () => {
     capacity: "",
     status: "Available",
     description: "",
+    imageUrl: "",
   });
 
   const fetchTables = async () => {
@@ -39,6 +40,8 @@ const AdminManageTables = () => {
       tableType: "",
       capacity: "",
       status: "Available",
+      description: "",
+      imageUrl: "",
     });
   };
 
@@ -54,6 +57,9 @@ const AdminManageTables = () => {
     data.append("capacity", formData.capacity);
     data.append("status", formData.status);
     data.append("description", formData.description);
+    if (formData.imageUrl) {
+      data.append("imageUrl", formData.imageUrl);
+    }
     if (image) {
       data.append("image", image);
     }
@@ -85,6 +91,8 @@ const AdminManageTables = () => {
       tableType: table.tableType,
       capacity: table.capacity,
       status: table.status,
+      description: table.description || "",
+      imageUrl: table.image || "",
     });
     setShowUpdateModal(true);
   };
@@ -96,6 +104,10 @@ const AdminManageTables = () => {
     data.append("tableType", formData.tableType);
     data.append("capacity", formData.capacity);
     data.append("status", formData.status);
+    data.append("description", formData.description);
+    if (formData.imageUrl) {
+      data.append("imageUrl", formData.imageUrl);
+    }
     if (image) {
       data.append("image", image);
     }
@@ -239,6 +251,22 @@ const AdminManageTables = () => {
                   onChange={handleImageChange}
                 />
               </div>
+              <div className="form-group">
+                <label htmlFor="table-image-url">Or Enter Image URL</label>
+                <input
+                  type="url"
+                  className="form-control cosmic-input"
+                  id="table-image-url"
+                  value={formData.imageUrl}
+                  onChange={(e) =>
+                    setFormData({ ...formData, imageUrl: e.target.value })
+                  }
+                  placeholder="https://example.com/table-image.jpg"
+                />
+                <small className="form-text text-muted">
+                  You can either upload a file or provide an image URL
+                </small>
+              </div>
               <div className="text-center mt-3">
                 <button type="submit" className="btn cosmic-btn-add">
                   Add Table
@@ -273,19 +301,52 @@ const AdminManageTables = () => {
         >
           <thead>
             <tr>
-              <th style={{ minWidth: "150px" }}>Table ID</th>
-              <th style={{ minWidth: "120px" }}>Name</th>
+              <th style={{ minWidth: "100px" }}>Image</th>
+              <th style={{ minWidth: "120px" }}>Table Name</th>
               <th style={{ minWidth: "100px" }}>Type</th>
               <th style={{ minWidth: "100px" }}>Capacity</th>
               <th style={{ minWidth: "100px" }}>Status</th>
-              <th style={{ minWidth: "100px" }}>Image</th>
+              <th style={{ minWidth: "120px" }}>Location</th>
               <th style={{ minWidth: "160px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {tables.map((table) => (
               <tr key={table._id}>
-                <td style={{ minWidth: "150px" }}>{table._id}</td>
+                <td style={{ minWidth: "100px" }}>
+                  {table.image ? (
+                    <img
+                      src={
+                        table.image.startsWith("http")
+                          ? table.image
+                          : `${
+                              process.env.REACT_APP_API_URL ||
+                              "https://hrms-bace.vercel.app"
+                            }${table.image}`
+                      }
+                      alt={table.tableName}
+                      className="simple-room-image"
+                      style={{
+                        width: "60px",
+                        height: "40px",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                      }}
+                      onError={(e) => {
+                        e.target.src =
+                          "https://via.placeholder.com/60x40/e5e7eb/9ca3af?text=No+Image";
+                        e.target.onerror = null;
+                      }}
+                    />
+                  ) : (
+                    <div
+                      className="simple-no-image"
+                      style={{ fontSize: "12px", color: "#6b7280" }}
+                    >
+                      No Image
+                    </div>
+                  )}
+                </td>
                 <td style={{ minWidth: "120px" }}>{table.tableName}</td>
                 <td style={{ minWidth: "100px" }}>{table.tableType}</td>
                 <td style={{ minWidth: "100px" }}>{table.capacity}</td>
@@ -296,17 +357,8 @@ const AdminManageTables = () => {
                     {table.status}
                   </span>
                 </td>
-                <td>
-                  {table.image && (
-                    <img
-                      src={`${
-                        process.env.REACT_APP_API_URL ||
-                        "https://hrms-bace.vercel.app"
-                      }${table.image}`}
-                      alt={table.tableName}
-                      className="cosmic-table-image"
-                    />
-                  )}
+                <td style={{ minWidth: "120px" }}>
+                  {table.location || "Main Hall"}
                 </td>
                 <td>
                   <Button
@@ -467,6 +519,19 @@ const AdminManageTables = () => {
                 </select>
               </div>
               <div className="form-group">
+                <label htmlFor="update-table-description">Description</label>
+                <textarea
+                  className="form-control cosmic-input"
+                  id="update-table-description"
+                  value={formData.description}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
+                  placeholder="Enter table description"
+                  rows="3"
+                />
+              </div>
+              <div className="form-group">
                 <label htmlFor="update-table-image">
                   Upload New Image (optional)
                 </label>
@@ -477,6 +542,24 @@ const AdminManageTables = () => {
                   accept="image/jpeg, image/png"
                   onChange={handleImageChange}
                 />
+              </div>
+              <div className="form-group">
+                <label htmlFor="update-table-image-url">
+                  Or Enter Image URL
+                </label>
+                <input
+                  type="url"
+                  className="form-control cosmic-input"
+                  id="update-table-image-url"
+                  value={formData.imageUrl}
+                  onChange={(e) =>
+                    setFormData({ ...formData, imageUrl: e.target.value })
+                  }
+                  placeholder="https://example.com/table-image.jpg"
+                />
+                <small className="form-text text-muted">
+                  You can either upload a file or provide an image URL
+                </small>
               </div>
               <div className="text-center mt-3">
                 <button type="submit" className="btn cosmic-btn-update">

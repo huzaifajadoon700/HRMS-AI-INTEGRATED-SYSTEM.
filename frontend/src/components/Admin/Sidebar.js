@@ -78,6 +78,7 @@ const Sidebar = () => {
   const [notifications, setNotifications] = useState(3);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -458,6 +459,7 @@ const Sidebar = () => {
                             toggleDropdown(item.name);
                           } else {
                             setSelectedModule(item.component || item.name);
+                            setForceUpdate((prev) => prev + 1); // Force re-render
                             if (isMobile) {
                               setIsMobileMenuOpen(false);
                             }
@@ -549,6 +551,7 @@ const Sidebar = () => {
                                     subItem.component
                                   );
                                   setSelectedModule(subItem.component);
+                                  setForceUpdate((prev) => prev + 1); // Force re-render
                                   if (isMobile) {
                                     setIsMobileMenuOpen(false);
                                   }
@@ -681,7 +684,9 @@ const Sidebar = () => {
         </header>
 
         {/* Dashboard Content */}
-        <div className="admin-content">{renderContent()}</div>
+        <div className="admin-content" key={`${selectedModule}-${forceUpdate}`}>
+          {renderContent()}
+        </div>
       </main>
     </div>
   );
