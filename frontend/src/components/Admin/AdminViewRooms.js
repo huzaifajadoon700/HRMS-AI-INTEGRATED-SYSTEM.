@@ -110,20 +110,20 @@ const AdminViewRooms = () => {
         <table className="simple-table">
           <thead>
             <tr>
-              <th>Image</th>
+              <th className="hide-mobile">Image</th>
               <th>Room Number</th>
               <th>Room Type</th>
-              <th>Capacity</th>
+              <th className="hide-mobile">Capacity</th>
               <th>Price</th>
               <th>Status</th>
-              <th>Description</th>
+              <th className="hide-mobile">Description</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredRooms.map((room) => (
               <tr key={room._id}>
-                <td>
+                <td className="hide-mobile">
                   {room.image ? (
                     <img
                       src={room.image}
@@ -136,7 +136,7 @@ const AdminViewRooms = () => {
                 </td>
                 <td>{room.roomNumber}</td>
                 <td>{room.roomType}</td>
-                <td>{room.capacity} people</td>
+                <td className="hide-mobile">{room.capacity} people</td>
                 <td>Rs. {room.price}/night</td>
                 <td>
                   <span
@@ -145,7 +145,9 @@ const AdminViewRooms = () => {
                     {room.status}
                   </span>
                 </td>
-                <td className="simple-description">{room.description}</td>
+                <td className="hide-mobile simple-description">
+                  {room.description}
+                </td>
                 <td>
                   <button
                     onClick={() => handleDelete(room._id)}

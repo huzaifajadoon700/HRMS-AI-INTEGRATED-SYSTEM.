@@ -111,11 +111,11 @@ const AdminViewTables = () => {
           <thead>
             <tr>
               <th>Table Number</th>
-              <th>Capacity</th>
-              <th>Location</th>
+              <th className="hide-mobile">Capacity</th>
+              <th className="hide-mobile">Location</th>
               <th>Type</th>
               <th>Status</th>
-              <th>Description</th>
+              <th className="hide-mobile">Description</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -123,8 +123,8 @@ const AdminViewTables = () => {
             {filteredTables.map((table) => (
               <tr key={table._id}>
                 <td>{table.tableNumber}</td>
-                <td>{table.capacity} people</td>
-                <td>{table.location}</td>
+                <td className="hide-mobile">{table.capacity} people</td>
+                <td className="hide-mobile">{table.location}</td>
                 <td>{table.tableType}</td>
                 <td>
                   <span
@@ -133,7 +133,9 @@ const AdminViewTables = () => {
                     {table.status}
                   </span>
                 </td>
-                <td className="simple-description">{table.description}</td>
+                <td className="hide-mobile simple-description">
+                  {table.description}
+                </td>
                 <td>
                   <button
                     onClick={() => handleDelete(table._id)}

@@ -84,6 +84,17 @@ const Sidebar = () => {
     if (name) {
       setUserName(name);
     }
+
+    // Handle window resize for mobile responsiveness
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        // Close mobile menu when switching to desktop
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const handleLogout = () => {
@@ -92,7 +103,13 @@ const Sidebar = () => {
   };
 
   const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
+    if (window.innerWidth <= 768) {
+      // On mobile, toggle mobile menu instead of collapsing
+      setIsMobileMenuOpen(!isMobileMenuOpen);
+    } else {
+      // On desktop, collapse/expand sidebar
+      setIsSidebarCollapsed(!isSidebarCollapsed);
+    }
   };
 
   const toggleDropdown = (module) => {
@@ -356,7 +373,9 @@ const Sidebar = () => {
 
       {/* Clean Sidebar */}
       <aside
-        className={`admin-sidebar ${isSidebarCollapsed ? "collapsed" : ""}`}
+        className={`admin-sidebar ${isSidebarCollapsed ? "collapsed" : ""} ${
+          isMobileMenuOpen ? "mobile-open" : ""
+        }`}
       >
         {/* Sidebar Header */}
         <div className="sidebar-header">
@@ -366,6 +385,27 @@ const Sidebar = () => {
               <h3 className="sidebar-title">HRMS</h3>
               <p className="sidebar-subtitle">Dashboard</p>
             </div>
+          )}
+          {/* Mobile Close Button */}
+          {window.innerWidth <= 768 && isMobileMenuOpen && (
+            <button
+              className="mobile-close-btn"
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{
+                position: "absolute",
+                right: "15px",
+                top: "15px",
+                background: "transparent",
+                border: "none",
+                fontSize: "20px",
+                color: "#000000",
+                cursor: "pointer",
+                padding: "5px",
+                borderRadius: "4px",
+              }}
+            >
+              ×
+            </button>
           )}
         </div>
 

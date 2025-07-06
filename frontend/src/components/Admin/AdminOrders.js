@@ -13,13 +13,13 @@ const AdminOrders = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
       return;
     }
-    
+
     fetchOrders();
   }, [navigate]);
 
@@ -27,11 +27,13 @@ const AdminOrders = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/orders`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       if (response.data && Array.isArray(response.data.orders)) {
         setOrders(response.data.orders);
       } else if (Array.isArray(response.data)) {
@@ -56,12 +58,15 @@ const AdminOrders = () => {
     setUpdatingOrderId(orderId);
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      await axios.put(`${apiUrl}/orders/${orderId}`, 
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
+      await axios.put(
+        `${apiUrl}/orders/${orderId}`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
+
       toast.success(`Order status updated to ${newStatus}`);
       fetchOrders();
     } catch (error) {
@@ -73,26 +78,36 @@ const AdminOrders = () => {
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case 'pending': return 'simple-status-pending';
-      case 'processing': return 'simple-status-processing';
-      case 'completed': return 'simple-status-available';
-      case 'cancelled': return 'simple-status-unavailable';
-      default: return 'simple-status-pending';
+      case "pending":
+        return "simple-status-pending";
+      case "processing":
+        return "simple-status-processing";
+      case "completed":
+        return "simple-status-available";
+      case "cancelled":
+        return "simple-status-unavailable";
+      default:
+        return "simple-status-pending";
     }
   };
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  if (loading)
+    return (
+      <div className="simple-admin-container">
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="simple-admin-container">
@@ -102,12 +117,12 @@ const AdminOrders = () => {
       </div>
 
       <div className="simple-admin-controls">
-        <button 
+        <button
           onClick={fetchOrders}
           disabled={loading}
           className="simple-btn simple-btn-primary"
         >
-          {loading ? 'Loading...' : 'Refresh Orders'}
+          {loading ? "Loading..." : "Refresh Orders"}
         </button>
       </div>
 
@@ -117,59 +132,73 @@ const AdminOrders = () => {
             <tr>
               <th>Order ID</th>
               <th>Customer</th>
-              <th>Items</th>
+              <th className="hide-mobile">Items</th>
               <th>Total Amount</th>
               <th>Status</th>
-              <th>Date</th>
+              <th className="hide-mobile">Date</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map(order => (
+            {orders.map((order) => (
               <tr key={order._id}>
                 <td>#{order.orderNumber || order._id.slice(-8)}</td>
                 <td>
                   <div>
-                    <div style={{ fontWeight: 'bold' }}>{order.customerName || order.customer?.name || 'N/A'}</div>
-                    <div style={{ fontSize: '12px', color: '#666' }}>{order.customerEmail || order.customer?.email || ''}</div>
+                    <div style={{ fontWeight: "bold" }}>
+                      {order.customerName || order.customer?.name || "N/A"}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#666" }}>
+                      {order.customerEmail || order.customer?.email || ""}
+                    </div>
                   </div>
                 </td>
-                <td>
-                  <div style={{ maxWidth: '200px' }}>
+                <td className="hide-mobile">
+                  <div style={{ maxWidth: "200px" }}>
                     {order.items?.map((item, index) => (
-                      <div key={index} style={{ fontSize: '12px' }}>
+                      <div key={index} style={{ fontSize: "12px" }}>
                         {item.name} x{item.quantity}
                       </div>
-                    )) || 'No items'}
+                    )) || "No items"}
                   </div>
                 </td>
                 <td>Rs. {order.totalAmount || order.totalPrice || 0}</td>
                 <td>
-                  <span className={`simple-status ${getStatusColor(order.status)}`}>
-                    {order.status || 'Pending'}
+                  <span
+                    className={`simple-status ${getStatusColor(order.status)}`}
+                  >
+                    {order.status || "Pending"}
                   </span>
                 </td>
-                <td>{formatDate(order.createdAt)}</td>
+                <td className="hide-mobile">{formatDate(order.createdAt)}</td>
                 <td>
                   <div className="simple-actions">
-                    {order.status === 'pending' && (
+                    {order.status === "pending" && (
                       <>
-                        <button 
-                          onClick={() => handleStatusUpdate(order._id, 'processing')}
+                        <button
+                          onClick={() =>
+                            handleStatusUpdate(order._id, "processing")
+                          }
                           className="simple-btn simple-btn-small"
                           disabled={updatingOrderId === order._id}
                         >
-                          {updatingOrderId === order._id ? 'Updating...' : 'Process'}
+                          {updatingOrderId === order._id
+                            ? "Updating..."
+                            : "Process"}
                         </button>
-                        <button 
-                          onClick={() => handleStatusUpdate(order._id, 'completed')}
+                        <button
+                          onClick={() =>
+                            handleStatusUpdate(order._id, "completed")
+                          }
                           className="simple-btn simple-btn-small simple-btn-success"
                           disabled={updatingOrderId === order._id}
                         >
                           Complete
                         </button>
-                        <button 
-                          onClick={() => handleStatusUpdate(order._id, 'cancelled')}
+                        <button
+                          onClick={() =>
+                            handleStatusUpdate(order._id, "cancelled")
+                          }
                           className="simple-btn simple-btn-small simple-btn-danger"
                           disabled={updatingOrderId === order._id}
                         >
@@ -177,17 +206,24 @@ const AdminOrders = () => {
                         </button>
                       </>
                     )}
-                    {order.status === 'processing' && (
-                      <button 
-                        onClick={() => handleStatusUpdate(order._id, 'completed')}
+                    {order.status === "processing" && (
+                      <button
+                        onClick={() =>
+                          handleStatusUpdate(order._id, "completed")
+                        }
                         className="simple-btn simple-btn-small simple-btn-success"
                         disabled={updatingOrderId === order._id}
                       >
-                        {updatingOrderId === order._id ? 'Updating...' : 'Complete'}
+                        {updatingOrderId === order._id
+                          ? "Updating..."
+                          : "Complete"}
                       </button>
                     )}
-                    {(order.status === 'completed' || order.status === 'cancelled') && (
-                      <span style={{ color: '#666', fontSize: '12px' }}>No actions</span>
+                    {(order.status === "completed" ||
+                      order.status === "cancelled") && (
+                      <span style={{ color: "#666", fontSize: "12px" }}>
+                        No actions
+                      </span>
                     )}
                   </div>
                 </td>
@@ -198,7 +234,7 @@ const AdminOrders = () => {
       </div>
 
       {orders.length === 0 && (
-        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No orders found.</p>
         </div>
       )}

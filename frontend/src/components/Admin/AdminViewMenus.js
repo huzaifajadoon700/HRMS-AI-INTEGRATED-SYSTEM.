@@ -107,20 +107,20 @@ const AdminViewMenus = () => {
         <table className="simple-table">
           <thead>
             <tr>
-              <th>Image</th>
+              <th className="hide-mobile">Image</th>
               <th>Name</th>
               <th>Category</th>
               <th>Price</th>
               <th>Status</th>
-              <th>Description</th>
-              <th>Ingredients</th>
+              <th className="hide-mobile">Description</th>
+              <th className="hide-mobile">Ingredients</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredMenus.map((menu) => (
               <tr key={menu._id}>
-                <td>
+                <td className="hide-mobile">
                   {menu.image ? (
                     <img
                       src={menu.image}
@@ -141,8 +141,12 @@ const AdminViewMenus = () => {
                     {menu.status}
                   </span>
                 </td>
-                <td className="simple-description">{menu.description}</td>
-                <td className="simple-description">{menu.ingredients}</td>
+                <td className="hide-mobile simple-description">
+                  {menu.description}
+                </td>
+                <td className="hide-mobile simple-description">
+                  {menu.ingredients}
+                </td>
                 <td>
                   <button
                     onClick={() => handleDelete(menu._id)}

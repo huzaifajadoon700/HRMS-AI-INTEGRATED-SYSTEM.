@@ -328,3 +328,568 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== ENHANCED MOBILE RESPONSIVE STYLES ===== */
+
+/* Tablet Styles (768px - 1024px) */
+@media (max-width: 1024px) {
+  .simple-admin-container {
+    padding: 15px;
+  }
+
+  .simple-admin-header h1 {
+    font-size: 24px;
+  }
+
+  .simple-admin-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 15px;
+  }
+
+  .simple-search-input {
+    max-width: 100%;
+  }
+
+  .simple-form-row {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .simple-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .simple-table {
+    min-width: 600px;
+  }
+
+  /* Tab navigation becomes scrollable */
+  .simple-tab-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Mobile Styles (480px - 768px) */
+@media (max-width: 768px) {
+  .simple-admin-container {
+    padding: 10px;
+  }
+
+  .simple-admin-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+  }
+
+  .simple-admin-header h1 {
+    font-size: 20px;
+    line-height: 1.3;
+  }
+
+  .simple-admin-header p {
+    font-size: 14px;
+  }
+
+  .simple-admin-controls {
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  .simple-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    min-height: 44px; /* Touch-friendly */
+  }
+
+  .simple-btn-small {
+    padding: 8px 12px;
+    font-size: 13px;
+    min-height: 36px;
+  }
+
+  .simple-table-container {
+    margin-bottom: 20px;
+    border-radius: 6px;
+  }
+
+  .simple-table {
+    font-size: 14px;
+    min-width: 500px;
+  }
+
+  .simple-table th,
+  .simple-table td {
+    padding: 8px 6px;
+    word-wrap: break-word;
+  }
+
+  .simple-form {
+    gap: 15px;
+  }
+
+  .simple-form input,
+  .simple-form select,
+  .simple-form textarea {
+    padding: 12px;
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+  }
+
+  .simple-form-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .simple-form-actions .simple-btn {
+    width: 100%;
+  }
+
+  /* Grid layouts become single column on mobile */
+  .simple-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 15px;
+  }
+
+  /* Actions become vertical on mobile */
+  .simple-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .simple-actions .simple-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Tab navigation */
+  .simple-tab-nav {
+    display: flex;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 5px;
+    padding-bottom: 10px;
+  }
+
+  .simple-tab-nav .simple-btn {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+/* Small Mobile Styles (320px - 480px) */
+@media (max-width: 480px) {
+  .simple-admin-container {
+    padding: 8px;
+  }
+
+  .simple-admin-header h1 {
+    font-size: 18px;
+  }
+
+  .simple-admin-header p {
+    font-size: 13px;
+  }
+
+  .simple-table {
+    font-size: 12px;
+    min-width: 400px;
+  }
+
+  .simple-table th,
+  .simple-table td {
+    padding: 6px 4px;
+    font-size: 12px;
+  }
+
+  .simple-btn {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+
+  .simple-btn-small {
+    padding: 6px 8px;
+    font-size: 11px;
+    min-height: 32px;
+  }
+
+  .simple-form input,
+  .simple-form select,
+  .simple-form textarea {
+    padding: 10px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  /* Hide less important columns on very small screens */
+  .simple-table .hide-mobile {
+    display: none;
+  }
+
+  /* Stack form elements vertically */
+  .simple-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Smaller gaps for very small screens */
+  .simple-admin-controls {
+    gap: 8px;
+  }
+
+  .simple-form {
+    gap: 12px;
+  }
+}
+
+/* Touch-friendly improvements */
+@media (hover: none) and (pointer: coarse) {
+  .simple-btn {
+    min-height: 44px;
+  }
+
+  .simple-btn-small {
+    min-height: 36px;
+  }
+
+  .simple-table th,
+  .simple-table td {
+    padding: 10px 8px;
+  }
+
+  /* Larger touch targets for checkboxes and radio buttons */
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+/* ===== ADDITIONAL MOBILE ENHANCEMENTS ===== */
+
+/* Prevent horizontal scroll on mobile */
+@media (max-width: 768px) {
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Ensure tables don't break layout */
+  .simple-table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+  }
+
+  /* Better button spacing on mobile */
+  .simple-admin-controls {
+    flex-wrap: wrap;
+  }
+
+  .simple-admin-controls > * {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  /* Mobile-friendly status badges */
+  .simple-status {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  /* Better form spacing on mobile */
+  .simple-form {
+    padding: 0;
+  }
+
+  .simple-form input,
+  .simple-form select,
+  .simple-form textarea {
+    border-radius: 8px;
+    border: 2px solid #e5e7eb;
+  }
+
+  .simple-form input:focus,
+  .simple-form select:focus,
+  .simple-form textarea:focus {
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+  }
+
+  /* Mobile-friendly image sizing */
+  .simple-room-image {
+    width: 40px !important;
+    height: 40px !important;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  /* Better no-image placeholder */
+  .simple-no-image {
+    width: 40px;
+    height: 40px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #6b7280;
+    border-radius: 4px;
+  }
+
+  /* Mobile-friendly actions */
+  .simple-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 80px;
+  }
+
+  .simple-actions .simple-btn {
+    font-size: 11px;
+    padding: 6px 8px;
+    white-space: nowrap;
+  }
+}
+
+/* Very small screens (iPhone SE, etc.) */
+@media (max-width: 375px) {
+  .simple-admin-container {
+    padding: 6px;
+  }
+
+  .simple-admin-header h1 {
+    font-size: 16px;
+  }
+
+  .simple-admin-header p {
+    font-size: 12px;
+  }
+
+  .simple-btn {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+
+  .simple-btn-small {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+
+  .simple-table {
+    font-size: 11px;
+  }
+
+  .simple-table th,
+  .simple-table td {
+    padding: 4px 2px;
+  }
+
+  /* Stack everything vertically on very small screens */
+  .simple-admin-controls {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .simple-admin-controls > * {
+    width: 100%;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .simple-admin-header {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+  }
+
+  .simple-admin-header h1 {
+    font-size: 18px;
+  }
+
+  .simple-table th,
+  .simple-table td {
+    padding: 6px 4px;
+  }
+}
+
+/* Dark mode support for mobile */
+@media (prefers-color-scheme: dark) and (max-width: 768px) {
+  .simple-admin-container {
+    background: #ffffff; /* Keep white background even in dark mode */
+    color: #111827;
+  }
+
+  .simple-table-container {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+  }
+}
+
+/* ===== DASHBOARD MOBILE SPECIFIC IMPROVEMENTS ===== */
+
+/* Mobile Dashboard Container */
+@media (max-width: 768px) {
+  .simple-admin-container {
+    min-height: calc(100vh - 60px);
+    overflow-x: hidden;
+  }
+
+  /* Mobile Dashboard Header */
+  .simple-admin-header {
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    z-index: 10;
+    padding: 15px 0;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 20px !important;
+  }
+
+  /* Mobile Stats Cards */
+  .simple-stat-card {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .simple-stat-card h3 {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .stat-number {
+    font-size: 24px !important;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  /* Mobile Revenue Card */
+  .simple-table-container {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  /* Mobile Grid Improvements */
+  .simple-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  /* Mobile Button Improvements */
+  .simple-btn {
+    min-height: 44px;
+    font-size: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .simple-btn:active {
+    transform: scale(0.98);
+  }
+
+  /* Mobile Select Improvements */
+  select {
+    min-height: 44px;
+    font-size: 14px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #111827;
+  }
+
+  /* Mobile Typography */
+  h1 {
+    font-size: 24px !important;
+    line-height: 1.3;
+    margin-bottom: 8px;
+  }
+
+  h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+
+  p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Mobile Spacing */
+  .simple-admin-controls {
+    margin-bottom: 20px;
+    gap: 10px;
+  }
+
+  /* Mobile Revenue Breakdown */
+  .revenue-breakdown {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 15px;
+  }
+
+  .revenue-item {
+    text-align: center;
+    padding: 12px;
+    background: #f9fafb;
+    border-radius: 6px;
+  }
+
+  .revenue-amount {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .revenue-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin: 0;
+  }
+}
+
+/* Small Mobile Specific (iPhone SE, etc.) */
+@media (max-width: 375px) {
+  .simple-admin-container {
+    padding: 8px !important;
+  }
+
+  .simple-admin-header {
+    padding: 12px 0;
+  }
+
+  .simple-stat-card {
+    padding: 12px;
+  }
+
+  .stat-number {
+    font-size: 20px !important;
+  }
+
+  h1 {
+    font-size: 20px !important;
+  }
+
+  .simple-btn {
+    font-size: 13px;
+    padding: 10px 14px;
+  }
+}

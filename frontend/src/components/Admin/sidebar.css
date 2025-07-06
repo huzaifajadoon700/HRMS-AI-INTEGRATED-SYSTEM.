@@ -605,6 +605,8 @@
   .admin-sidebar {
     transform: translateX(-100%);
     transition: transform var(--transition-smooth);
+    z-index: 1001;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   }
 
   .admin-sidebar.mobile-open {
@@ -613,6 +615,7 @@
 
   .admin-main {
     margin-left: 0;
+    width: 100%;
   }
 
   .mobile-overlay {
@@ -622,12 +625,104 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
+    z-index: 1000;
     display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
   }
 
   .mobile-overlay.active {
     display: block;
+    opacity: 1;
+  }
+
+  /* Mobile header improvements */
+  .admin-header {
+    padding: 1rem;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .header-btn:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+
+  .header-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* Mobile sidebar header */
+  .sidebar-header {
+    position: relative;
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .mobile-close-btn {
+    position: absolute !important;
+    right: 15px !important;
+    top: 15px !important;
+    background: transparent !important;
+    border: none !important;
+    font-size: 24px !important;
+    color: #000000 !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    border-radius: 6px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: background-color 0.2s ease !important;
+  }
+
+  .mobile-close-btn:hover {
+    background: #f3f4f6 !important;
+  }
+
+  /* Mobile navigation improvements */
+  .nav-item {
+    padding: 0.75rem 1rem;
+    margin: 0.25rem 0.5rem;
+    border-radius: 8px;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-item:active {
+    transform: scale(0.98);
+  }
+
+  /* Mobile submenu improvements */
+  .submenu {
+    margin: 0.25rem 0;
+  }
+
+  .submenu-item {
+    padding: 0.5rem 1rem 0.5rem 2.5rem;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
   }
 }
 
