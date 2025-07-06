@@ -106,40 +106,69 @@ const AdminViewTables = () => {
         </button>
       </div>
 
-      <div className="simple-table-container">
-        <table className="simple-table">
+      {/* Table scroll hint for mobile */}
+      <div
+        style={{
+          marginBottom: "10px",
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+        }}
+      >
+        {window.innerWidth <= 768 && (
+          <span>← Swipe left/right to see all columns →</span>
+        )}
+      </div>
+
+      <div
+        className="simple-table-container"
+        style={{ overflowX: "auto", width: "100%" }}
+      >
+        <table
+          className="simple-table"
+          style={{ minWidth: "800px", width: "100%" }}
+        >
           <thead>
             <tr>
-              <th>Table Number</th>
-              <th className="hide-mobile">Capacity</th>
-              <th className="hide-mobile">Location</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th className="hide-mobile">Description</th>
-              <th>Actions</th>
+              <th style={{ minWidth: "120px" }}>Table Number</th>
+              <th style={{ minWidth: "100px" }}>Capacity</th>
+              <th style={{ minWidth: "120px" }}>Location</th>
+              <th style={{ minWidth: "100px" }}>Type</th>
+              <th style={{ minWidth: "100px" }}>Status</th>
+              <th style={{ minWidth: "200px" }}>Description</th>
+              <th style={{ minWidth: "120px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredTables.map((table) => (
               <tr key={table._id}>
-                <td>{table.tableNumber}</td>
-                <td className="hide-mobile">{table.capacity} people</td>
-                <td className="hide-mobile">{table.location}</td>
-                <td>{table.tableType}</td>
-                <td>
+                <td style={{ minWidth: "120px" }}>{table.tableNumber}</td>
+                <td style={{ minWidth: "100px" }}>{table.capacity} people</td>
+                <td style={{ minWidth: "120px" }}>{table.location}</td>
+                <td style={{ minWidth: "100px" }}>{table.tableType}</td>
+                <td style={{ minWidth: "100px" }}>
                   <span
                     className={`simple-status simple-status-${table.status?.toLowerCase()}`}
                   >
                     {table.status}
                   </span>
                 </td>
-                <td className="hide-mobile simple-description">
+                <td
+                  style={{
+                    minWidth: "200px",
+                    maxWidth: "200px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {table.description}
                 </td>
-                <td>
+                <td style={{ minWidth: "120px" }}>
                   <button
                     onClick={() => handleDelete(table._id)}
                     className="simple-btn simple-btn-small simple-btn-danger"
+                    style={{ whiteSpace: "nowrap" }}
                   >
                     Delete
                   </button>

@@ -145,6 +145,23 @@
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
 }
 
+/* Better select dropdown styling */
+.simple-form select {
+  position: relative;
+  z-index: 10;
+  max-width: 100%;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+/* Ensure dropdowns don't overflow on mobile */
+@media (max-width: 768px) {
+  .simple-form select {
+    position: static;
+    z-index: auto;
+  }
+}
+
 .simple-form-actions {
   display: flex;
   gap: 12px;

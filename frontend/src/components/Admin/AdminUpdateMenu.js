@@ -16,19 +16,19 @@ const AdminUpdateMenu = () => {
     category: "",
     status: "Available",
     ingredients: "",
-    image: ""
+    image: "",
   });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
       return;
     }
-    
+
     fetchMenuItems();
   }, [navigate]);
 
@@ -36,9 +36,11 @@ const AdminUpdateMenu = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/menus`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setMenuItems(response.data);
     } catch (error) {
@@ -58,15 +60,15 @@ const AdminUpdateMenu = () => {
       category: item.category || "",
       status: item.status || "Available",
       ingredients: item.ingredients || "",
-      image: item.image || ""
+      image: item.image || "",
     });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -77,10 +79,12 @@ const AdminUpdateMenu = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
+
       await axios.put(`${apiUrl}/menus/${selectedItem._id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       toast.success("Menu item updated successfully!");
@@ -92,7 +96,7 @@ const AdminUpdateMenu = () => {
         category: "",
         status: "Available",
         ingredients: "",
-        image: ""
+        image: "",
       });
       fetchMenuItems();
     } catch (error) {
@@ -103,7 +107,12 @@ const AdminUpdateMenu = () => {
     }
   };
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  if (loading)
+    return (
+      <div className="simple-admin-container">
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="simple-admin-container">
@@ -113,44 +122,73 @@ const AdminUpdateMenu = () => {
       </div>
 
       <div className="simple-admin-controls">
-        <button 
+        <button
           onClick={fetchMenuItems}
           disabled={loading}
           className="simple-btn simple-btn-primary"
         >
-          {loading ? 'Loading...' : 'Refresh Menu'}
+          {loading ? "Loading..." : "Refresh Menu"}
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: window.innerWidth <= 768 ? "1fr" : "1fr 1fr",
+          gap: "30px",
+        }}
+      >
         {/* Menu Selection */}
         <div className="simple-table-container">
-          <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
-            <h3 style={{ margin: 0, color: '#000000' }}>Select Menu Item to Update</h3>
+          <div style={{ padding: "20px", borderBottom: "1px solid #e5e7eb" }}>
+            <h3 style={{ margin: 0, color: "#000000" }}>
+              Select Menu Item to Update
+            </h3>
           </div>
-          <div style={{ padding: '20px' }}>
+          <div style={{ padding: "20px" }}>
             {menuItems.length > 0 ? (
-              <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              <div style={{ maxHeight: "400px", overflowY: "auto" }}>
                 {menuItems.map((item) => (
-                  <div 
+                  <div
                     key={item._id}
                     onClick={() => handleSelectItem(item)}
-                    style={{ 
-                      cursor: 'pointer',
-                      padding: '15px',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
-                      backgroundColor: selectedItem?._id === item._id ? '#f0f9ff' : '#ffffff'
+                    style={{
+                      cursor: "pointer",
+                      padding: "15px",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      backgroundColor:
+                        selectedItem?._id === item._id ? "#f0f9ff" : "#ffffff",
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
                       <div>
-                        <h6 style={{ margin: '0 0 5px 0', color: '#000000' }}>{item.name}</h6>
-                        <p style={{ margin: '0 0 5px 0', color: '#000000', fontSize: '14px' }}>{item.category}</p>
-                        <small style={{ color: '#059669' }}>Rs. {item.price}</small>
+                        <h6 style={{ margin: "0 0 5px 0", color: "#000000" }}>
+                          {item.name}
+                        </h6>
+                        <p
+                          style={{
+                            margin: "0 0 5px 0",
+                            color: "#000000",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {item.category}
+                        </p>
+                        <small style={{ color: "#059669" }}>
+                          Rs. {item.price}
+                        </small>
                       </div>
-                      <span className={`simple-status simple-status-${item.status?.toLowerCase()}`}>
+                      <span
+                        className={`simple-status simple-status-${item.status?.toLowerCase()}`}
+                      >
                         {item.status}
                       </span>
                     </div>
@@ -158,9 +196,11 @@ const AdminUpdateMenu = () => {
                 ))}
               </div>
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px' }}>
-                <p style={{ color: '#000000' }}>No menu items found</p>
-                <small style={{ color: '#000000' }}>Add some menu items first to update them</small>
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <p style={{ color: "#000000" }}>No menu items found</p>
+                <small style={{ color: "#000000" }}>
+                  Add some menu items first to update them
+                </small>
               </div>
             )}
           </div>
@@ -168,10 +208,12 @@ const AdminUpdateMenu = () => {
 
         {/* Update Form */}
         <div className="simple-table-container">
-          <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
-            <h3 style={{ margin: 0, color: '#000000' }}>Update Menu Item Details</h3>
+          <div style={{ padding: "20px", borderBottom: "1px solid #e5e7eb" }}>
+            <h3 style={{ margin: 0, color: "#000000" }}>
+              Update Menu Item Details
+            </h3>
           </div>
-          <div style={{ padding: '20px' }}>
+          <div style={{ padding: "20px" }}>
             {selectedItem ? (
               <form onSubmit={handleSubmit} className="simple-form">
                 <div className="simple-form-row">
@@ -248,15 +290,15 @@ const AdminUpdateMenu = () => {
                 />
 
                 <div className="simple-form-actions">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="simple-btn simple-btn-primary"
                     disabled={loading}
                   >
-                    {loading ? 'Updating...' : 'Update Menu Item'}
+                    {loading ? "Updating..." : "Update Menu Item"}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => {
                       setSelectedItem(null);
                       setFormData({
@@ -266,7 +308,7 @@ const AdminUpdateMenu = () => {
                         category: "",
                         status: "Available",
                         ingredients: "",
-                        image: ""
+                        image: "",
                       });
                     }}
                     className="simple-btn simple-btn-secondary"
@@ -276,8 +318,10 @@ const AdminUpdateMenu = () => {
                 </div>
               </form>
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px' }}>
-                <p style={{ color: '#000000' }}>Select a menu item from the list to update its details</p>
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <p style={{ color: "#000000" }}>
+                  Select a menu item from the list to update its details
+                </p>
               </div>
             )}
           </div>

@@ -16,19 +16,19 @@ const AdminRoomUpdate = () => {
     status: "",
     description: "",
     capacity: "",
-    image: ""
+    image: "",
   });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
       return;
     }
-    
+
     fetchRooms();
   }, [navigate]);
 
@@ -36,9 +36,11 @@ const AdminRoomUpdate = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/rooms`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setRooms(response.data);
     } catch (error) {
@@ -58,15 +60,15 @@ const AdminRoomUpdate = () => {
       status: room.status || "",
       description: room.description || "",
       capacity: room.capacity || "",
-      image: room.image || ""
+      image: room.image || "",
     });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -77,10 +79,12 @@ const AdminRoomUpdate = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
+
       await axios.put(`${apiUrl}/rooms/${selectedRoom._id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       toast.success("Room updated successfully!");
@@ -92,7 +96,7 @@ const AdminRoomUpdate = () => {
         status: "",
         description: "",
         capacity: "",
-        image: ""
+        image: "",
       });
       fetchRooms();
     } catch (error) {
@@ -111,48 +115,79 @@ const AdminRoomUpdate = () => {
       </div>
 
       <div className="simple-admin-controls">
-        <button 
+        <button
           onClick={fetchRooms}
           disabled={loading}
           className="simple-btn simple-btn-primary"
         >
-          {loading ? 'Loading...' : 'Refresh Rooms'}
+          {loading ? "Loading..." : "Refresh Rooms"}
         </button>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: window.innerWidth <= 768 ? "1fr" : "1fr 1fr",
+          gap: "30px",
+        }}
+      >
         {/* Room Selection */}
         <div className="simple-table-container">
-          <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
-            <h3 style={{ margin: 0, color: '#000000' }}>Select Room to Update</h3>
+          <div style={{ padding: "20px", borderBottom: "1px solid #e5e7eb" }}>
+            <h3 style={{ margin: 0, color: "#000000" }}>
+              Select Room to Update
+            </h3>
           </div>
-          <div style={{ padding: '20px' }}>
+          <div style={{ padding: "20px" }}>
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '40px' }}>
-                <p style={{ color: '#000000' }}>Loading rooms...</p>
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <p style={{ color: "#000000" }}>Loading rooms...</p>
               </div>
             ) : rooms.length > 0 ? (
-              <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              <div style={{ maxHeight: "400px", overflowY: "auto" }}>
                 {rooms.map((room) => (
-                  <div 
+                  <div
                     key={room._id}
                     onClick={() => handleSelectRoom(room)}
-                    style={{ 
-                      cursor: 'pointer',
-                      padding: '15px',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
-                      backgroundColor: selectedRoom?._id === room._id ? '#f0f9ff' : '#ffffff'
+                    style={{
+                      cursor: "pointer",
+                      padding: "15px",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      backgroundColor:
+                        selectedRoom?._id === room._id ? "#f0f9ff" : "#ffffff",
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
                       <div>
-                        <h6 style={{ margin: '0 0 5px 0', color: '#000000' }}>Room {room.roomNumber}</h6>
-                        <p style={{ margin: '0 0 5px 0', color: '#000000', fontSize: '14px' }}>{room.roomType}</p>
-                        <small style={{ color: '#059669' }}>Rs. {parseInt(room.price || 0).toLocaleString('en-PK')}/night</small>
+                        <h6 style={{ margin: "0 0 5px 0", color: "#000000" }}>
+                          Room {room.roomNumber}
+                        </h6>
+                        <p
+                          style={{
+                            margin: "0 0 5px 0",
+                            color: "#000000",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {room.roomType}
+                        </p>
+                        <small style={{ color: "#059669" }}>
+                          Rs.{" "}
+                          {parseInt(room.price || 0).toLocaleString("en-PK")}
+                          /night
+                        </small>
                       </div>
-                      <span className={`simple-status simple-status-${room.status?.toLowerCase()}`}>
+                      <span
+                        className={`simple-status simple-status-${room.status?.toLowerCase()}`}
+                      >
                         {room.status}
                       </span>
                     </div>
@@ -160,9 +195,11 @@ const AdminRoomUpdate = () => {
                 ))}
               </div>
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px' }}>
-                <p style={{ color: '#000000' }}>No rooms found</p>
-                <small style={{ color: '#000000' }}>Add some rooms first to update them</small>
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <p style={{ color: "#000000" }}>No rooms found</p>
+                <small style={{ color: "#000000" }}>
+                  Add some rooms first to update them
+                </small>
               </div>
             )}
           </div>
@@ -170,10 +207,10 @@ const AdminRoomUpdate = () => {
 
         {/* Update Form */}
         <div className="simple-table-container">
-          <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
-            <h3 style={{ margin: 0, color: '#000000' }}>Update Room Details</h3>
+          <div style={{ padding: "20px", borderBottom: "1px solid #e5e7eb" }}>
+            <h3 style={{ margin: 0, color: "#000000" }}>Update Room Details</h3>
           </div>
-          <div style={{ padding: '20px' }}>
+          <div style={{ padding: "20px" }}>
             {selectedRoom ? (
               <form onSubmit={handleSubmit} className="simple-form">
                 <div className="simple-form-row">
@@ -248,15 +285,15 @@ const AdminRoomUpdate = () => {
                 />
 
                 <div className="simple-form-actions">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="simple-btn simple-btn-primary"
                     disabled={loading}
                   >
-                    {loading ? 'Updating...' : 'Update Room'}
+                    {loading ? "Updating..." : "Update Room"}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => {
                       setSelectedRoom(null);
                       setFormData({
@@ -266,7 +303,7 @@ const AdminRoomUpdate = () => {
                         status: "",
                         description: "",
                         capacity: "",
-                        image: ""
+                        image: "",
                       });
                     }}
                     className="simple-btn simple-btn-secondary"
@@ -276,8 +313,10 @@ const AdminRoomUpdate = () => {
                 </div>
               </form>
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px' }}>
-                <p style={{ color: '#000000' }}>Select a room from the list to update its details</p>
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <p style={{ color: "#000000" }}>
+                  Select a room from the list to update its details
+                </p>
               </div>
             )}
           </div>

@@ -15,19 +15,19 @@ const AdminUpdateTable = () => {
     capacity: "",
     status: "Available",
     location: "",
-    description: ""
+    description: "",
   });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
-    
+
     if (!token || role !== "admin") {
       toast.error("Please login as admin to access this page");
       navigate("/login");
       return;
     }
-    
+
     fetchTables();
   }, [navigate]);
 
@@ -35,9 +35,11 @@ const AdminUpdateTable = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
       const response = await axios.get(`${apiUrl}/tables`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
       setTables(response.data);
     } catch (error) {
@@ -56,15 +58,15 @@ const AdminUpdateTable = () => {
       capacity: table.capacity || "",
       status: table.status || "Available",
       location: table.location || "",
-      description: table.description || ""
+      description: table.description || "",
     });
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -75,10 +77,12 @@ const AdminUpdateTable = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-      
+      const apiUrl =
+        process.env.REACT_APP_API_BASE_URL ||
+        "https://hrms-bace.vercel.app/api";
+
       await axios.put(`${apiUrl}/tables/${selectedTable._id}`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       toast.success("Table updated successfully!");
@@ -89,7 +93,7 @@ const AdminUpdateTable = () => {
         capacity: "",
         status: "Available",
         location: "",
-        description: ""
+        description: "",
       });
       fetchTables();
     } catch (error) {
@@ -100,7 +104,12 @@ const AdminUpdateTable = () => {
     }
   };
 
-  if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
+  if (loading)
+    return (
+      <div className="simple-admin-container">
+        <p>Loading...</p>
+      </div>
+    );
 
   return (
     <div className="simple-admin-container">
@@ -109,35 +118,66 @@ const AdminUpdateTable = () => {
         <p>Select a table to update its details</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: window.innerWidth <= 768 ? "1fr" : "1fr 1fr",
+          gap: "30px",
+        }}
+      >
         {/* Table Selection */}
         <div className="simple-table-container">
-          <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
-            <h3 style={{ margin: 0, color: '#000000' }}>Select Table to Update</h3>
+          <div style={{ padding: "20px", borderBottom: "1px solid #e5e7eb" }}>
+            <h3 style={{ margin: 0, color: "#000000" }}>
+              Select Table to Update
+            </h3>
           </div>
-          <div style={{ padding: '20px' }}>
+          <div style={{ padding: "20px" }}>
             {tables.length > 0 ? (
-              <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              <div style={{ maxHeight: "400px", overflowY: "auto" }}>
                 {tables.map((table) => (
-                  <div 
+                  <div
                     key={table._id}
                     onClick={() => handleSelectTable(table)}
-                    style={{ 
-                      cursor: 'pointer',
-                      padding: '15px',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px',
-                      marginBottom: '10px',
-                      backgroundColor: selectedTable?._id === table._id ? '#f0f9ff' : '#ffffff'
+                    style={{
+                      cursor: "pointer",
+                      padding: "15px",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "8px",
+                      marginBottom: "10px",
+                      backgroundColor:
+                        selectedTable?._id === table._id
+                          ? "#f0f9ff"
+                          : "#ffffff",
                     }}
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
                       <div>
-                        <h6 style={{ margin: '0 0 5px 0', color: '#000000' }}>Table {table.tableNumber}</h6>
-                        <p style={{ margin: '0 0 5px 0', color: '#000000', fontSize: '14px' }}>{table.tableType}</p>
-                        <small style={{ color: '#059669' }}>Capacity: {table.capacity} people</small>
+                        <h6 style={{ margin: "0 0 5px 0", color: "#000000" }}>
+                          Table {table.tableNumber}
+                        </h6>
+                        <p
+                          style={{
+                            margin: "0 0 5px 0",
+                            color: "#000000",
+                            fontSize: "14px",
+                          }}
+                        >
+                          {table.tableType}
+                        </p>
+                        <small style={{ color: "#059669" }}>
+                          Capacity: {table.capacity} people
+                        </small>
                       </div>
-                      <span className={`simple-status simple-status-${table.status?.toLowerCase()}`}>
+                      <span
+                        className={`simple-status simple-status-${table.status?.toLowerCase()}`}
+                      >
                         {table.status}
                       </span>
                     </div>
@@ -145,9 +185,11 @@ const AdminUpdateTable = () => {
                 ))}
               </div>
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px' }}>
-                <p style={{ color: '#000000' }}>No tables found</p>
-                <small style={{ color: '#000000' }}>Add some tables first to update them</small>
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <p style={{ color: "#000000" }}>No tables found</p>
+                <small style={{ color: "#000000" }}>
+                  Add some tables first to update them
+                </small>
               </div>
             )}
           </div>
@@ -155,10 +197,12 @@ const AdminUpdateTable = () => {
 
         {/* Update Form */}
         <div className="simple-table-container">
-          <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
-            <h3 style={{ margin: 0, color: '#000000' }}>Update Table Details</h3>
+          <div style={{ padding: "20px", borderBottom: "1px solid #e5e7eb" }}>
+            <h3 style={{ margin: 0, color: "#000000" }}>
+              Update Table Details
+            </h3>
           </div>
-          <div style={{ padding: '20px' }}>
+          <div style={{ padding: "20px" }}>
             {selectedTable ? (
               <form onSubmit={handleSubmit} className="simple-form">
                 <div className="simple-form-row">
@@ -227,15 +271,15 @@ const AdminUpdateTable = () => {
                 />
 
                 <div className="simple-form-actions">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="simple-btn simple-btn-primary"
                     disabled={loading}
                   >
-                    {loading ? 'Updating...' : 'Update Table'}
+                    {loading ? "Updating..." : "Update Table"}
                   </button>
-                  <button 
-                    type="button" 
+                  <button
+                    type="button"
                     onClick={() => {
                       setSelectedTable(null);
                       setFormData({
@@ -244,7 +288,7 @@ const AdminUpdateTable = () => {
                         capacity: "",
                         status: "Available",
                         location: "",
-                        description: ""
+                        description: "",
                       });
                     }}
                     className="simple-btn simple-btn-secondary"
@@ -254,8 +298,10 @@ const AdminUpdateTable = () => {
                 </div>
               </form>
             ) : (
-              <div style={{ textAlign: 'center', padding: '40px' }}>
-                <p style={{ color: '#000000' }}>Select a table from the list to update its details</p>
+              <div style={{ textAlign: "center", padding: "40px" }}>
+                <p style={{ color: "#000000" }}>
+                  Select a table from the list to update its details
+                </p>
               </div>
             )}
           </div>
