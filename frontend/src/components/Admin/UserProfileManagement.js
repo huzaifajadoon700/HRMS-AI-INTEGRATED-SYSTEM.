@@ -334,8 +334,8 @@ const UserProfileManagement = () => {
             <tr>
               <th>Name</th>
               <th>Email</th>
-              <th>Phone</th>
-              <th>Department</th>
+              <th className="hide-mobile">Phone</th>
+              <th className="hide-mobile">Department</th>
               <th>Role</th>
               <th>Status</th>
               <th>Actions</th>
@@ -346,8 +346,8 @@ const UserProfileManagement = () => {
               <tr key={user._id}>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
-                <td>{user.phone || "N/A"}</td>
-                <td>{user.department || "N/A"}</td>
+                <td className="hide-mobile">{user.phone || "N/A"}</td>
+                <td className="hide-mobile">{user.department || "N/A"}</td>
                 <td>{user.role}</td>
                 <td>
                   <span
