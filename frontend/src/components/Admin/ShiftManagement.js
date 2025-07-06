@@ -91,9 +91,28 @@ const ShiftManagement = () => {
       </div>
 
       <div className="simple-admin-controls">
-        <div style={{ display: "flex", gap: "15px", alignItems: "center" }}>
-          <div>
-            <label style={{ marginRight: "10px", color: "#000000" }}>
+        <div
+          style={{
+            display: "flex",
+            gap: window.innerWidth <= 768 ? "10px" : "15px",
+            alignItems: "center",
+            flexWrap: window.innerWidth <= 768 ? "wrap" : "nowrap",
+          }}
+        >
+          <div
+            style={{
+              minWidth: window.innerWidth <= 768 ? "100%" : "auto",
+              marginBottom: window.innerWidth <= 768 ? "10px" : "0",
+            }}
+          >
+            <label
+              style={{
+                marginRight: "10px",
+                color: "#000000",
+                display: window.innerWidth <= 768 ? "block" : "inline",
+                marginBottom: window.innerWidth <= 768 ? "5px" : "0",
+              }}
+            >
               Select Date:
             </label>
             <input
@@ -104,6 +123,7 @@ const ShiftManagement = () => {
                 padding: "8px",
                 border: "1px solid #e5e7eb",
                 borderRadius: "4px",
+                width: window.innerWidth <= 768 ? "100%" : "auto",
               }}
             />
           </div>
@@ -111,6 +131,10 @@ const ShiftManagement = () => {
             onClick={fetchShifts}
             disabled={loading}
             className="simple-btn simple-btn-secondary"
+            style={{
+              width: window.innerWidth <= 768 ? "100%" : "auto",
+              whiteSpace: "nowrap",
+            }}
           >
             {loading ? "Loading..." : "Refresh"}
           </button>

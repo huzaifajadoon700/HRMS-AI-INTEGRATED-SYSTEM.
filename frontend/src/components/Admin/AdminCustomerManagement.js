@@ -164,19 +164,33 @@ const AdminCustomerManagement = () => {
       </div>
 
       <div className="simple-admin-controls">
-        <div style={{ display: "flex", gap: "16px", flex: 1 }}>
+        <div
+          style={{
+            display: "flex",
+            gap: window.innerWidth <= 768 ? "8px" : "16px",
+            flex: 1,
+            flexWrap: window.innerWidth <= 768 ? "wrap" : "nowrap",
+          }}
+        >
           <input
             type="text"
             placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="simple-search-input"
+            style={{
+              minWidth: window.innerWidth <= 768 ? "100%" : "auto",
+              marginBottom: window.innerWidth <= 768 ? "10px" : "0",
+            }}
           />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className="simple-search-input"
-            style={{ maxWidth: "200px" }}
+            style={{
+              maxWidth: window.innerWidth <= 768 ? "100%" : "200px",
+              minWidth: window.innerWidth <= 768 ? "100%" : "150px",
+            }}
           >
             <option value="All Status">All Status</option>
             <option value="Active">Active</option>
@@ -187,6 +201,10 @@ const AdminCustomerManagement = () => {
         <button
           onClick={() => setShowAddForm(true)}
           className="simple-btn simple-btn-primary"
+          style={{
+            marginTop: window.innerWidth <= 768 ? "10px" : "0",
+            width: window.innerWidth <= 768 ? "100%" : "auto",
+          }}
         >
           Add Customer
         </button>
