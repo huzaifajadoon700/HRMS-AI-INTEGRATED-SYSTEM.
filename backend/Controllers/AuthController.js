@@ -1,10 +1,3 @@
-/**
- * Authentication Controller
- * Handles user registration, login, and authentication
- * @author HRMS Development Team
- * @version 1.0.0
- */
-
 const bcrypt = require("bcrypt");
 const UserModel = require("../Models/User");
 const jwt = require("jsonwebtoken");

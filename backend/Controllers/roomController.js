@@ -1,12 +1,3 @@
-/**
- * Room Management Controller with AI Integration
- * Advanced room operations with machine learning recommendations
- * Supports real-time availability and intelligent booking suggestions
- * @author HRMS Development Team
- * @version 4.0.0
- * @features ML-powered recommendations, real-time availability, analytics
- */
-
 const Room = require("../Models/Room");
 const Booking = require("../Models/Booking");
 const UserRoomInteraction = require("../Models/UserRoomInteraction");

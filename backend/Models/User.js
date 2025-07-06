@@ -1,12 +1,3 @@
-/**
- * User Data Model
- * Comprehensive user schema with enhanced security features
- * Supports multiple user roles and profile management
- * @author HRMS Data Team
- * @version 3.2.0
- * @database MongoDB with Mongoose ODM
- */
-
 const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;

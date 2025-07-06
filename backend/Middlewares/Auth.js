@@ -1,12 +1,3 @@
-/**
- * Authentication Middleware
- * Secure JWT-based authentication and authorization
- * Implements role-based access control and token validation
- * @author HRMS Security Team
- * @version 2.5.0
- * @security JWT token validation with role-based permissions
- */
-
 const jwt = require("jsonwebtoken");
 
 const ensureAuthenticated = (req, res, next) => {

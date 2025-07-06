@@ -1,12 +1,3 @@
-/**
- * Booking Management Controller
- * Secure booking operations with payment integration
- * Implements data validation and fraud prevention
- * @author HRMS Development Team
- * @version 3.0.0
- * @security Enhanced with input validation and payment security
- */
-
 const Booking = require("../Models/Booking");
 const Room = require("../Models/Room");
 const stripe = require("../config/stripe");

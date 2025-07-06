@@ -1,12 +1,3 @@
-/**
- * Menu Management Controller
- * Optimized for high-performance menu operations
- * Includes caching strategies and efficient database queries
- * @author HRMS Development Team
- * @version 2.1.0
- * @performance Optimized for concurrent requests
- */
-
 const Menu = require("../Models/Menu");
 
 // Get all menu items

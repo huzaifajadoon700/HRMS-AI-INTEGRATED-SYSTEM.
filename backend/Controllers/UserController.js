@@ -1,11 +1,3 @@
-/**
- * User Management Controller
- * Handles user profile operations and account management
- * Includes comprehensive error handling and validation
- * @author HRMS Development Team
- * @version 1.2.0
- */
-
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
 
