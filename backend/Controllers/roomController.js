@@ -1,35 +1,52 @@
-const Room = require('../Models/Room');
-const Booking = require('../Models/Booking');
-const UserRoomInteraction = require('../Models/UserRoomInteraction');
-const RoomRecommendation = require('../Models/RoomRecommendation');
-const { spawn } = require('child_process');
-const path = require('path');
-const axios = require('axios');
+/**
+ * Room Management Controller with AI Integration
+ * Advanced room operations with machine learning recommendations
+ * Supports real-time availability and intelligent booking suggestions
+ * @author HRMS Development Team
+ * @version 4.0.0
+ * @features ML-powered recommendations, real-time availability, analytics
+ */
+
+const Room = require("../Models/Room");
+const Booking = require("../Models/Booking");
+const UserRoomInteraction = require("../Models/UserRoomInteraction");
+const RoomRecommendation = require("../Models/RoomRecommendation");
+const { spawn } = require("child_process");
+const path = require("path");
+const axios = require("axios");
 
 // Room ML Model Service Configuration
-const ROOM_MODEL_SERVICE_URL = 'http://localhost:5002';
+const ROOM_MODEL_SERVICE_URL = "http://localhost:5002";
 
 // Get real ML model recommendations
 exports.getRealMLRoomRecommendations = async (userId, count = 10) => {
   try {
     // First check if the service is available
-    const healthResponse = await axios.get(`${ROOM_MODEL_SERVICE_URL}/health`, { timeout: 2000 });
+    const healthResponse = await axios.get(`${ROOM_MODEL_SERVICE_URL}/health`, {
+      timeout: 2000,
+    });
 
     if (!healthResponse.data.model_ready) {
-      console.log('Room ML model service not ready');
+      console.log("Room ML model service not ready");
       return null;
     }
 
     // Get all available rooms as candidates
-    const availableRooms = await Room.find({ status: 'Available' }).select('_id');
-    const candidateRoomIds = availableRooms.map(room => room._id.toString());
+    const availableRooms = await Room.find({ status: "Available" }).select(
+      "_id"
+    );
+    const candidateRoomIds = availableRooms.map((room) => room._id.toString());
 
     // Get recommendations from ML service
-    const response = await axios.post(`${ROOM_MODEL_SERVICE_URL}/recommendations`, {
-      user_id: userId,
-      candidate_rooms: candidateRoomIds,
-      n_recommendations: count
-    }, { timeout: 5000 });
+    const response = await axios.post(
+      `${ROOM_MODEL_SERVICE_URL}/recommendations`,
+      {
+        user_id: userId,
+        candidate_rooms: candidateRoomIds,
+        n_recommendations: count,
+      },
+      { timeout: 5000 }
+    );
 
     if (response.data.success && response.data.recommendations) {
       const mlRecommendations = response.data.recommendations;
@@ -47,8 +64,8 @@ exports.getRealMLRoomRecommendations = async (userId, count = 10) => {
               roomId: room._id,
               roomDetails: room,
               score: rec.predicted_rating,
-              reason: 'real_svd_collaborative_filtering',
-              confidence: rec.confidence || 'high',
+              reason: "real_svd_collaborative_filtering",
+              confidence: rec.confidence || "high",
               predictedRating: rec.predicted_rating,
               mlModelUsed: true,
               // Include room properties for easier access
@@ -60,28 +77,32 @@ exports.getRealMLRoomRecommendations = async (userId, count = 10) => {
               description: room.description,
               image: room.image,
               averageRating: room.averageRating || 0,
-              totalRatings: room.totalRatings || 0
+              totalRatings: room.totalRatings || 0,
             });
           }
         } catch (error) {
-          console.error(`Error processing room recommendation ${rec.room_id}:`, error.message);
+          console.error(
+            `Error processing room recommendation ${rec.room_id}:`,
+            error.message
+          );
           continue;
         }
       }
 
-      console.log(`✅ Real ML model returned ${roomRecommendations.length} room recommendations for user ${userId}`);
+      console.log(
+        `✅ Real ML model returned ${roomRecommendations.length} room recommendations for user ${userId}`
+      );
       return roomRecommendations;
     }
 
     return null;
-
   } catch (error) {
-    if (error.code === 'ECONNREFUSED') {
-      console.log('Room ML model service not available (connection refused)');
-    } else if (error.code === 'ETIMEDOUT') {
-      console.log('Room ML model service timeout');
+    if (error.code === "ECONNREFUSED") {
+      console.log("Room ML model service not available (connection refused)");
+    } else if (error.code === "ETIMEDOUT") {
+      console.log("Room ML model service timeout");
     } else {
-      console.log('Room ML model service error:', error.message);
+      console.log("Room ML model service error:", error.message);
     }
     return null;
   }
@@ -102,7 +123,7 @@ exports.addRoom = async (req, res) => {
       size,
       bedType,
       smokingAllowed,
-      petFriendly
+      petFriendly,
     } = req.body;
 
     // Handle image upload
@@ -111,15 +132,17 @@ exports.addRoom = async (req, res) => {
       if (req.file.filename) {
         // Disk storage (development)
         image = `/uploads/${req.file.filename}`;
-        console.log('Development upload - saved to disk:', image);
+        console.log("Development upload - saved to disk:", image);
       } else {
         // Memory storage (production) - since we can't save files on Vercel,
         // we'll set image to null and let frontend handle placeholder
-        console.log('Production environment detected - file upload not supported on serverless');
-        console.log('File details:', {
+        console.log(
+          "Production environment detected - file upload not supported on serverless"
+        );
+        console.log("File details:", {
           originalname: req.file.originalname,
           mimetype: req.file.mimetype,
-          size: req.file.size
+          size: req.file.size,
         });
         // Don't set image path for production uploads since files can't be served
         image = null;
@@ -127,14 +150,15 @@ exports.addRoom = async (req, res) => {
     } else if (req.body.imageUrl) {
       // Handle image URL
       image = req.body.imageUrl;
-      console.log('Image URL provided:', image);
+      console.log("Image URL provided:", image);
     }
 
     // Parse amenities if it's a string
     let parsedAmenities = [];
     if (amenities) {
       try {
-        parsedAmenities = typeof amenities === 'string' ? JSON.parse(amenities) : amenities;
+        parsedAmenities =
+          typeof amenities === "string" ? JSON.parse(amenities) : amenities;
       } catch (e) {
         parsedAmenities = [];
       }
@@ -144,7 +168,7 @@ exports.addRoom = async (req, res) => {
       roomNumber,
       roomType,
       price: parseFloat(price),
-      status: status || 'Available',
+      status: status || "Available",
       description,
       image,
       capacity: parseInt(capacity),
@@ -152,17 +176,17 @@ exports.addRoom = async (req, res) => {
       floor: floor ? parseInt(floor) : undefined,
       size: size ? parseFloat(size) : undefined,
       bedType: bedType || undefined,
-      smokingAllowed: smokingAllowed === 'true' || smokingAllowed === true,
-      petFriendly: petFriendly === 'true' || petFriendly === true
+      smokingAllowed: smokingAllowed === "true" || smokingAllowed === true,
+      petFriendly: petFriendly === "true" || petFriendly === true,
     });
 
     await newRoom.save();
     res.status(201).json({
-      message: 'Room added successfully!',
+      message: "Room added successfully!",
       room: newRoom,
     });
   } catch (error) {
-    console.error('Error adding room:', error);
+    console.error("Error adding room:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -182,7 +206,7 @@ exports.getRoomById = async (req, res) => {
   try {
     const room = await Room.findById(req.params.id);
     if (!room) {
-      return res.status(404).json({ message: 'Room not found' });
+      return res.status(404).json({ message: "Room not found" });
     }
     res.status(200).json(room);
   } catch (error) {
@@ -199,15 +223,21 @@ exports.checkRoomAvailability = async (req, res) => {
   try {
     const { checkInDate, checkOutDate, excludeBookingId } = req.query;
 
-    console.log('Checking room availability for:', { checkInDate, checkOutDate, excludeBookingId });
+    console.log("Checking room availability for:", {
+      checkInDate,
+      checkOutDate,
+      excludeBookingId,
+    });
 
     if (!checkInDate || !checkOutDate) {
-      return res.status(400).json({ error: "Check-in and check-out dates are required" });
+      return res
+        .status(400)
+        .json({ error: "Check-in and check-out dates are required" });
     }
 
     // Get all rooms
     const rooms = await Room.find();
-    
+
     // Check bookings for each room
     const availabilityResults = await Promise.all(
       rooms.map(async (room) => {
@@ -218,43 +248,48 @@ exports.checkRoomAvailability = async (req, res) => {
             // Case 1: New booking starts during an existing booking
             {
               checkInDate: { $lt: checkInDate },
-              checkOutDate: { $gt: checkInDate }
+              checkOutDate: { $gt: checkInDate },
             },
             // Case 2: New booking ends during an existing booking
             {
               checkInDate: { $lt: checkOutDate },
-              checkOutDate: { $gt: checkOutDate }
+              checkOutDate: { $gt: checkOutDate },
             },
             // Case 3: New booking completely encompasses an existing booking
             {
               checkInDate: { $gte: checkInDate },
-              checkOutDate: { $lte: checkOutDate }
+              checkOutDate: { $lte: checkOutDate },
             },
             // Case 4: Existing booking completely encompasses new booking
             {
               checkInDate: { $lte: checkInDate },
-              checkOutDate: { $gte: checkOutDate }
-            }
-          ]
+              checkOutDate: { $gte: checkOutDate },
+            },
+          ],
         };
-        
+
         // If we're excluding a booking (for editing purposes), add that to the query
         if (excludeBookingId) {
           bookingQuery._id = { $ne: excludeBookingId };
         }
-        
+
         const bookings = await Booking.find(bookingQuery);
 
-        console.log(`Room ${room.roomNumber} (${room._id}): Found ${bookings.length} conflicting bookings`);
+        console.log(
+          `Room ${room.roomNumber} (${room._id}): Found ${bookings.length} conflicting bookings`
+        );
         if (bookings.length > 0) {
-          console.log('Conflicting bookings:', bookings.map(b => ({
-            checkIn: b.checkInDate,
-            checkOut: b.checkOutDate
-          })));
+          console.log(
+            "Conflicting bookings:",
+            bookings.map((b) => ({
+              checkIn: b.checkInDate,
+              checkOut: b.checkOutDate,
+            }))
+          );
         }
 
         const isAvailable = bookings.length === 0;
-        
+
         return {
           room: {
             _id: room._id,
@@ -262,18 +297,20 @@ exports.checkRoomAvailability = async (req, res) => {
             roomType: room.roomType,
             price: room.price,
             description: room.description,
-            image: room.image
+            image: room.image,
           },
           isAvailable,
-          status: isAvailable ? 'Available' : 'Booked',
-          bookings: isAvailable ? [] : bookings.map(b => ({
-            checkInDate: b.checkInDate,
-            checkOutDate: b.checkOutDate
-          }))
+          status: isAvailable ? "Available" : "Booked",
+          bookings: isAvailable
+            ? []
+            : bookings.map((b) => ({
+                checkInDate: b.checkInDate,
+                checkOutDate: b.checkOutDate,
+              })),
         };
       })
     );
-    
+
     res.status(200).json(availabilityResults);
   } catch (error) {
     console.error("Error checking room availability:", error);
@@ -298,17 +335,19 @@ exports.updateRoom = async (req, res) => {
       if (req.file.filename) {
         // Disk storage (development)
         updateData.image = `/uploads/${req.file.filename}`;
-        console.log('Development update - saved to disk:', updateData.image);
+        console.log("Development update - saved to disk:", updateData.image);
       } else {
         // Memory storage (production) - don't update image field
-        console.log('Production environment detected - file upload not supported on serverless');
-        console.log('Keeping existing image for room update');
+        console.log(
+          "Production environment detected - file upload not supported on serverless"
+        );
+        console.log("Keeping existing image for room update");
         // Don't update the image field in production
       }
     } else if (req.body.imageUrl) {
       // Handle image URL update
       updateData.image = req.body.imageUrl;
-      console.log('Image URL updated:', updateData.image);
+      console.log("Image URL updated:", updateData.image);
     }
 
     const updatedRoom = await Room.findByIdAndUpdate(
@@ -318,7 +357,7 @@ exports.updateRoom = async (req, res) => {
     );
 
     if (!updatedRoom) {
-      return res.status(404).json({ message: 'Room not found' });
+      return res.status(404).json({ message: "Room not found" });
     }
 
     res.status(200).json(updatedRoom);
@@ -332,9 +371,9 @@ exports.deleteRoom = async (req, res) => {
   try {
     const deletedRoom = await Room.findByIdAndDelete(req.params.id);
     if (!deletedRoom) {
-      return res.status(404).json({ message: 'Room not found' });
+      return res.status(404).json({ message: "Room not found" });
     }
-    res.status(200).json({ message: 'Room deleted successfully' });
+    res.status(200).json({ message: "Room deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -345,13 +384,20 @@ exports.deleteRoom = async (req, res) => {
 // Record user interaction with rooms (booking, rating, viewing)
 exports.recordRoomInteraction = async (req, res) => {
   try {
-    const { userId, roomId, interactionType, rating, bookingDuration, groupSize } = req.body;
+    const {
+      userId,
+      roomId,
+      interactionType,
+      rating,
+      bookingDuration,
+      groupSize,
+    } = req.body;
 
     // Validate required fields
     if (!userId || !roomId || !interactionType) {
       return res.status(400).json({
         success: false,
-        message: 'userId, roomId, and interactionType are required'
+        message: "userId, roomId, and interactionType are required",
       });
     }
 
@@ -363,28 +409,27 @@ exports.recordRoomInteraction = async (req, res) => {
       rating,
       bookingDuration,
       groupSize,
-      timestamp: new Date()
+      timestamp: new Date(),
     });
 
     await interaction.save();
 
     // Update room statistics if it's a rating
-    if (interactionType === 'rating' && rating) {
+    if (interactionType === "rating" && rating) {
       await exports.updateRoomRating(roomId, rating);
     }
 
     res.status(201).json({
       success: true,
-      message: 'Room interaction recorded successfully',
-      interaction
+      message: "Room interaction recorded successfully",
+      interaction,
     });
-
   } catch (error) {
-    console.error('Error recording room interaction:', error);
+    console.error("Error recording room interaction:", error);
     res.status(500).json({
       success: false,
-      message: 'Error recording room interaction',
-      error: error.message
+      message: "Error recording room interaction",
+      error: error.message,
     });
   }
 };
@@ -398,8 +443,8 @@ exports.getRoomRecommendations = async (req, res) => {
     // Check for cached recommendations (1 hour cache)
     const cachedRecommendations = await RoomRecommendation.findOne({
       userId,
-      generatedAt: { $gte: new Date(Date.now() - 3600000) }
-    }).populate('recommendedRooms.roomId');
+      generatedAt: { $gte: new Date(Date.now() - 3600000) },
+    }).populate("recommendedRooms.roomId");
 
     if (cachedRecommendations) {
       // Enrich cached recommendations with room details
@@ -408,15 +453,17 @@ exports.getRoomRecommendations = async (req, res) => {
           const room = await Room.findById(rec.roomId);
           return {
             ...rec.toObject(),
-            roomDetails: room ? {
-              roomNumber: room.roomNumber,
-              roomType: room.roomType,
-              price: room.price,
-              description: room.description,
-              image: room.image,
-              averageRating: room.averageRating,
-              totalRatings: room.totalRatings
-            } : null
+            roomDetails: room
+              ? {
+                  roomNumber: room.roomNumber,
+                  roomType: room.roomType,
+                  price: room.price,
+                  description: room.description,
+                  image: room.image,
+                  averageRating: room.averageRating,
+                  totalRatings: room.totalRatings,
+                }
+              : null,
           };
         })
       );
@@ -426,7 +473,7 @@ exports.getRoomRecommendations = async (req, res) => {
         recommendations: enrichedCachedRecs,
         preferences: cachedRecommendations.userPreferences,
         cached: true,
-        generatedAt: cachedRecommendations.generatedAt
+        generatedAt: cachedRecommendations.generatedAt,
       });
     }
 
@@ -435,16 +482,16 @@ exports.getRoomRecommendations = async (req, res) => {
       count: parseInt(count),
       checkInDate,
       checkOutDate,
-      groupSize: groupSize ? parseInt(groupSize) : null
+      groupSize: groupSize ? parseInt(groupSize) : null,
     });
 
     // Format recommendations to match model schema (for database storage)
     const formattedRooms = recommendations.rooms.map((room, index) => ({
       roomId: room.roomId,
       score: room.score || 3.5,
-      reason: room.reason || 'hybrid',
-      confidence: room.confidence || 'medium',
-      rank: index + 1
+      reason: room.reason || "hybrid",
+      confidence: room.confidence || "medium",
+      rank: index + 1,
     }));
 
     // Cache the recommendations
@@ -452,7 +499,7 @@ exports.getRoomRecommendations = async (req, res) => {
       userId,
       recommendedRooms: formattedRooms,
       userPreferences: recommendations.preferences,
-      generatedAt: new Date()
+      generatedAt: new Date(),
     });
 
     await roomRecommendation.save();
@@ -462,7 +509,7 @@ exports.getRoomRecommendations = async (req, res) => {
       const originalRoom = recommendations.rooms[index];
       return {
         ...rec,
-        roomDetails: originalRoom.roomDetails || null
+        roomDetails: originalRoom.roomDetails || null,
       };
     });
 
@@ -470,15 +517,14 @@ exports.getRoomRecommendations = async (req, res) => {
       success: true,
       recommendations: enrichedRecommendations,
       preferences: recommendations.preferences,
-      cached: false
+      cached: false,
     });
-
   } catch (error) {
-    console.error('Error getting room recommendations:', error);
+    console.error("Error getting room recommendations:", error);
     res.status(500).json({
       success: false,
-      message: 'Error generating room recommendations',
-      error: error.message
+      message: "Error generating room recommendations",
+      error: error.message,
     });
   }
 };
@@ -491,11 +537,14 @@ exports.generateRoomRecommendations = async (userId, options = {}) => {
     // Get user's room interaction history (last 30 days)
     const userInteractions = await UserRoomInteraction.find({
       userId,
-      timestamp: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
-    }).populate('roomId');
+      timestamp: { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+    }).populate("roomId");
 
     // Try to get real ML model recommendations first
-    const realMLRecommendations = await exports.getRealMLRoomRecommendations(userId, count);
+    const realMLRecommendations = await exports.getRealMLRoomRecommendations(
+      userId,
+      count
+    );
     if (realMLRecommendations && realMLRecommendations.length > 0) {
       console.log(`✅ Using real ML model recommendations for user ${userId}`);
       return {
@@ -503,50 +552,78 @@ exports.generateRoomRecommendations = async (userId, options = {}) => {
         preferences: {
           mlModel: true,
           totalInteractions: userInteractions.length,
-          source: 'real_svd_model'
-        }
+          source: "real_svd_model",
+        },
       };
     }
 
-    console.log(`⚠️ Real ML model not available, falling back to hybrid algorithm for user ${userId}`);
+    console.log(
+      `⚠️ Real ML model not available, falling back to hybrid algorithm for user ${userId}`
+    );
 
     if (userInteractions.length === 0) {
       // New user - return popularity-based recommendations
-      const popularRooms = await exports.getPopularityBasedRoomRecommendations(count, { checkInDate, checkOutDate, groupSize });
+      const popularRooms = await exports.getPopularityBasedRoomRecommendations(
+        count,
+        { checkInDate, checkOutDate, groupSize }
+      );
       return {
         rooms: popularRooms,
-        preferences: { newUser: true, totalInteractions: 0, source: 'popularity_fallback' }
+        preferences: {
+          newUser: true,
+          totalInteractions: 0,
+          source: "popularity_fallback",
+        },
       };
     }
 
     // Analyze user preferences
-    const userPreferences = exports.analyzeUserRoomPreferences(userInteractions);
+    const userPreferences =
+      exports.analyzeUserRoomPreferences(userInteractions);
 
     // Generate collaborative filtering recommendations (60%)
-    const collaborativeRecs = await exports.getCollaborativeRoomRecommendations(userId, userPreferences, Math.ceil(count * 0.6));
+    const collaborativeRecs = await exports.getCollaborativeRoomRecommendations(
+      userId,
+      userPreferences,
+      Math.ceil(count * 0.6)
+    );
 
     // Generate content-based recommendations (30%)
-    const contentRecs = await exports.getContentBasedRoomRecommendations(userPreferences, Math.ceil(count * 0.3), { checkInDate, checkOutDate, groupSize });
+    const contentRecs = await exports.getContentBasedRoomRecommendations(
+      userPreferences,
+      Math.ceil(count * 0.3),
+      { checkInDate, checkOutDate, groupSize }
+    );
 
     // Add popular rooms (10%)
-    const popularRecs = await exports.getPopularityBasedRoomRecommendations(Math.ceil(count * 0.1), { checkInDate, checkOutDate, groupSize });
+    const popularRecs = await exports.getPopularityBasedRoomRecommendations(
+      Math.ceil(count * 0.1),
+      { checkInDate, checkOutDate, groupSize }
+    );
 
     // Combine and deduplicate
-    const allRecommendations = [...collaborativeRecs, ...contentRecs, ...popularRecs];
-    const uniqueRecommendations = exports.deduplicateRoomRecommendations(allRecommendations);
+    const allRecommendations = [
+      ...collaborativeRecs,
+      ...contentRecs,
+      ...popularRecs,
+    ];
+    const uniqueRecommendations =
+      exports.deduplicateRoomRecommendations(allRecommendations);
 
     return {
       rooms: uniqueRecommendations.slice(0, count),
-      preferences: userPreferences
+      preferences: userPreferences,
     };
-
   } catch (error) {
-    console.error('Error generating room recommendations:', error);
+    console.error("Error generating room recommendations:", error);
     // Fallback to popularity-based
-    const popularRooms = await exports.getPopularityBasedRoomRecommendations(count, options);
+    const popularRooms = await exports.getPopularityBasedRoomRecommendations(
+      count,
+      options
+    );
     return {
       rooms: popularRooms,
-      preferences: { fallback: true, error: error.message }
+      preferences: { fallback: true, error: error.message },
     };
   }
 };
@@ -560,7 +637,7 @@ exports.analyzeUserRoomPreferences = (interactions) => {
     preferredPriceRanges: {},
     avgGroupSize: 0,
     avgBookingDuration: 0,
-    ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }
+    ratingDistribution: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 },
   };
 
   let totalRating = 0;
@@ -570,7 +647,7 @@ exports.analyzeUserRoomPreferences = (interactions) => {
   let totalDuration = 0;
   let durationCount = 0;
 
-  interactions.forEach(interaction => {
+  interactions.forEach((interaction) => {
     if (interaction.rating) {
       totalRating += interaction.rating;
       ratingCount++;
@@ -592,30 +669,34 @@ exports.analyzeUserRoomPreferences = (interactions) => {
 
       // Count room type preferences
       if (room.roomType) {
-        preferences.preferredRoomTypes[room.roomType] = (preferences.preferredRoomTypes[room.roomType] || 0) + 1;
+        preferences.preferredRoomTypes[room.roomType] =
+          (preferences.preferredRoomTypes[room.roomType] || 0) + 1;
       }
 
       // Count price range preferences
       if (room.price) {
         const priceRange = exports.getPriceRange(room.price);
-        preferences.preferredPriceRanges[priceRange] = (preferences.preferredPriceRanges[priceRange] || 0) + 1;
+        preferences.preferredPriceRanges[priceRange] =
+          (preferences.preferredPriceRanges[priceRange] || 0) + 1;
       }
     }
   });
 
   preferences.avgRating = ratingCount > 0 ? totalRating / ratingCount : 0;
-  preferences.avgGroupSize = groupSizeCount > 0 ? totalGroupSize / groupSizeCount : 0;
-  preferences.avgBookingDuration = durationCount > 0 ? totalDuration / durationCount : 0;
+  preferences.avgGroupSize =
+    groupSizeCount > 0 ? totalGroupSize / groupSizeCount : 0;
+  preferences.avgBookingDuration =
+    durationCount > 0 ? totalDuration / durationCount : 0;
 
   return preferences;
 };
 
 // Get price range category
 exports.getPriceRange = (price) => {
-  if (price <= 5000) return 'Budget';
-  if (price <= 10000) return 'Standard';
-  if (price <= 20000) return 'Premium';
-  return 'Luxury';
+  if (price <= 5000) return "Budget";
+  if (price <= 10000) return "Standard";
+  if (price <= 20000) return "Premium";
+  return "Luxury";
 };
 
 // Get popularity-based room recommendations
@@ -624,7 +705,7 @@ exports.getPopularityBasedRoomRecommendations = async (count, options = {}) => {
     const { checkInDate, checkOutDate, groupSize } = options;
 
     // Build query for available rooms
-    let query = { status: 'Available' };
+    let query = { status: "Available" };
 
     // Filter by group size if provided
     if (groupSize) {
@@ -643,11 +724,23 @@ exports.getPopularityBasedRoomRecommendations = async (count, options = {}) => {
         const bookings = await Booking.find({
           roomId: room._id,
           $or: [
-            { checkInDate: { $lt: checkInDate }, checkOutDate: { $gt: checkInDate } },
-            { checkInDate: { $lt: checkOutDate }, checkOutDate: { $gt: checkOutDate } },
-            { checkInDate: { $gte: checkInDate }, checkOutDate: { $lte: checkOutDate } },
-            { checkInDate: { $lte: checkInDate }, checkOutDate: { $gte: checkOutDate } }
-          ]
+            {
+              checkInDate: { $lt: checkInDate },
+              checkOutDate: { $gt: checkInDate },
+            },
+            {
+              checkInDate: { $lt: checkOutDate },
+              checkOutDate: { $gt: checkOutDate },
+            },
+            {
+              checkInDate: { $gte: checkInDate },
+              checkOutDate: { $lte: checkOutDate },
+            },
+            {
+              checkInDate: { $lte: checkInDate },
+              checkOutDate: { $gte: checkOutDate },
+            },
+          ],
         });
 
         if (bookings.length === 0) {
@@ -659,11 +752,11 @@ exports.getPopularityBasedRoomRecommendations = async (count, options = {}) => {
       rooms = rooms.slice(0, count);
     }
 
-    return rooms.map(room => ({
+    return rooms.map((room) => ({
       roomId: room._id,
       score: room.averageRating || 3.5,
-      reason: 'popularity',
-      confidence: 'medium',
+      reason: "popularity",
+      confidence: "medium",
       roomDetails: room,
       // Include room properties directly for easier access
       _id: room._id,
@@ -682,37 +775,42 @@ exports.getPopularityBasedRoomRecommendations = async (count, options = {}) => {
       petFriendly: room.petFriendly,
       averageRating: room.averageRating,
       totalRatings: room.totalRatings,
-      popularityScore: room.popularityScore
+      popularityScore: room.popularityScore,
     }));
-
   } catch (error) {
-    console.error('Error getting popular room recommendations:', error);
+    console.error("Error getting popular room recommendations:", error);
     return [];
   }
 };
 
 // Get collaborative filtering recommendations
-exports.getCollaborativeRoomRecommendations = async (userId, userPreferences, count) => {
+exports.getCollaborativeRoomRecommendations = async (
+  userId,
+  userPreferences,
+  count
+) => {
   try {
     // Find similar users based on room preferences
     const similarUserInteractions = await UserRoomInteraction.find({
       userId: { $ne: userId },
-      rating: { $gte: 4 } // Users who rated rooms highly
-    }).populate('roomId');
+      rating: { $gte: 4 }, // Users who rated rooms highly
+    }).populate("roomId");
 
     // Get highly rated rooms from similar users
     const recommendedRooms = [];
     const seenRooms = new Set();
 
-    similarUserInteractions.forEach(interaction => {
-      if (!seenRooms.has(interaction.roomId._id.toString()) &&
-          interaction.roomId.status === 'Available') {
+    similarUserInteractions.forEach((interaction) => {
+      if (
+        !seenRooms.has(interaction.roomId._id.toString()) &&
+        interaction.roomId.status === "Available"
+      ) {
         const room = interaction.roomId;
         recommendedRooms.push({
           roomId: room._id,
           score: interaction.rating,
-          reason: 'collaborative_filtering',
-          confidence: 'high',
+          reason: "collaborative_filtering",
+          confidence: "high",
           roomDetails: room,
           // Include room properties directly for easier access
           _id: room._id,
@@ -731,26 +829,29 @@ exports.getCollaborativeRoomRecommendations = async (userId, userPreferences, co
           petFriendly: room.petFriendly,
           averageRating: room.averageRating,
           totalRatings: room.totalRatings,
-          popularityScore: room.popularityScore
+          popularityScore: room.popularityScore,
         });
         seenRooms.add(interaction.roomId._id.toString());
       }
     });
 
     return recommendedRooms.slice(0, count);
-
   } catch (error) {
-    console.error('Error getting collaborative room recommendations:', error);
+    console.error("Error getting collaborative room recommendations:", error);
     return [];
   }
 };
 
 // Get content-based room recommendations
-exports.getContentBasedRoomRecommendations = async (userPreferences, count, options = {}) => {
+exports.getContentBasedRoomRecommendations = async (
+  userPreferences,
+  count,
+  options = {}
+) => {
   try {
     const { checkInDate, checkOutDate, groupSize } = options;
 
-    let query = { status: 'Available' };
+    let query = { status: "Available" };
 
     // Filter by preferred room type
     const topRoomType = Object.keys(userPreferences.preferredRoomTypes)[0];
@@ -762,16 +863,16 @@ exports.getContentBasedRoomRecommendations = async (userPreferences, count, opti
     const topPriceRange = Object.keys(userPreferences.preferredPriceRanges)[0];
     if (topPriceRange) {
       switch (topPriceRange) {
-        case 'Budget':
+        case "Budget":
           query.price = { $lte: 5000 };
           break;
-        case 'Standard':
+        case "Standard":
           query.price = { $gte: 5001, $lte: 10000 };
           break;
-        case 'Premium':
+        case "Premium":
           query.price = { $gte: 10001, $lte: 20000 };
           break;
-        case 'Luxury':
+        case "Luxury":
           query.price = { $gte: 20001 };
           break;
       }
@@ -788,11 +889,23 @@ exports.getContentBasedRoomRecommendations = async (userPreferences, count, opti
         const bookings = await Booking.find({
           roomId: room._id,
           $or: [
-            { checkInDate: { $lt: checkInDate }, checkOutDate: { $gt: checkInDate } },
-            { checkInDate: { $lt: checkOutDate }, checkOutDate: { $gt: checkOutDate } },
-            { checkInDate: { $gte: checkInDate }, checkOutDate: { $lte: checkOutDate } },
-            { checkInDate: { $lte: checkInDate }, checkOutDate: { $gte: checkOutDate } }
-          ]
+            {
+              checkInDate: { $lt: checkInDate },
+              checkOutDate: { $gt: checkInDate },
+            },
+            {
+              checkInDate: { $lt: checkOutDate },
+              checkOutDate: { $gt: checkOutDate },
+            },
+            {
+              checkInDate: { $gte: checkInDate },
+              checkOutDate: { $lte: checkOutDate },
+            },
+            {
+              checkInDate: { $lte: checkInDate },
+              checkOutDate: { $gte: checkOutDate },
+            },
+          ],
         });
 
         if (bookings.length === 0) {
@@ -804,11 +917,11 @@ exports.getContentBasedRoomRecommendations = async (userPreferences, count, opti
       rooms = rooms.slice(0, count);
     }
 
-    return rooms.map(room => ({
+    return rooms.map((room) => ({
       roomId: room._id,
       score: room.averageRating || 3.5,
-      reason: 'content_based',
-      confidence: 'medium',
+      reason: "content_based",
+      confidence: "medium",
       roomDetails: room,
       // Include room properties directly for easier access
       _id: room._id,
@@ -827,11 +940,10 @@ exports.getContentBasedRoomRecommendations = async (userPreferences, count, opti
       petFriendly: room.petFriendly,
       averageRating: room.averageRating,
       totalRatings: room.totalRatings,
-      popularityScore: room.popularityScore
+      popularityScore: room.popularityScore,
     }));
-
   } catch (error) {
-    console.error('Error getting content-based room recommendations:', error);
+    console.error("Error getting content-based room recommendations:", error);
     return [];
   }
 };
@@ -848,18 +960,17 @@ exports.updateRoomRating = async (roomId, newRating) => {
 
     await Room.findByIdAndUpdate(roomId, {
       averageRating: Math.round(newAverageRating * 100) / 100,
-      totalRatings: newTotalRatings
+      totalRatings: newTotalRatings,
     });
-
   } catch (error) {
-    console.error('Error updating room rating:', error);
+    console.error("Error updating room rating:", error);
   }
 };
 
 // Remove duplicate room recommendations
 exports.deduplicateRoomRecommendations = (recommendations) => {
   const seen = new Set();
-  return recommendations.filter(rec => {
+  return recommendations.filter((rec) => {
     const id = rec.roomId.toString();
     if (seen.has(id)) {
       return false;
@@ -879,8 +990,10 @@ exports.getUserRoomHistory = async (req, res) => {
 
     const interactions = await UserRoomInteraction.find({
       userId,
-      timestamp: { $gte: startDate }
-    }).populate('roomId').sort({ timestamp: -1 });
+      timestamp: { $gte: startDate },
+    })
+      .populate("roomId")
+      .sort({ timestamp: -1 });
 
     const preferences = exports.analyzeUserRoomPreferences(interactions);
 
@@ -888,14 +1001,13 @@ exports.getUserRoomHistory = async (req, res) => {
       success: true,
       history: interactions,
       preferences,
-      historyPeriodDays: days
+      historyPeriodDays: days,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching user room history',
-      error: error.message
+      message: "Error fetching user room history",
+      error: error.message,
     });
   }
 };
@@ -904,18 +1016,19 @@ exports.getUserRoomHistory = async (req, res) => {
 exports.getPopularRooms = async (req, res) => {
   try {
     const { count = 10 } = req.query;
-    const popularRooms = await exports.getPopularityBasedRoomRecommendations(parseInt(count));
+    const popularRooms = await exports.getPopularityBasedRoomRecommendations(
+      parseInt(count)
+    );
 
     res.json({
       success: true,
-      popularRooms
+      popularRooms,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching popular rooms',
-      error: error.message
+      message: "Error fetching popular rooms",
+      error: error.message,
     });
   }
 };
