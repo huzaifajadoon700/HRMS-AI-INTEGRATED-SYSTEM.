@@ -213,19 +213,22 @@ const UserProfileManagement = () => {
       </div>
 
       <div className="simple-admin-controls">
-        <div style={{ display: "flex", gap: "16px", flex: 1 }}>
+        <div
+          style={{ display: "flex", gap: "16px", flex: 1, flexWrap: "wrap" }}
+        >
           <input
             type="text"
             placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="simple-search-input"
+            style={{ minWidth: "200px", flex: 1 }}
           />
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
             className="simple-search-input"
-            style={{ maxWidth: "200px" }}
+            style={{ minWidth: "150px", maxWidth: "200px" }}
           >
             <option value="All Roles">All Roles</option>
             <option value="Administrator">Administrator</option>
@@ -237,6 +240,7 @@ const UserProfileManagement = () => {
         <button
           onClick={() => setShowAddForm(true)}
           className="simple-btn simple-btn-primary"
+          style={{ whiteSpace: "nowrap", minWidth: "120px" }}
         >
           Add User
         </button>
@@ -328,45 +332,58 @@ const UserProfileManagement = () => {
         </div>
       )}
 
-      <div className="simple-table-container">
-        <table className="simple-table">
+      <div
+        className="simple-table-container"
+        style={{ overflowX: "auto", width: "100%" }}
+      >
+        <table
+          className="simple-table"
+          style={{ minWidth: "800px", width: "100%" }}
+        >
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th className="hide-mobile">Phone</th>
-              <th className="hide-mobile">Department</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th style={{ minWidth: "120px" }}>Name</th>
+              <th style={{ minWidth: "180px" }}>Email</th>
+              <th style={{ minWidth: "120px" }}>Phone</th>
+              <th style={{ minWidth: "120px" }}>Department</th>
+              <th style={{ minWidth: "100px" }}>Role</th>
+              <th style={{ minWidth: "100px" }}>Status</th>
+              <th style={{ minWidth: "160px" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredUsers.map((user) => (
               <tr key={user._id}>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td className="hide-mobile">{user.phone || "N/A"}</td>
-                <td className="hide-mobile">{user.department || "N/A"}</td>
-                <td>{user.role}</td>
-                <td>
+                <td style={{ minWidth: "120px" }}>{user.name}</td>
+                <td style={{ minWidth: "180px" }}>{user.email}</td>
+                <td style={{ minWidth: "120px" }}>{user.phone || "N/A"}</td>
+                <td style={{ minWidth: "120px" }}>
+                  {user.department || "N/A"}
+                </td>
+                <td style={{ minWidth: "100px" }}>{user.role}</td>
+                <td style={{ minWidth: "100px" }}>
                   <span
                     className={`simple-status simple-status-${user.status?.toLowerCase()}`}
                   >
                     {user.status}
                   </span>
                 </td>
-                <td>
-                  <div className="simple-actions">
+                <td style={{ minWidth: "160px" }}>
+                  <div
+                    className="simple-actions"
+                    style={{ display: "flex", gap: "8px", flexWrap: "nowrap" }}
+                  >
                     <button
                       onClick={() => handleEdit(user)}
                       className="simple-btn simple-btn-small"
+                      style={{ whiteSpace: "nowrap" }}
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(user._id)}
                       className="simple-btn simple-btn-small simple-btn-danger"
+                      style={{ whiteSpace: "nowrap" }}
                     >
                       Delete
                     </button>

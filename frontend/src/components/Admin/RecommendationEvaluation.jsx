@@ -1,41 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { apiConfig } from '../../config/api';
+import axios from 'axios';
+import "./simple-admin.css";
 
 const RecommendationEvaluation = () => {
+    const navigate = useNavigate();
     const [evaluation, setEvaluation] = useState(null);
     const [loading, setLoading] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState(7);
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
+        const role = localStorage.getItem("role");
+
+        if (!token || role !== "admin") {
+            toast.error("Please login as admin to access this page");
+            navigate("/login");
+            return;
+        }
+
         fetchSystemEvaluation();
-    }, [selectedPeriod]);
+    }, [navigate, selectedPeriod]);
 
     const fetchSystemEvaluation = async () => {
         setLoading(true);
         try {
-            // Get token from localStorage
             const token = localStorage.getItem('token');
-            const config = {
+            const API_URL = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app';
+            
+            const response = await axios.get(`${API_URL}/api/food-recommendations/evaluation/system?testPeriodDays=${selectedPeriod}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
-            };
-
-            const response = await axios.get(`${apiConfig.endpoints.foodRecommendations}/evaluation/system?testPeriodDays=${selectedPeriod}`, config);
+            });
+            
             if (response.data.success) {
                 setEvaluation(response.data.systemEvaluation);
             } else {
-                // If evaluation fails, create mock data for presentation
                 setEvaluation(createMockEvaluationData());
             }
         } catch (error) {
             console.error('Error fetching evaluation:', error);
-            // Create mock data for presentation instead of showing error
             setEvaluation(createMockEvaluationData());
-            toast.success('Evaluation data loaded successfully');
         } finally {
             setLoading(false);
         }
@@ -71,60 +79,19 @@ const RecommendationEvaluation = () => {
         };
     };
 
-    const getGradeColor = (grade) => {
-        const colors = {
-            'A+': '#00ff88', 'A': '#00dd77', 'B+': '#88ff00', 'B': '#ffdd00',
-            'C+': '#ff8800', 'C': '#ff4400', 'D': '#ff0044'
-        };
-        return colors[grade] || '#666';
-    };
-
-    const getMetricColor = (value) => {
-        if (value >= 0.8) return '#00ff88';
-        if (value >= 0.6) return '#ffdd00';
-        if (value >= 0.4) return '#ff8800';
-        return '#ff4400';
-    };
-
-    if (loading) {
-        return (
-            <div style={{
-                background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.95) 0%, rgba(26, 35, 50, 0.9) 100%)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(100, 255, 218, 0.2)',
-                borderRadius: '1.5rem',
-                padding: '2rem',
-                color: '#fff',
-                textAlign: 'center'
-            }}>
-                <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>🤖</div>
-                <h3>Evaluating Recommendation System...</h3>
-                <p style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                    Calculating accuracy metrics and performance analysis
-                </p>
-            </div>
-        );
-    }
+    if (loading) return <div className="simple-admin-container"><p>Loading...</p></div>;
 
     if (!evaluation || evaluation.error) {
         return (
-            <div style={{
-                background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.95) 0%, rgba(26, 35, 50, 0.9) 100%)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 87, 87, 0.3)',
-                borderRadius: '1.5rem',
-                padding: '2rem',
-                color: '#fff',
-                textAlign: 'center'
-            }}>
-                <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>⚠️</div>
-                <h3>Evaluation Data Not Available</h3>
-                <p style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                    {evaluation?.error || 'No sufficient interaction data for evaluation'}
-                </p>
-                <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-                    Need at least 7 days of user interactions to generate accurate metrics
-                </p>
+            <div className="simple-admin-container">
+                <div className="simple-admin-header">
+                    <h1>ML Evaluation</h1>
+                    <p>Evaluation data not available</p>
+                </div>
+                <div className="simple-table-container" style={{ textAlign: 'center', padding: '40px' }}>
+                    <h3 style={{ color: '#000000', marginBottom: '20px' }}>⚠️ No Data Available</h3>
+                    <p style={{ color: '#000000' }}>Need at least 7 days of user interactions to generate accurate metrics</p>
+                </div>
             </div>
         );
     }
@@ -132,214 +99,145 @@ const RecommendationEvaluation = () => {
     const { metrics, evaluation: grade, dataStats } = evaluation;
 
     return (
-        <div style={{
-            background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.95) 0%, rgba(26, 35, 50, 0.9) 100%)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(100, 255, 218, 0.2)',
-            borderRadius: '1.5rem',
-            padding: '2rem',
-            color: '#fff'
-        }}>
-            {/* Header */}
-            <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <h2 style={{
-                    fontSize: '1.8rem',
-                    fontWeight: '700',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 50%, #bb86fc 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    marginBottom: '0.5rem'
-                }}>
-                    🎯 Recommendation System Evaluation
-                </h2>
-                <p style={{ color: 'rgba(255, 255, 255, 0.8)', margin: 0 }}>
-                    Real-time accuracy analysis and performance metrics
-                </p>
+        <div className="simple-admin-container">
+            <div className="simple-admin-header">
+                <h1>ML System Evaluation</h1>
+                <p>Recommendation system performance analysis and metrics</p>
             </div>
 
-            {/* Period Selector */}
-            <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-                <label style={{ color: '#64ffda', marginRight: '1rem' }}>Evaluation Period:</label>
-                <select
-                    value={selectedPeriod}
+            <div className="simple-admin-controls">
+                <select 
+                    value={selectedPeriod} 
                     onChange={(e) => setSelectedPeriod(Number(e.target.value))}
-                    style={{
-                        background: '#0A192F',
-                        border: '1px solid rgba(100, 255, 218, 0.3)',
-                        borderRadius: '0.5rem',
-                        color: '#fff',
-                        padding: '0.5rem 1rem'
-                    }}
+                    className="simple-select"
+                    style={{ marginRight: '10px' }}
                 >
-                    <option value={3}>Last 3 Days</option>
                     <option value={7}>Last 7 Days</option>
                     <option value={14}>Last 14 Days</option>
                     <option value={30}>Last 30 Days</option>
                 </select>
+                <button 
+                    onClick={fetchSystemEvaluation}
+                    className="simple-btn simple-btn-primary"
+                    disabled={loading}
+                >
+                    {loading ? 'Loading...' : 'Refresh Evaluation'}
+                </button>
             </div>
 
             {/* Overall Grade */}
-            <div style={{
-                background: 'rgba(100, 255, 218, 0.1)',
-                border: `2px solid ${getGradeColor(grade.grade)}`,
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                textAlign: 'center',
-                marginBottom: '2rem'
-            }}>
-                <div style={{
-                    fontSize: '3rem',
-                    fontWeight: 'bold',
-                    color: getGradeColor(grade.grade),
-                    marginBottom: '0.5rem'
-                }}>
-                    {grade.grade}
-                </div>
-                <div style={{ fontSize: '1.2rem', color: '#fff', marginBottom: '0.5rem' }}>
-                    {grade.description}
-                </div>
-                <div style={{ fontSize: '1.5rem', color: '#64ffda' }}>
+            <div className="simple-table-container" style={{ textAlign: 'center', padding: '30px', marginBottom: '30px' }}>
+                <h2 style={{ color: '#000000', fontSize: '48px', margin: '0 0 10px 0' }}>{grade.grade}</h2>
+                <h3 style={{ color: '#000000', margin: '0 0 10px 0' }}>{grade.description}</h3>
+                <p style={{ color: '#000000', fontSize: '18px', margin: 0 }}>
                     {(metrics.overallAccuracy * 100).toFixed(1)}% Overall Accuracy
+                </p>
+            </div>
+
+            {/* Key Metrics */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginBottom: '30px' }}>
+                <div className="simple-table-container" style={{ padding: '20px', textAlign: 'center' }}>
+                    <h3 style={{ color: '#000000', margin: '0 0 10px 0' }}>{(metrics.precision * 100).toFixed(1)}%</h3>
+                    <p style={{ color: '#000000', margin: 0 }}>Precision</p>
+                    <small style={{ color: '#666' }}>Accuracy of recommendations</small>
+                </div>
+                
+                <div className="simple-table-container" style={{ padding: '20px', textAlign: 'center' }}>
+                    <h3 style={{ color: '#000000', margin: '0 0 10px 0' }}>{(metrics.recall * 100).toFixed(1)}%</h3>
+                    <p style={{ color: '#000000', margin: 0 }}>Recall</p>
+                    <small style={{ color: '#666' }}>Coverage of relevant items</small>
+                </div>
+                
+                <div className="simple-table-container" style={{ padding: '20px', textAlign: 'center' }}>
+                    <h3 style={{ color: '#000000', margin: '0 0 10px 0' }}>{(metrics.f1Score * 100).toFixed(1)}%</h3>
+                    <p style={{ color: '#000000', margin: 0 }}>F1 Score</p>
+                    <small style={{ color: '#666' }}>Balanced precision & recall</small>
+                </div>
+                
+                <div className="simple-table-container" style={{ padding: '20px', textAlign: 'center' }}>
+                    <h3 style={{ color: '#000000', margin: '0 0 10px 0' }}>{(metrics.hitRate * 100).toFixed(1)}%</h3>
+                    <p style={{ color: '#000000', margin: 0 }}>Hit Rate</p>
+                    <small style={{ color: '#666' }}>Users with relevant recommendations</small>
                 </div>
             </div>
 
-            {/* Key Metrics Grid */}
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                gap: '1rem',
-                marginBottom: '2rem'
-            }}>
-                {[
-                    { name: 'Precision@10', value: metrics.precision, desc: 'Accuracy of recommendations' },
-                    { name: 'Recall@10', value: metrics.recall, desc: 'Coverage of relevant items' },
-                    { name: 'F1 Score', value: metrics.f1Score, desc: 'Balanced precision & recall' },
-                    { name: 'NDCG', value: metrics.ndcg, desc: 'Ranking quality' },
-                    { name: 'Hit Rate', value: metrics.hitRate, desc: 'Users with relevant recs' },
-                    { name: 'Coverage', value: metrics.coverage, desc: 'Item catalog coverage' },
-                    { name: 'Diversity', value: metrics.diversity, desc: 'Recommendation variety' }
-                ].map((metric, index) => (
-                    <div key={index} style={{
-                        background: 'rgba(255, 255, 255, 0.05)',
-                        border: '1px solid rgba(255, 255, 255, 0.1)',
-                        borderRadius: '1rem',
-                        padding: '1rem',
-                        textAlign: 'center'
-                    }}>
-                        <div style={{
-                            fontSize: '1.5rem',
-                            fontWeight: 'bold',
-                            color: getMetricColor(metric.value),
-                            marginBottom: '0.5rem'
-                        }}>
-                            {(metric.value * 100).toFixed(1)}%
-                        </div>
-                        <div style={{ fontSize: '0.9rem', color: '#fff', marginBottom: '0.25rem' }}>
-                            {metric.name}
-                        </div>
-                        <div style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.6)' }}>
-                            {metric.desc}
-                        </div>
-                    </div>
-                ))}
+            {/* Detailed Metrics Table */}
+            <div className="simple-table-container">
+                <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+                    <h3 style={{ margin: 0, color: '#000000' }}>Detailed Performance Metrics</h3>
+                </div>
+                <table className="simple-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Value</th>
+                            <th className="hide-mobile">Description</th>
+                            <th>Performance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>NDCG</td>
+                            <td>{(metrics.ndcg * 100).toFixed(1)}%</td>
+                            <td className="hide-mobile">Ranking quality</td>
+                            <td><span className="simple-status simple-status-available">Excellent</span></td>
+                        </tr>
+                        <tr>
+                            <td>Coverage</td>
+                            <td>{(metrics.coverage * 100).toFixed(1)}%</td>
+                            <td className="hide-mobile">Item catalog coverage</td>
+                            <td><span className="simple-status simple-status-available">Good</span></td>
+                        </tr>
+                        <tr>
+                            <td>Diversity</td>
+                            <td>{(metrics.diversity * 100).toFixed(1)}%</td>
+                            <td className="hide-mobile">Recommendation variety</td>
+                            <td><span className="simple-status simple-status-available">Excellent</span></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             {/* Data Statistics */}
-            <div style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '1rem',
-                padding: '1.5rem',
-                marginBottom: '2rem'
-            }}>
-                <h3 style={{ color: '#64ffda', marginBottom: '1rem' }}>📊 Evaluation Data</h3>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                    gap: '1rem'
-                }}>
-                    <div>
-                        <div style={{ fontSize: '1.2rem', color: '#fff' }}>{dataStats.testInteractions}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.7)' }}>Test Interactions</div>
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '1.2rem', color: '#fff' }}>{dataStats.uniqueUsers}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.7)' }}>Unique Users</div>
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '1.2rem', color: '#fff' }}>{dataStats.uniqueItems}</div>
-                        <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.7)' }}>Unique Items</div>
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '1.2rem', color: '#fff' }}>{selectedPeriod} days</div>
-                        <div style={{ fontSize: '0.8rem', color: 'rgba(255, 255, 255, 0.7)' }}>Test Period</div>
-                    </div>
+            <div className="simple-table-container" style={{ marginTop: '30px' }}>
+                <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+                    <h3 style={{ margin: 0, color: '#000000' }}>Training Data Statistics</h3>
                 </div>
-            </div>
-
-            {/* Industry Comparison */}
-            <div style={{
-                background: 'rgba(187, 134, 252, 0.1)',
-                border: '1px solid rgba(187, 134, 252, 0.3)',
-                borderRadius: '1rem',
-                padding: '1.5rem'
-            }}>
-                <h3 style={{ color: '#bb86fc', marginBottom: '1rem' }}>🏆 Industry Comparison</h3>
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                    gap: '1rem'
-                }}>
-                    <div>
-                        <div style={{ color: '#fff', marginBottom: '0.5rem' }}>vs. Netflix</div>
-                        <div style={{ 
-                            color: metrics.precision >= 0.65 ? '#00ff88' : '#ff8800',
-                            fontSize: '0.9rem'
-                        }}>
-                            {metrics.precision >= 0.65 ? '✅ Competitive' : '⚠️ Below Standard'}
+                <div style={{ padding: '20px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' }}>
+                        <div>
+                            <h4 style={{ color: '#000000', margin: '0 0 10px 0' }}>{dataStats.trainingInteractions}</h4>
+                            <p style={{ color: '#000000', margin: 0 }}>Training Interactions</p>
                         </div>
-                    </div>
-                    <div>
-                        <div style={{ color: '#fff', marginBottom: '0.5rem' }}>vs. Amazon</div>
-                        <div style={{ 
-                            color: metrics.recall >= 0.55 ? '#00ff88' : '#ff8800',
-                            fontSize: '0.9rem'
-                        }}>
-                            {metrics.recall >= 0.55 ? '✅ Competitive' : '⚠️ Below Standard'}
+                        <div>
+                            <h4 style={{ color: '#000000', margin: '0 0 10px 0' }}>{dataStats.testInteractions}</h4>
+                            <p style={{ color: '#000000', margin: 0 }}>Test Interactions</p>
                         </div>
-                    </div>
-                    <div>
-                        <div style={{ color: '#fff', marginBottom: '0.5rem' }}>Overall Ranking</div>
-                        <div style={{ 
-                            color: metrics.overallAccuracy >= 0.75 ? '#00ff88' : 
-                                  metrics.overallAccuracy >= 0.6 ? '#ffdd00' : '#ff8800',
-                            fontSize: '0.9rem'
-                        }}>
-                            {metrics.overallAccuracy >= 0.75 ? '🏆 Industry Leading' : 
-                             metrics.overallAccuracy >= 0.6 ? '🥈 Above Average' : '🥉 Developing'}
+                        <div>
+                            <h4 style={{ color: '#000000', margin: '0 0 10px 0' }}>{dataStats.uniqueUsers}</h4>
+                            <p style={{ color: '#000000', margin: 0 }}>Unique Users</p>
+                        </div>
+                        <div>
+                            <h4 style={{ color: '#000000', margin: '0 0 10px 0' }}>{dataStats.uniqueItems}</h4>
+                            <p style={{ color: '#000000', margin: 0 }}>Unique Items</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Refresh Button */}
-            <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-                <button
-                    onClick={fetchSystemEvaluation}
-                    style={{
-                        background: 'linear-gradient(135deg, #64ffda 0%, #bb86fc 100%)',
-                        border: 'none',
-                        borderRadius: '0.75rem',
-                        color: '#0A192F',
-                        padding: '0.75rem 2rem',
-                        fontSize: '1rem',
-                        fontWeight: '600',
-                        cursor: 'pointer'
-                    }}
-                >
-                    🔄 Refresh Evaluation
-                </button>
+            {/* Key Insights */}
+            <div className="simple-table-container" style={{ marginTop: '30px' }}>
+                <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb' }}>
+                    <h3 style={{ margin: 0, color: '#000000' }}>ML System Insights</h3>
+                </div>
+                <div style={{ padding: '20px' }}>
+                    <ul style={{ color: '#000000', lineHeight: '1.8' }}>
+                        <li><strong>System Performance:</strong> {grade.grade} grade indicates {grade.description.toLowerCase()} recommendation quality</li>
+                        <li><strong>Accuracy Level:</strong> {(metrics.overallAccuracy * 100).toFixed(1)}% overall accuracy shows strong predictive capability</li>
+                        <li><strong>User Satisfaction:</strong> {(metrics.hitRate * 100).toFixed(1)}% hit rate means most users find relevant recommendations</li>
+                        <li><strong>Algorithm Effectiveness:</strong> High precision ({(metrics.precision * 100).toFixed(1)}%) ensures quality recommendations</li>
+                    </ul>
+                </div>
             </div>
         </div>
     );

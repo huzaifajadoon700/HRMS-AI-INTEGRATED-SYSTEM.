@@ -451,7 +451,7 @@ const Sidebar = () => {
                             toggleDropdown(item.name);
                           } else {
                             setSelectedModule(item.component || item.name);
-                            if (window.innerWidth <= 768) {
+                            if (isMobile) {
                               setIsMobileMenuOpen(false);
                             }
                           }
@@ -536,7 +536,7 @@ const Sidebar = () => {
                                 onClick={(e) => {
                                   e.preventDefault();
                                   setSelectedModule(subItem.component);
-                                  if (window.innerWidth <= 768) {
+                                  if (isMobile) {
                                     setIsMobileMenuOpen(false);
                                   }
                                 }}
