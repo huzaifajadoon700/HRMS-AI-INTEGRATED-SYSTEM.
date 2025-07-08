@@ -1,6 +1,11 @@
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
 
+/**
+ * User Controller
+ * Handles user profile management and user-related operations
+ */
+
 // ✅ Get User Profile
 exports.getProfile = async (req, res) => {
   try {
