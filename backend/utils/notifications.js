@@ -1,3 +1,4 @@
+// Notification helpers for email and SMS. No business logic is present in this file.
 const nodemailer = require('nodemailer');
 const twilio = require('twilio');
 
