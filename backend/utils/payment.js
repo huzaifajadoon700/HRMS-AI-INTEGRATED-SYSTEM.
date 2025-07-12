@@ -1,3 +1,4 @@
+// Payment processing helpers for Stripe integration. No business logic is present in this file.
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 async function processPayment(paymentMethod, amount) {
