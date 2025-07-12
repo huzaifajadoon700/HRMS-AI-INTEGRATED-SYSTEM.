@@ -1,7 +1,7 @@
 const winston = require('winston');
 const path = require('path');
 
-// Ensure logs directory exists
+// Ensure logs directory exists for proper log file storage
 const fs = require('fs');
 const logsDir = path.join(__dirname, '../logs');
 if (!fs.existsSync(logsDir)) {
