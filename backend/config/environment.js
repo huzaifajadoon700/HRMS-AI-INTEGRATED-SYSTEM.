@@ -1,6 +1,7 @@
 /**
  * Environment configuration helper
  * Centralizes environment variable management and provides defaults
+ * This file contains only configuration helpers, no business logic
  */
 
 const config = {
