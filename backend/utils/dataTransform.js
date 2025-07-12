@@ -1,7 +1,4 @@
-/**
- * Data transformation utilities
- * Provides functions for data formatting, conversion, and manipulation
- */
+// Data transformation helpers for formatting and cleaning data. No business logic is present in this file.
 
 /**
  * Transform user data for API response (remove sensitive fields)
