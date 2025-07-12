@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 /**
  * Database connection configuration and utilities
  * Handles MongoDB connection with proper error handling and monitoring
+ * This file contains only database connection helpers, no business logic
  */
 
 /**
