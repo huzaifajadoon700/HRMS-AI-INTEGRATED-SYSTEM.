@@ -1,7 +1,4 @@
-/**
- * Performance monitoring utilities
- * Provides tools for measuring and tracking application performance
- */
+// Performance monitoring helpers for tracking and measuring. No business logic is present in this file.
 
 /**
  * Simple performance timer class
