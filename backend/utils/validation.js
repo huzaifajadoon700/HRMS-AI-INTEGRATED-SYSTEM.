@@ -1,7 +1,7 @@
-// Validation utility functions
+// Validation utility functions for HRMS system
 
 /**
- * Validates email format using regex
+ * Validates email format using regex pattern
  * @param {string} email - Email address to validate
  * @returns {boolean} True if email is valid, false otherwise
  */
