@@ -1,3 +1,4 @@
+// This file contains only helper functions for API responses. No business logic is present here.
 /**
  * API Response Helper Utilities
  * Standardizes API responses across the application
