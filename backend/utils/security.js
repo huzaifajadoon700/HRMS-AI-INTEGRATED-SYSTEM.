@@ -1,3 +1,4 @@
+// Security helpers for encryption and authentication. No business logic is present in this file.
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 
