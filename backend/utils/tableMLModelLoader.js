@@ -1,3 +1,4 @@
+// ML model loading helpers for table recommendations. No business logic is present in this file.
 const fs = require('fs');
 const path = require('path');
 
