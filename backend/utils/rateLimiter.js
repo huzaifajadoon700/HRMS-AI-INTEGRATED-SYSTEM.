@@ -1,7 +1,4 @@
-/**
- * Rate limiting utilities for API protection
- * Provides configurable rate limiting with different strategies
- */
+// Rate limiting helpers for API protection. No business logic is present in this file.
 
 /**
  * In-memory store for rate limiting data
