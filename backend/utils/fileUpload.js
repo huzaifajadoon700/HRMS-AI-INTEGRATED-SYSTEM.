@@ -1,3 +1,4 @@
+// File upload helpers for secure file handling. No business logic is present in this file.
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
