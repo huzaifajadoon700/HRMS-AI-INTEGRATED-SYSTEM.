@@ -1,3 +1,4 @@
+// Delivery helpers for location and route calculations. No business logic is present in this file.
 const axios = require('axios');
 
 const RESTAURANT_COORDS = {
