@@ -1,3 +1,4 @@
+// Caching helpers for performance optimization. No business logic is present in this file.
 /**
  * Caching utilities for improved application performance
  * Provides in-memory caching with TTL support and cache management
