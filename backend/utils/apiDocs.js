@@ -1,3 +1,4 @@
+// API documentation helpers for Swagger generation. No business logic is present in this file.
 /**
  * API Documentation Helper Utilities
  * Provides standardized documentation templates and schemas
