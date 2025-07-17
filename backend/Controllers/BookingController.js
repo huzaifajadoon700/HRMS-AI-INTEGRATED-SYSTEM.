@@ -1,3 +1,4 @@
+// Booking Controller - Handles hotel room reservations and booking management
 const Booking = require("../Models/Booking");
 const Room = require("../Models/Room");
 const stripe = require("../config/stripe");
