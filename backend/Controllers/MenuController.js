@@ -1,3 +1,4 @@
+// Menu Controller - Manages restaurant menu items and categories
 const Menu = require("../Models/Menu");
 
 // Get all menu items
