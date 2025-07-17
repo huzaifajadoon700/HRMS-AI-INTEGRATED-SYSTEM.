@@ -1,10 +1,11 @@
+// Order Controller - Manages food orders, payments, and real-time order tracking
 const Order = require("../Models/Order");
 const User = require("../Models/User");
 const UserFoodInteraction = require("../Models/UserFoodInteraction");
 const http = require("http");
 const socketIo = require("socket.io");
 const mongoose = require("mongoose");
-const stripe = require('../config/stripe');
+const stripe = require("../config/stripe");
 
 const server = http.createServer();
 const io = socketIo(server);
@@ -12,7 +13,15 @@ const io = socketIo(server);
 // ✅ Create Order (Logged-in users only)
 exports.createOrder = async (req, res) => {
   try {
-    const { items, totalPrice, deliveryFee, deliveryAddress, deliveryLocation, payment, paymentMethodId } = req.body;
+    const {
+      items,
+      totalPrice,
+      deliveryFee,
+      deliveryAddress,
+      deliveryLocation,
+      payment,
+      paymentMethodId,
+    } = req.body;
 
     // Debug authentication
     console.log("req.user object:", req.user);
@@ -25,7 +34,15 @@ exports.createOrder = async (req, res) => {
     const userId = req.user._id || req.user.id;
 
     console.log("Creating order for user:", userId);
-    console.log("Order data received:", { items, totalPrice, deliveryFee, deliveryAddress, deliveryLocation, payment, paymentMethodId });
+    console.log("Order data received:", {
+      items,
+      totalPrice,
+      deliveryFee,
+      deliveryAddress,
+      deliveryLocation,
+      payment,
+      paymentMethodId,
+    });
 
     // Log each item in detail to debug the menuItemId issue
     console.log("🔍 Detailed items analysis:");
@@ -38,67 +55,77 @@ exports.createOrder = async (req, res) => {
         menuItemId: item.menuItemId,
         id: item.id,
         _id: item._id,
-        allKeys: Object.keys(item)
+        allKeys: Object.keys(item),
       });
     });
 
     if (!items || !Array.isArray(items) || items.length === 0) {
-      return res.status(400).json({ message: "Order items must be a non-empty array" });
+      return res
+        .status(400)
+        .json({ message: "Order items must be a non-empty array" });
     }
 
     if (!deliveryAddress || !deliveryLocation) {
-      return res.status(400).json({ message: "Delivery address and location are required" });
+      return res
+        .status(400)
+        .json({ message: "Delivery address and location are required" });
     }
 
     for (const item of items) {
-      console.log('Validating item:', item);
+      console.log("Validating item:", item);
 
       if (!item.quantity || !item.price || !item.name) {
-        return res.status(400).json({ message: "Each item must have name, quantity, and price" });
+        return res
+          .status(400)
+          .json({ message: "Each item must have name, quantity, and price" });
       }
       if (isNaN(item.quantity) || item.quantity <= 0) {
-        return res.status(400).json({ message: "Quantity must be a positive number" });
+        return res
+          .status(400)
+          .json({ message: "Quantity must be a positive number" });
       }
       if (isNaN(item.price) || item.price <= 0) {
-        return res.status(400).json({ message: "Price must be a positive number" });
+        return res
+          .status(400)
+          .json({ message: "Price must be a positive number" });
       }
     }
 
     // Process payment with Stripe
     let paymentIntent;
-    if (payment === 'card' && paymentMethodId) {
+    if (payment === "card" && paymentMethodId) {
       if (!stripe) {
         return res.status(500).json({
-          error: 'Payment processing unavailable',
-          message: 'Stripe is not configured properly'
+          error: "Payment processing unavailable",
+          message: "Stripe is not configured properly",
         });
       }
       try {
         // First create the payment intent
         paymentIntent = await stripe.paymentIntents.create({
           amount: (totalPrice + deliveryFee) * 100, // Convert to cents
-          currency: 'pkr',
-          payment_method_types: ['card'],
+          currency: "pkr",
+          payment_method_types: ["card"],
           metadata: {
             orderItems: JSON.stringify(items),
             deliveryAddress,
-            deliveryLocation
-          }
+            deliveryLocation,
+          },
         });
 
         // Then confirm the payment intent with the payment method
         paymentIntent = await stripe.paymentIntents.confirm(paymentIntent.id, {
-          payment_method: paymentMethodId
+          payment_method: paymentMethodId,
         });
 
-        if (paymentIntent.status !== 'succeeded') {
-          throw new Error('Payment failed: ' + paymentIntent.status);
+        if (paymentIntent.status !== "succeeded") {
+          throw new Error("Payment failed: " + paymentIntent.status);
         }
       } catch (error) {
-        console.error('Stripe payment error:', error);
-        return res.status(400).json({ 
-          error: 'Payment failed',
-          message: error.message 
+        console.error("Stripe payment error:", error);
+        return res.status(400).json({
+          error: "Payment failed",
+          message: error.message,
         });
       }
     }
@@ -109,12 +136,13 @@ exports.createOrder = async (req, res) => {
       console.log(`📦 Processing item:`, item);
 
       return {
-        menuItemId: item.itemId || item.menuItemId || item.id || item._id || null,
+        menuItemId:
+          item.itemId || item.menuItemId || item.id || item._id || null,
         name: item.name,
         price: item.price,
         quantity: item.quantity,
-        customizations: item.customizations || '',
-        addOns: item.addOns || []
+        customizations: item.customizations || "",
+        addOns: item.addOns || [],
       };
     });
 
@@ -132,7 +160,7 @@ exports.createOrder = async (req, res) => {
       deliveryStatus: "pending",
       payment,
       paymentIntentId: paymentIntent?.id,
-      paymentStatus: paymentIntent?.status || 'pending'
+      paymentStatus: paymentIntent?.status || "pending",
     });
 
     console.log("Creating order with data:", newOrder);
@@ -146,7 +174,7 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({
         message: "Order validation failed",
         error: validationError.message,
-        details: validationError.errors
+        details: validationError.errors,
       });
     }
     console.log("✅ Order validation passed, saving...");
@@ -160,20 +188,22 @@ exports.createOrder = async (req, res) => {
           const interaction = new UserFoodInteraction({
             userId: userId,
             menuItemId: item.menuItemId,
-            interactionType: 'order',
-            orderQuantity: item.quantity || 1
+            interactionType: "order",
+            orderQuantity: item.quantity || 1,
           });
           await interaction.save();
         }
       }
-      console.log(`📊 Recorded ${mappedItems.length} food interactions for recommendation system`);
+      console.log(
+        `📊 Recorded ${mappedItems.length} food interactions for recommendation system`
+      );
     } catch (interactionError) {
-      console.error('Error recording food interactions:', interactionError);
+      console.error("Error recording food interactions:", interactionError);
       // Don't fail the order if interaction recording fails
     }
 
     // Get socket.io instance
-    const socketModule = require('../socket');
+    const socketModule = require("../socket");
     const io = socketModule.getIO();
 
     // Emit socket event for real-time updates
@@ -183,28 +213,32 @@ exports.createOrder = async (req, res) => {
         status: "pending",
         timestamp: new Date(),
         estimatedDelivery: new Date(Date.now() + 30 * 60000), // 30 minutes from now
-        completed: false
+        completed: false,
       };
-      
+
       // Emit to everyone in the room for this order
-      io.to(`order_${savedOrder._id}`).emit('orderUpdate', orderUpdate);
-      
+      io.to(`order_${savedOrder._id}`).emit("orderUpdate", orderUpdate);
+
       // Also emit a global event for any page that might be displaying this order
-      io.emit('orderStatusUpdate', orderUpdate);
-      
-      console.log(`[Socket] Order ${savedOrder._id} created with status: pending`);
+      io.emit("orderStatusUpdate", orderUpdate);
+
+      console.log(
+        `[Socket] Order ${savedOrder._id} created with status: pending`
+      );
     } else {
-      console.warn('[Socket] Socket.io instance not available');
+      console.warn("[Socket] Socket.io instance not available");
     }
-    
+
     res.status(201).json({
       message: "Order created successfully",
       order: savedOrder,
-      paymentIntent: paymentIntent
+      paymentIntent: paymentIntent,
     });
   } catch (error) {
     console.error("Error creating order:", error);
-    res.status(500).json({ message: "Error creating order", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error creating order", error: error.message });
   }
 };
 
@@ -270,15 +304,15 @@ exports.getOrders = async (req, res) => {
     console.log("Final orders found:", orders.length);
 
     // Ensure all price fields are valid numbers
-    const validatedOrders = orders.map(order => ({
+    const validatedOrders = orders.map((order) => ({
       ...order.toObject(),
       totalPrice: Number(order.totalPrice) || 0,
       deliveryFee: Number(order.deliveryFee) || 0,
-      items: order.items.map(item => ({
+      items: order.items.map((item) => ({
         ...item,
         price: Number(item.price) || 0,
-        quantity: Number(item.quantity) || 0
-      }))
+        quantity: Number(item.quantity) || 0,
+      })),
     }));
 
     res.status(200).json({
@@ -287,12 +321,14 @@ exports.getOrders = async (req, res) => {
         page,
         limit,
         totalPages,
-        totalOrders
-      }
+        totalOrders,
+      },
     });
   } catch (error) {
     console.error("Error fetching orders:", error);
-    res.status(500).json({ message: "Error fetching orders", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching orders", error: error.message });
   }
 };
 
@@ -301,23 +337,23 @@ exports.getOrderById = async (req, res) => {
   try {
     const { orderId } = req.params;
     console.log(`Attempting to fetch order with ID: ${orderId}`);
-    
+
     // Check if we need a validation bypass for the specific order from screenshot
     const bypassValidationId = "67fab24d9a3558b7a0c8267f";
-    
+
     // For the specific ID, we'll just try direct query
     if (orderId === bypassValidationId) {
       console.log(`Using direct query for known ID: ${bypassValidationId}`);
       try {
         // Try both methods to find this order
         const order = await Order.findOne({ _id: bypassValidationId });
-        
+
         if (order) {
           console.log(`Successfully found order with direct query`);
           const user = await User.findById(order.user).select("-password");
           const fullOrder = {
             ...order.toObject(),
-            userDetails: user
+            userDetails: user,
           };
           return res.status(200).json(fullOrder);
         } else {
@@ -327,7 +363,7 @@ exports.getOrderById = async (req, res) => {
         console.error(`Error with direct query:`, directError);
       }
     }
-    
+
     // Try with MongoDB ObjectId validation
     let isValidId = false;
     try {
@@ -335,7 +371,7 @@ exports.getOrderById = async (req, res) => {
     } catch (validationError) {
       console.error("ID validation error:", validationError);
     }
-    
+
     if (!isValidId) {
       console.log(`Invalid order ID format: ${orderId}`);
       return res.status(400).json({ message: "Invalid order ID format" });
@@ -344,14 +380,14 @@ exports.getOrderById = async (req, res) => {
     // Try to find the order by ID without additional constraints
     console.log(`Searching database for order: ${orderId}`);
     const order = await Order.findById(orderId);
-    
+
     if (!order) {
       console.log(`Order ${orderId} not found in database`);
       return res.status(404).json({ message: "Order not found" });
     }
-    
+
     console.log(`Found order in database: ${order._id}`);
-    
+
     // Get user details
     let userDetails = null;
     try {
@@ -363,15 +399,17 @@ exports.getOrderById = async (req, res) => {
 
     const fullOrder = {
       ...order.toObject(),
-      userDetails: userDetails
+      userDetails: userDetails,
     };
-    
+
     console.log(`Successfully returning order ${orderId} details`);
     res.status(200).json(fullOrder);
   } catch (error) {
     console.error(`Error fetching order ${req.params.orderId}:`, error);
-    console.error('Stack trace:', error.stack);
-    res.status(500).json({ message: "Error fetching order", error: error.message });
+    console.error("Stack trace:", error.stack);
+    res
+      .status(500)
+      .json({ message: "Error fetching order", error: error.message });
   }
 };
 
@@ -387,23 +425,28 @@ exports.updateDeliveryLocation = async (req, res) => {
     }
 
     const order = await Order.findOne({ _id: orderId, user: userId }); // Ensure the order belongs to the user
-    if (!order) return res.status(404).json({ message: "Order not found or unauthorized access" });
+    if (!order)
+      return res
+        .status(404)
+        .json({ message: "Order not found or unauthorized access" });
 
     // Check if order can be modified based on its status
-    if (order.status === 'delivered' || order.status === 'canceled') {
-      return res.status(400).json({ 
-        message: "Cannot update location for delivered or canceled orders"
+    if (order.status === "delivered" || order.status === "canceled") {
+      return res.status(400).json({
+        message: "Cannot update location for delivered or canceled orders",
       });
     }
 
     // Check if order is from past date (more than 1 day old)
     const orderDate = new Date(order.createdAt);
     const today = new Date();
-    const daysDifference = Math.floor((today - orderDate) / (1000 * 60 * 60 * 24));
-    
+    const daysDifference = Math.floor(
+      (today - orderDate) / (1000 * 60 * 60 * 24)
+    );
+
     if (daysDifference > 1) {
-      return res.status(400).json({ 
-        message: "Cannot update location for orders older than 1 day"
+      return res.status(400).json({
+        message: "Cannot update location for orders older than 1 day",
       });
     }
 
@@ -411,12 +454,20 @@ exports.updateDeliveryLocation = async (req, res) => {
     await order.save();
 
     if (io) {
-      io.emit("updateDeliveryLocation", { orderId: order._id, deliveryLocation });
+      io.emit("updateDeliveryLocation", {
+        orderId: order._id,
+        deliveryLocation,
+      });
     }
     res.json({ message: "Delivery location updated", order });
   } catch (error) {
     console.error("Error updating delivery location:", error);
-    res.status(500).json({ message: "Error updating delivery location", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Error updating delivery location",
+        error: error.message,
+      });
   }
 };
 
@@ -425,18 +476,24 @@ exports.cancelOrder = async (req, res) => {
   try {
     const { orderId } = req.params;
     const userId = req.user._id; // Get user ID from the authenticated request
-    const isAdmin = req.user.isAdmin || req.user.role === 'admin'; // Check if user is admin
+    const isAdmin = req.user.isAdmin || req.user.role === "admin"; // Check if user is admin
 
     // Find the order first to check status before deleting
     const order = await Order.findOne({ _id: orderId, user: userId });
     if (!order) {
-      return res.status(404).json({ message: "Order not found or unauthorized access" });
+      return res
+        .status(404)
+        .json({ message: "Order not found or unauthorized access" });
     }
 
     // Check if order can be canceled based on its status
-    if (!isAdmin && (order.status === 'delivered' || order.status === 'out_for_delivery')) {
-      return res.status(400).json({ 
-        message: "Cannot cancel orders that are already out for delivery or delivered"
+    if (
+      !isAdmin &&
+      (order.status === "delivered" || order.status === "out_for_delivery")
+    ) {
+      return res.status(400).json({
+        message:
+          "Cannot cancel orders that are already out for delivery or delivered",
       });
     }
 
@@ -445,10 +502,10 @@ exports.cancelOrder = async (req, res) => {
       const orderDate = new Date(order.createdAt);
       const now = new Date();
       const hoursDifference = (now - orderDate) / (1000 * 60 * 60);
-      
+
       if (hoursDifference > 1) {
-        return res.status(400).json({ 
-          message: "Orders can only be canceled within 1 hour of placing them"
+        return res.status(400).json({
+          message: "Orders can only be canceled within 1 hour of placing them",
         });
       }
     }
@@ -463,7 +520,9 @@ exports.cancelOrder = async (req, res) => {
     res.status(200).json({ message: "Order cancelled successfully" });
   } catch (error) {
     console.error("Error cancelling order:", error);
-    res.status(500).json({ message: "Error cancelling order", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error cancelling order", error: error.message });
   }
 };
 
@@ -474,7 +533,14 @@ exports.updateOrderStatus = async (req, res) => {
     const { status } = req.body;
 
     // Validate status
-    const validStatuses = ["pending", "confirmed", "preparing", "out_for_delivery", "delivered", "canceled"];
+    const validStatuses = [
+      "pending",
+      "confirmed",
+      "preparing",
+      "out_for_delivery",
+      "delivered",
+      "canceled",
+    ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
@@ -489,7 +555,7 @@ exports.updateOrderStatus = async (req, res) => {
     await order.save();
 
     // Get socket.io instance
-    const socketModule = require('../socket');
+    const socketModule = require("../socket");
     const io = socketModule.getIO();
 
     // Emit socket event for real-time updates
@@ -499,23 +565,25 @@ exports.updateOrderStatus = async (req, res) => {
         status: status,
         timestamp: new Date(),
         estimatedDelivery: new Date(Date.now() + 30 * 60000), // 30 minutes from now
-        completed: true
+        completed: true,
       };
-      
+
       // Emit to everyone in the room for this order
-      io.to(`order_${orderId}`).emit('orderUpdate', statusUpdate);
-      
+      io.to(`order_${orderId}`).emit("orderUpdate", statusUpdate);
+
       // Also emit a global event for any page that might be displaying this order
-      io.emit('orderStatusUpdate', statusUpdate);
-      
+      io.emit("orderStatusUpdate", statusUpdate);
+
       console.log(`[Socket] Order ${orderId} status updated to: ${status}`);
     } else {
-      console.warn('[Socket] Socket.io instance not available');
+      console.warn("[Socket] Socket.io instance not available");
     }
 
     res.status(200).json(order);
   } catch (error) {
     console.error("Error updating order status:", error);
-    res.status(500).json({ message: "Error updating order status", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating order status", error: error.message });
   }
 };
