@@ -1,3 +1,4 @@
+// User management controller for HRMS system
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
 
