@@ -1,3 +1,4 @@
+// Admin Controller - Handles administrative operations and user management
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
 
