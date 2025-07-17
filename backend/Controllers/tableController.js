@@ -1,3 +1,4 @@
+// Table Controller - Manages restaurant table operations and reservations
 const Table = require("../Models/Table");
 const Reservation = require("../Models/Reservations");
 
@@ -66,11 +67,9 @@ const checkTableAvailability = async (req, res) => {
     const { reservationDate, time, endTime, excludeReservationId } = req.query;
 
     if (!reservationDate || !time || !endTime) {
-      return res
-        .status(400)
-        .json({
-          error: "Reservation date, start time, and end time are required",
-        });
+      return res.status(400).json({
+        error: "Reservation date, start time, and end time are required",
+      });
     }
 
     // Convert times to minutes for comparison
