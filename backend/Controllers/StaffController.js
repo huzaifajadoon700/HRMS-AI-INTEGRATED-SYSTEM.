@@ -1,5 +1,6 @@
-const Staff = require('../Models/staff');
-const Shift = require('../Models/shift');
+// Staff Controller - Manages hotel staff members and their information
+const Staff = require("../Models/staff");
+const Shift = require("../Models/shift");
 
 exports.addStaff = async (req, res) => {
   try {
@@ -7,13 +8,13 @@ exports.addStaff = async (req, res) => {
 
     // Validate required fields
     if (!name || !email || !phone || !role || !department) {
-      return res.status(400).json({ message: 'All fields are required' });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
     // Check if email already exists
     const existingStaff = await Staff.findOne({ email });
     if (existingStaff) {
-      return res.status(400).json({ message: 'Email already exists' });
+      return res.status(400).json({ message: "Email already exists" });
     }
 
     const staff = new Staff({
@@ -22,7 +23,7 @@ exports.addStaff = async (req, res) => {
       phone,
       role,
       department,
-      status: status || 'active'
+      status: status || "active",
     });
 
     await staff.save();
@@ -34,7 +35,7 @@ exports.addStaff = async (req, res) => {
 
 exports.getAllStaff = async (req, res) => {
   try {
-    const staff = await Staff.find().select('-__v');
+    const staff = await Staff.find().select("-__v");
     res.status(200).json(staff);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -49,14 +50,14 @@ exports.updateStaff = async (req, res) => {
     // Check if staff exists
     const existingStaff = await Staff.findById(staffId);
     if (!existingStaff) {
-      return res.status(404).json({ message: 'Staff member not found' });
+      return res.status(404).json({ message: "Staff member not found" });
     }
 
     // If email is being updated, check if it's already taken
     if (email && email !== existingStaff.email) {
       const emailExists = await Staff.findOne({ email });
       if (emailExists) {
-        return res.status(400).json({ message: 'Email already exists' });
+        return res.status(400).json({ message: "Email already exists" });
       }
     }
 
@@ -79,7 +80,7 @@ exports.deleteStaff = async (req, res) => {
     // Check if staff exists
     const existingStaff = await Staff.findById(staffId);
     if (!existingStaff) {
-      return res.status(404).json({ message: 'Staff member not found' });
+      return res.status(404).json({ message: "Staff member not found" });
     }
 
     // Delete all shifts associated with the staff member
@@ -87,8 +88,10 @@ exports.deleteStaff = async (req, res) => {
 
     // Delete the staff member
     await Staff.findByIdAndDelete(staffId);
-    
-    res.status(200).json({ message: 'Staff and associated shifts deleted successfully' });
+
+    res
+      .status(200)
+      .json({ message: "Staff and associated shifts deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
