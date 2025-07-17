@@ -1,3 +1,4 @@
+// Room Controller - Manages hotel rooms, availability, and ML-based recommendations
 const Room = require("../Models/Room");
 const Booking = require("../Models/Booking");
 const UserRoomInteraction = require("../Models/UserRoomInteraction");
