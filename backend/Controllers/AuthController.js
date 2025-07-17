@@ -1,3 +1,4 @@
+// Authentication Controller - Handles user signup, login, and authentication
 const bcrypt = require("bcrypt");
 const UserModel = require("../Models/User");
 const jwt = require("jsonwebtoken");
