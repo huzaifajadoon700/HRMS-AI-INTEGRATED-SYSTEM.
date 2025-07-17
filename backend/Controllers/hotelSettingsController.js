@@ -1,23 +1,24 @@
-const HotelSettings = require('../Models/HotelSettings');
+// Hotel Settings Controller - Manages hotel configuration and branding settings
+const HotelSettings = require("../Models/HotelSettings");
 
 // Get hotel settings (public endpoint - no auth required)
 const getHotelSettings = async (req, res) => {
   try {
     const settings = await HotelSettings.getSingleton();
-    
+
     res.status(200).json({
       success: true,
       data: settings,
-      message: 'Hotel settings retrieved successfully',
-      timestamp: new Date().toISOString()
+      message: "Hotel settings retrieved successfully",
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Error fetching hotel settings:', error);
+    console.error("Error fetching hotel settings:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch hotel settings',
+      message: "Failed to fetch hotel settings",
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -29,46 +30,58 @@ const updateHotelSettings = async (req, res) => {
     const updateData = req.body;
 
     // Validate required fields if provided
-    if (updateData.contact?.email?.primary && !isValidEmail(updateData.contact.email.primary)) {
+    if (
+      updateData.contact?.email?.primary &&
+      !isValidEmail(updateData.contact.email.primary)
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid primary email format',
-        timestamp: new Date().toISOString()
+        message: "Invalid primary email format",
+        timestamp: new Date().toISOString(),
       });
     }
 
-    if (updateData.contact?.email?.support && !isValidEmail(updateData.contact.email.support)) {
+    if (
+      updateData.contact?.email?.support &&
+      !isValidEmail(updateData.contact.email.support)
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid support email format',
-        timestamp: new Date().toISOString()
+        message: "Invalid support email format",
+        timestamp: new Date().toISOString(),
       });
     }
 
-    if (updateData.contact?.email?.reservations && !isValidEmail(updateData.contact.email.reservations)) {
+    if (
+      updateData.contact?.email?.reservations &&
+      !isValidEmail(updateData.contact.email.reservations)
+    ) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid reservations email format',
-        timestamp: new Date().toISOString()
+        message: "Invalid reservations email format",
+        timestamp: new Date().toISOString(),
       });
     }
 
     // Update settings
-    const updatedSettings = await HotelSettings.updateSingleton(updateData, userId);
+    const updatedSettings = await HotelSettings.updateSingleton(
+      updateData,
+      userId
+    );
 
     res.status(200).json({
       success: true,
       data: updatedSettings,
-      message: 'Hotel settings updated successfully',
-      timestamp: new Date().toISOString()
+      message: "Hotel settings updated successfully",
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Error updating hotel settings:', error);
+    console.error("Error updating hotel settings:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to update hotel settings',
+      message: "Failed to update hotel settings",
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -80,7 +93,7 @@ const resetHotelSettings = async (req, res) => {
 
     // Delete existing settings to trigger default creation
     await HotelSettings.deleteMany({});
-    
+
     // Create new default settings
     const defaultSettings = new HotelSettings({});
     defaultSettings.settings.updatedBy = userId;
@@ -89,16 +102,16 @@ const resetHotelSettings = async (req, res) => {
     res.status(200).json({
       success: true,
       data: defaultSettings,
-      message: 'Hotel settings reset to defaults successfully',
-      timestamp: new Date().toISOString()
+      message: "Hotel settings reset to defaults successfully",
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Error resetting hotel settings:', error);
+    console.error("Error resetting hotel settings:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to reset hotel settings',
+      message: "Failed to reset hotel settings",
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -107,7 +120,7 @@ const resetHotelSettings = async (req, res) => {
 const getPublicHotelSettings = async (req, res) => {
   try {
     const settings = await HotelSettings.getSingleton();
-    
+
     // Return only public-facing information
     const publicData = {
       hotelName: settings.hotelName,
@@ -118,38 +131,38 @@ const getPublicHotelSettings = async (req, res) => {
         phone: {
           primary: settings.contact.phone.primary,
           secondary: settings.contact.phone.secondary,
-          whatsapp: settings.contact.phone.whatsapp
+          whatsapp: settings.contact.phone.whatsapp,
         },
         email: {
           primary: settings.contact.email.primary,
           support: settings.contact.email.support,
-          reservations: settings.contact.email.reservations
+          reservations: settings.contact.email.reservations,
         },
-        website: settings.contact.website
+        website: settings.contact.website,
       },
       socialMedia: settings.socialMedia,
       business: {
-        hours: settings.business.hours
+        hours: settings.business.hours,
       },
       statistics: settings.statistics,
       heroContent: settings.heroContent,
       services: settings.services,
-      seo: settings.seo
+      seo: settings.seo,
     };
 
     res.status(200).json({
       success: true,
       data: publicData,
-      message: 'Public hotel settings retrieved successfully',
-      timestamp: new Date().toISOString()
+      message: "Public hotel settings retrieved successfully",
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Error fetching public hotel settings:', error);
+    console.error("Error fetching public hotel settings:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch public hotel settings',
+      message: "Failed to fetch public hotel settings",
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -161,28 +174,41 @@ const updateHotelSection = async (req, res) => {
     const userId = req.user?.id;
     const updateData = req.body;
 
-    const validSections = ['contact', 'socialMedia', 'business', 'statistics', 'heroContent', 'services', 'seo'];
-    
+    const validSections = [
+      "contact",
+      "socialMedia",
+      "business",
+      "statistics",
+      "heroContent",
+      "services",
+      "seo",
+    ];
+
     if (!validSections.includes(section)) {
       return res.status(400).json({
         success: false,
-        message: `Invalid section. Valid sections are: ${validSections.join(', ')}`,
-        timestamp: new Date().toISOString()
+        message: `Invalid section. Valid sections are: ${validSections.join(
+          ", "
+        )}`,
+        timestamp: new Date().toISOString(),
       });
     }
 
     // Prepare update object
     const sectionUpdate = {
-      [section]: updateData
+      [section]: updateData,
     };
 
-    const updatedSettings = await HotelSettings.updateSingleton(sectionUpdate, userId);
+    const updatedSettings = await HotelSettings.updateSingleton(
+      sectionUpdate,
+      userId
+    );
 
     res.status(200).json({
       success: true,
       data: updatedSettings,
       message: `Hotel ${section} updated successfully`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error(`Error updating hotel ${req.params.section}:`, error);
@@ -190,7 +216,7 @@ const updateHotelSection = async (req, res) => {
       success: false,
       message: `Failed to update hotel ${req.params.section}`,
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -198,8 +224,11 @@ const updateHotelSection = async (req, res) => {
 // Get settings metadata (admin only)
 const getHotelSettingsMetadata = async (req, res) => {
   try {
-    const settings = await HotelSettings.getSingleton().populate('settings.updatedBy', 'name email');
-    
+    const settings = await HotelSettings.getSingleton().populate(
+      "settings.updatedBy",
+      "name email"
+    );
+
     const metadata = {
       lastUpdated: settings.settings.lastUpdated,
       updatedBy: settings.settings.updatedBy,
@@ -211,22 +240,22 @@ const getHotelSettingsMetadata = async (req, res) => {
         settings.contact.address.fullAddress &&
         settings.contact.phone.primary &&
         settings.contact.email.primary
-      )
+      ),
     };
 
     res.status(200).json({
       success: true,
       data: metadata,
-      message: 'Hotel settings metadata retrieved successfully',
-      timestamp: new Date().toISOString()
+      message: "Hotel settings metadata retrieved successfully",
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Error fetching hotel settings metadata:', error);
+    console.error("Error fetching hotel settings metadata:", error);
     res.status(500).json({
       success: false,
-      message: 'Failed to fetch hotel settings metadata',
+      message: "Failed to fetch hotel settings metadata",
       error: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -243,5 +272,5 @@ module.exports = {
   resetHotelSettings,
   getPublicHotelSettings,
   updateHotelSection,
-  getHotelSettingsMetadata
+  getHotelSettingsMetadata,
 };
