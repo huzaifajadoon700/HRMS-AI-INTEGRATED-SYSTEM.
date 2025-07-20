@@ -1,3 +1,4 @@
+// User Routes - Handles user profile management and user-related API endpoints
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../Middlewares/Auth");
@@ -5,7 +6,7 @@ const {
   getProfile,
   updateProfile,
   updatePassword,
-  getUserById
+  getUserById,
 } = require("../Controllers/UserController");
 
 // ✅ Get User Profile (Logged-in users only)
