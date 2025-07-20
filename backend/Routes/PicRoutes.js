@@ -1,11 +1,14 @@
-const express = require('express');
+// Picture Routes - Handles image upload endpoints for the application
+const express = require("express");
 const router = express.Router();
-const upload = require('../Middlewares/uploadpic')
+const upload = require("../Middlewares/uploadpic");
 
 // POST endpoint for file upload
-router.post('/upload', upload.single('file'), (req, res) => {
+router.post("/upload", upload.single("file"), (req, res) => {
   try {
-    res.status(200).json({ message: 'File uploaded successfully', filePath: req.file.path });
+    res
+      .status(200)
+      .json({ message: "File uploaded successfully", filePath: req.file.path });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
