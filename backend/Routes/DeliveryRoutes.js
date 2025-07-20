@@ -1,3 +1,4 @@
+// Delivery Routes - Handles food delivery tracking and status updates
 const express = require("express");
 const router = express.Router();
 const Order = require("../Models/Order");
@@ -14,7 +15,12 @@ router.get("/:orderId", async (req, res) => {
       estimatedTime: order.estimatedTime || "N/A",
     });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching delivery status", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Error fetching delivery status",
+        error: error.message,
+      });
   }
 });
 
@@ -28,9 +34,16 @@ router.put("/:orderId", async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json({ message: "Order status updated", order: updatedOrder });
+    res
+      .status(200)
+      .json({ message: "Order status updated", order: updatedOrder });
   } catch (error) {
-    res.status(500).json({ message: "Error updating delivery status", error: error.message });
+    res
+      .status(500)
+      .json({
+        message: "Error updating delivery status",
+        error: error.message,
+      });
   }
 });
 
