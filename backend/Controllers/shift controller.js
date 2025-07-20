@@ -1,5 +1,6 @@
-const Shift = require('../Models/shift');
-const Staff = require('../Models/staff');
+// Shift Controller - Manages staff work shifts and scheduling operations
+const Shift = require("../Models/shift");
+const Staff = require("../Models/staff");
 
 exports.addShift = async (req, res) => {
   try {
@@ -7,13 +8,15 @@ exports.addShift = async (req, res) => {
 
     // Validate required fields
     if (!staffId || !date || !startTime || !endTime || !duration) {
-      return res.status(400).json({ message: 'All required fields must be provided' });
+      return res
+        .status(400)
+        .json({ message: "All required fields must be provided" });
     }
 
     // Check if staff member exists
     const staffMember = await Staff.findById(staffId);
     if (!staffMember) {
-      return res.status(404).json({ message: 'Staff member not found' });
+      return res.status(404).json({ message: "Staff member not found" });
     }
 
     // Check for overlapping shifts
@@ -23,14 +26,15 @@ exports.addShift = async (req, res) => {
       $or: [
         {
           startTime: { $lte: endTime },
-          endTime: { $gte: startTime }
-        }
-      ]
+          endTime: { $gte: startTime },
+        },
+      ],
     });
 
     if (existingShift) {
-      return res.status(400).json({ 
-        message: 'This staff member already has a shift scheduled for this time period' 
+      return res.status(400).json({
+        message:
+          "This staff member already has a shift scheduled for this time period",
       });
     }
 
@@ -41,13 +45,15 @@ exports.addShift = async (req, res) => {
       endTime,
       duration,
       notes,
-      status: 'scheduled'
+      status: "scheduled",
     });
 
     await shift.save();
-    const populatedShift = await Shift.findById(shift._id)
-      .populate('staffId', 'name role department');
-    
+    const populatedShift = await Shift.findById(shift._id).populate(
+      "staffId",
+      "name role department"
+    );
+
     res.status(201).json(populatedShift);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -65,7 +71,7 @@ exports.getAllShifts = async (req, res) => {
     if (status) query.status = status;
 
     const shifts = await Shift.find(query)
-      .populate('staffId', 'name role department')
+      .populate("staffId", "name role department")
       .sort({ date: 1, startTime: 1 });
 
     res.status(200).json(shifts);
@@ -80,14 +86,20 @@ exports.updateShiftStatus = async (req, res) => {
     const { status, notes } = req.body;
 
     // Validate status
-    const validStatuses = ['scheduled', 'in-progress', 'completed', 'cancelled', 'no-show'];
+    const validStatuses = [
+      "scheduled",
+      "in-progress",
+      "completed",
+      "cancelled",
+      "no-show",
+    ];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ message: 'Invalid status' });
+      return res.status(400).json({ message: "Invalid status" });
     }
 
     const shift = await Shift.findById(id);
     if (!shift) {
-      return res.status(404).json({ message: 'Shift not found' });
+      return res.status(404).json({ message: "Shift not found" });
     }
 
     // Update status and notes
@@ -95,15 +107,17 @@ exports.updateShiftStatus = async (req, res) => {
     if (notes) shift.notes = notes;
 
     // Update attended status based on new status
-    if (status === 'completed') {
+    if (status === "completed") {
       shift.attended = true;
-    } else if (status === 'no-show') {
+    } else if (status === "no-show") {
       shift.attended = false;
     }
 
     await shift.save();
-    const updatedShift = await Shift.findById(id)
-      .populate('staffId', 'name role department');
+    const updatedShift = await Shift.findById(id).populate(
+      "staffId",
+      "name role department"
+    );
 
     res.status(200).json(updatedShift);
   } catch (error) {
@@ -115,7 +129,7 @@ exports.deleteShift = async (req, res) => {
   try {
     const shift = await Shift.findById(req.params.id);
     if (!shift) {
-      return res.status(404).json({ message: 'Shift not found' });
+      return res.status(404).json({ message: "Shift not found" });
     }
 
     // Only allow deletion of future shifts
@@ -124,13 +138,13 @@ exports.deleteShift = async (req, res) => {
     today.setHours(0, 0, 0, 0);
 
     if (shiftDate < today) {
-      return res.status(400).json({ 
-        message: 'Cannot delete past shifts' 
+      return res.status(400).json({
+        message: "Cannot delete past shifts",
       });
     }
 
     await Shift.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: 'Shift deleted successfully' });
+    res.status(200).json({ message: "Shift deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
