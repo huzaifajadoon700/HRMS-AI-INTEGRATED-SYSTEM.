@@ -1,76 +1,89 @@
 # Dependencies
 node_modules/
-/frontend/node_modules/
-/backend/node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Build outputs
-/build/
-/dist/
-/frontend/build/
-/backend/dist/
+# Production builds
+build/
+dist/
+*/build/
+*/dist/
 
-# Environment files
+# Environment variables
 .env
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
+# Vercel environment variables (contains secrets)
+VERCEL_ENV_VARS.md
+
 # IDE files
-.idea/
 .vscode/
+.idea/
 *.swp
 *.swo
 
-# OS files
+# OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # Logs
+logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# Uploads and large files
-/backend/uploads/
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.pdf
-*.zip
-*.rar
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# Cache
-.cache/
-.npm/
+# Coverage directory used by tools like istanbul
+coverage/
 
-# Python files
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+
+# Vercel
+.vercel
+
+# Backend specific
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# ML models (large files)
+backend/ml_models/*.pkl
+backend/ml_models/*.joblib
+backend/rooms_ml_models/*.pkl
+backend/table_ml_models/*.pkl
+
+# Python cache
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
-
-# ML Models (if large)
-*.pkl
-*.joblib
-*.h5
-*.pb
-
-# Database files
-*.sqlite
-*.db
-
-# Backup files
-*.bak
-*.backup
-*.old
-
-# Test coverage
-coverage/
-.coverage
-
-# Temporary files
-temp/
-tmp/

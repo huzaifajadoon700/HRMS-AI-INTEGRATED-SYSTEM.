@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Admin Endpoints</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Admin Endpoints Test</h1>
+    <div id="results"></div>
+
+    <script>
+        const API_BASE_URL = 'https://hrms-bace.vercel.app/api';
+        const resultsDiv = document.getElementById('results');
+
+        function log(message) {
+            console.log(message);
+            resultsDiv.innerHTML += '<p>' + message + '</p>';
+        }
+
+        async function testAdminEndpoints() {
+            try {
+                // Login first
+                log('🔐 Logging in as admin...');
+                const loginResponse = await axios.post('https://hrms-bace.vercel.app/auth/login', {
+                    email: 'admin@example.com',
+                    password: 'admin123'
+                });
+                
+                const token = loginResponse.data.jwtToken;
+                log('✅ Login successful');
+
+                const headers = {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                };
+
+                // Test Orders
+                log('<br>📦 Testing Orders...');
+                try {
+                    const ordersResponse = await axios.get(`${API_BASE_URL}/orders`, { headers });
+                    log('✅ Orders Response Type: ' + typeof ordersResponse.data);
+                    log('✅ Orders Response Keys: ' + Object.keys(ordersResponse.data || {}).join(', '));
+                    
+                    if (ordersResponse.data && Array.isArray(ordersResponse.data.orders)) {
+                        log('✅ Found orders array in response.data.orders: ' + ordersResponse.data.orders.length + ' items');
+                    } else if (Array.isArray(ordersResponse.data)) {
+                        log('✅ Found orders array in response.data: ' + ordersResponse.data.length + ' items');
+                    } else {
+                        log('❌ No orders array found');
+                        log('Response structure: ' + JSON.stringify(ordersResponse.data, null, 2));
+                    }
+                } catch (error) {
+                    log('❌ Orders Error: ' + error.response?.status + ' - ' + JSON.stringify(error.response?.data));
+                }
+
+                // Test Bookings
+                log('<br>🏨 Testing Bookings...');
+                try {
+                    const bookingsResponse = await axios.get(`${API_BASE_URL}/bookings`, { headers });
+                    log('✅ Bookings Response Type: ' + typeof bookingsResponse.data);
+                    log('✅ Bookings Response Keys: ' + Object.keys(bookingsResponse.data || {}).join(', '));
+                    
+                    if (Array.isArray(bookingsResponse.data)) {
+                        log('✅ Found bookings array: ' + bookingsResponse.data.length + ' items');
+                    } else {
+                        log('❌ Bookings response is not an array');
+                        log('Response structure: ' + JSON.stringify(bookingsResponse.data, null, 2));
+                    }
+                } catch (error) {
+                    log('❌ Bookings Error: ' + error.response?.status + ' - ' + JSON.stringify(error.response?.data));
+                }
+
+                // Test Reservations (working)
+                log('<br>🍽️ Testing Reservations (should work)...');
+                try {
+                    const reservationsResponse = await axios.get(`${API_BASE_URL}/reservations`, { headers });
+                    log('✅ Reservations Response Type: ' + typeof reservationsResponse.data);
+                    log('✅ Reservations Response Keys: ' + Object.keys(reservationsResponse.data || {}).join(', '));
+                    
+                    if (Array.isArray(reservationsResponse.data)) {
+                        log('✅ Found reservations array: ' + reservationsResponse.data.length + ' items');
+                    } else {
+                        log('❌ Reservations response is not an array');
+                    }
+                } catch (error) {
+                    log('❌ Reservations Error: ' + error.response?.status + ' - ' + JSON.stringify(error.response?.data));
+                }
+
+            } catch (error) {
+                log('💥 Login failed: ' + error.message);
+            }
+        }
+
+        // Run the test
+        testAdminEndpoints();
+    </script>
+</body>
+</html>
