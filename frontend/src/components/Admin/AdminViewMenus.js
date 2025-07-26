@@ -2,10 +2,23 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getMenuImageUrl, handleMenuImageError } from "../../utils/imageUtils";
 import "./simple-admin.css";
 
 const AdminViewMenus = () => {
   const navigate = useNavigate();
+
+  // Function to handle navigation within admin dashboard
+  const handleAdminNavigation = (module) => {
+    console.log("=== ADMIN NAVIGATION TRIGGERED ===");
+    console.log("Navigating to module:", module);
+
+    // Dispatch custom event to trigger sidebar module change
+    const event = new CustomEvent('adminModuleChange', {
+      detail: { module: module }
+    });
+    window.dispatchEvent(event);
+  };
   const [loading, setLoading] = useState(true);
   const [menus, setMenus] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -96,7 +109,7 @@ const AdminViewMenus = () => {
           className="simple-search-input"
         />
         <button
-          onClick={() => navigate("/admin/add-menu")}
+          onClick={() => handleAdminNavigation("AdminAddMenu")}
           className="simple-btn simple-btn-primary"
         >
           Add New Menu Item
@@ -143,7 +156,7 @@ const AdminViewMenus = () => {
                 <td style={{ minWidth: "100px" }}>
                   {menu.image ? (
                     <img
-                      src={menu.image}
+                      src={getMenuImageUrl(menu.image)}
                       alt={menu.name}
                       className="simple-room-image"
                       style={{
@@ -152,6 +165,7 @@ const AdminViewMenus = () => {
                         objectFit: "cover",
                         borderRadius: "4px",
                       }}
+                      onError={handleMenuImageError}
                     />
                   ) : (
                     <div
@@ -213,7 +227,7 @@ const AdminViewMenus = () => {
         <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No menu items found.</p>
           <button
-            onClick={() => navigate("/admin/add-menu")}
+            onClick={() => handleAdminNavigation("AdminAddMenu")}
             className="simple-btn simple-btn-primary"
           >
             Add First Menu Item

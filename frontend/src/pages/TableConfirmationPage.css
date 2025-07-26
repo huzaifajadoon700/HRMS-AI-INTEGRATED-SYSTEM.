@@ -1,7 +1,7 @@
-/* Enhanced TableConfirmationPage.css - Full Width Compact Design */
+/* Enhanced TableConfirmationPage.css - Clean White Design */
 .table-confirmation-page {
   min-height: 100vh;
-  background: #0A192F;
+  background: #ffffff;
   width: 100%;
   margin: 0;
   padding: 0;
@@ -10,11 +10,12 @@
 
 /* Hero Section */
 .confirmation-hero {
-  background: linear-gradient(135deg, #0A192F 0%, #112240 50%, #1A365D 100%);
+  background: #ffffff;
   padding: 3rem 2rem;
   text-align: center;
   position: relative;
   overflow: hidden;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .confirmation-hero::before {
@@ -24,7 +25,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(100, 255, 218, 0.1) 0%, transparent 70%);
+  background: none;
   pointer-events: none;
 }
 
@@ -38,41 +39,38 @@
 .success-animation {
   width: 80px;
   height: 80px;
-  background: linear-gradient(135deg, #64ffda 0%, #bb86fc 100%);
+  background: #10b981;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 2rem;
   animation: successPulse 2s ease-in-out infinite;
-  box-shadow: 0 0 30px rgba(100, 255, 218, 0.4);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 }
 
 .success-icon {
   font-size: 2.5rem;
-  color: #0A192F;
+  color: #ffffff;
   font-weight: bold;
 }
 
 @keyframes successPulse {
-  0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(100, 255, 218, 0.4); }
-  50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(100, 255, 218, 0.6); }
+  0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); }
+  50% { transform: scale(1.05); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
 }
 
 .hero-title {
   font-size: 3rem;
   font-weight: 900;
-  background: linear-gradient(135deg, #ffffff 0%, #64ffda 30%, #bb86fc 70%, #ff6b9d 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #000000;
   margin-bottom: 1rem;
   line-height: 1.1;
 }
 
 .hero-subtitle {
   font-size: 1.2rem;
-  color: rgba(255, 255, 255, 0.8);
+  color: #6b7280;
   margin-bottom: 2rem;
   font-weight: 400;
 }
@@ -82,10 +80,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: rgba(100, 255, 218, 0.1);
-  border: 1px solid rgba(100, 255, 218, 0.3);
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
   border-radius: 50px;
-  color: #64ffda;
+  color: #000000;
   font-weight: 600;
   font-family: 'Courier New', monospace;
   letter-spacing: 1px;
@@ -93,7 +91,7 @@
 
 /* Main Content */
 .confirmation-content {
-  background: #0A192F;
+  background: #ffffff;
   padding: 2rem 0;
   width: 100%;
 }
@@ -113,9 +111,9 @@
 }
 
 .summary-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  backdrop-filter: none;
+  border: 1px solid #e5e7eb;
   border-radius: 1rem;
   padding: 1.5rem;
   display: flex;
@@ -124,6 +122,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .summary-card::before {
@@ -133,15 +132,15 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(100, 255, 218, 0.05) 0%, rgba(187, 134, 252, 0.05) 100%);
+  background: none;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
 
 .summary-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: rgba(100, 255, 218, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
 }
 
 .summary-card:hover::before {
@@ -149,11 +148,11 @@
 }
 
 .summary-card.primary {
-  border-left: 3px solid #64ffda;
+  border-left: 3px solid #000000;
 }
 
 .summary-card.accent {
-  border-left: 3px solid #bb86fc;
+  border-left: 3px solid #6b7280;
 }
 
 .summary-card.success {
@@ -163,13 +162,13 @@
 .card-icon {
   width: 50px;
   height: 50px;
-  background: linear-gradient(135deg, #64ffda 0%, #bb86fc 100%);
+  background: #000000;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  color: #0A192F;
+  color: #ffffff;
   flex-shrink: 0;
 }
 
@@ -182,13 +181,13 @@
 .card-content h3 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #000000;
   margin-bottom: 0.25rem;
 }
 
 .card-content p {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #6b7280;
   margin: 0;
 }
 
@@ -200,13 +199,9 @@
 .section-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #ffffff;
+  color: #000000;
   margin-bottom: 1.5rem;
   text-align: center;
-  background: linear-gradient(135deg, #ffffff 0%, #64ffda 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .details-grid {
@@ -216,18 +211,19 @@
 }
 
 .detail-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  backdrop-filter: none;
+  border: 1px solid #e5e7eb;
   border-radius: 1rem;
   overflow: hidden;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .detail-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-  border-color: rgba(100, 255, 218, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: #d1d5db;
 }
 
 .detail-card.full-width {
@@ -235,23 +231,23 @@
 }
 
 .detail-header {
-  background: rgba(100, 255, 218, 0.1);
+  background: #f8fafc;
   padding: 1rem 1.5rem;
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .detail-icon {
   font-size: 1.25rem;
-  color: #64ffda;
+  color: #000000;
 }
 
 .detail-header span {
   font-size: 1rem;
   font-weight: 600;
-  color: #ffffff;
+  color: #000000;
 }
 
 .detail-body {
@@ -271,13 +267,13 @@
 
 .detail-row .label {
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #6b7280;
   font-weight: 500;
 }
 
 .detail-row .value {
   font-size: 0.95rem;
-  color: #ffffff;
+  color: #000000;
   font-weight: 600;
 }
 
@@ -286,7 +282,7 @@
 }
 
 .special-request-text {
-  color: rgba(255, 255, 255, 0.9);
+  color: #374151;
   font-size: 0.95rem;
   line-height: 1.5;
   margin: 0;
@@ -322,26 +318,27 @@
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #64ffda 0%, #bb86fc 100%);
-  color: #0A192F;
-  box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3);
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .action-btn.primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(100, 255, 218, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  background: #374151;
 }
 
 .action-btn.secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #ffffff;
+  color: #000000;
+  border: 1px solid #d1d5db;
 }
 
 .action-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #f9fafb;
   transform: translateY(-2px);
-  border-color: rgba(100, 255, 218, 0.3);
+  border-color: #9ca3af;
 }
 
 .loading-spinner {
@@ -447,7 +444,7 @@
 .invoice-page {
   padding: 2rem;
   min-height: calc(100vh - 80px);
-  background: var(--gradient-dark);
+  background: #ffffff;
 }
 
 .invoice-actions {
@@ -465,7 +462,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  border-radius: 2rem;
+  border-radius: 0.5rem;
   font-size: 1rem;
   font-weight: 600;
   transition: all 0.3s ease;
@@ -476,47 +473,48 @@
 }
 
 .action-button.download {
-  background: var(--gradient-primary);
-  color: var(--primary-bg);
+  background: #000000;
+  color: #ffffff;
 }
 
 .action-button.back {
-  background: transparent;
-  border: 1px solid var(--accent-primary);
-  color: var(--accent-primary);
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  color: #000000;
 }
 
 .action-button:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .invoice-container {
   max-width: 800px;
   margin: 0 auto;
-  background: #fff;
+  background: #ffffff;
   border-radius: 1rem;
   padding: 3rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow-x: hidden;
+  border: 1px solid #e5e7eb;
 }
 
 .invoice-header {
   display: flex;
   justify-content: space-between;
   margin-bottom: 3rem;
-  color: #1a1a1a;
+  color: #000000;
 }
 
 .hotel-info h1 {
   font-size: 2rem;
-  color: #1a1a1a;
+  color: #000000;
   margin-bottom: 1rem;
 }
 
 .hotel-info p {
   margin: 0.25rem 0;
-  color: #4a4a4a;
+  color: #6b7280;
 }
 
 .invoice-details {
@@ -525,30 +523,30 @@
 
 .invoice-details h2 {
   font-size: 2rem;
-  color: var(--accent-primary);
+  color: #000000;
   margin-bottom: 1rem;
 }
 
 .invoice-details p {
   margin: 0.5rem 0;
-  color: #4a4a4a;
+  color: #374151;
 }
 
 .invoice-to {
   margin-bottom: 3rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .invoice-to h3 {
-  color: #1a1a1a;
+  color: #000000;
   margin-bottom: 1rem;
   font-size: 1.1rem;
 }
 
 .invoice-to p {
   margin: 0.25rem 0;
-  color: #4a4a4a;
+  color: #374151;
 }
 
 .invoice-items {
@@ -564,27 +562,28 @@
 }
 
 .invoice-items th {
-  background: #f8f9fa;
+  background: #f8fafc;
   padding: 1rem;
   text-align: left;
-  color: #1a1a1a;
+  color: #000000;
   font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .invoice-items td {
   padding: 1rem;
-  border-bottom: 1px solid #eee;
-  color: #4a4a4a;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
 }
 
 .invoice-items td p {
   margin: 0;
-  color: #1a1a1a;
+  color: #000000;
   font-weight: 500;
 }
 
 .invoice-items td small {
-  color: #6c757d;
+  color: #6b7280;
   display: inline-block;
   margin-top: 0.25rem;
 }
@@ -592,21 +591,21 @@
 .invoice-summary {
   margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 2px solid #eee;
+  border-top: 2px solid #e5e7eb;
 }
 
 .summary-item {
   display: flex;
   justify-content: space-between;
   padding: 0.5rem 0;
-  color: #4a4a4a;
+  color: #374151;
 }
 
 .summary-item.total {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1a1a1a;
-  border-top: 1px solid #eee;
+  color: #000000;
+  border-top: 1px solid #e5e7eb;
   margin-top: 0.5rem;
   padding-top: 1rem;
 }
@@ -614,23 +613,26 @@
 .summary-item.payment {
   margin-top: 1rem;
   padding-top: 1rem;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #e5e7eb;
   font-style: italic;
 }
 
 .invoice-footer {
   margin-top: 3rem;
   text-align: center;
-  color: #6c757d;
+  color: #6b7280;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 2rem;
 }
 
 .invoice-footer p {
   margin-bottom: 0.5rem;
-  color: #1a1a1a;
+  color: #000000;
 }
 
 .invoice-footer small {
   font-style: italic;
+  color: #9ca3af;
 }
 
 @media (max-width: 768px) {
@@ -1460,6 +1462,104 @@
   }
 }
 
+/* ========== COMPREHENSIVE WHITE THEME OVERRIDES ========== */
+
+/* Force white background for all main containers */
+.table-confirmation-page,
+.confirmation-content,
+.content-container {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* Force white styling for all cards and sections */
+.summary-card,
+.detail-card,
+.confirmation-hero {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #000000 !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Force black text for all headings */
+h1, h2, h3, h4, h5, h6 {
+  color: #000000 !important;
+}
+
+/* Force proper text colors for all text elements */
+p, span, div, label {
+  color: #374151 !important;
+}
+
+/* Force proper card icon styling */
+.card-icon {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Force proper detail header styling */
+.detail-header {
+  background: #f8fafc !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* Force proper button styling */
+.action-btn.primary,
+.action-button.download {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+.action-btn.secondary,
+.action-button.back {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+/* Force proper invoice styling */
+.invoice-container {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  color: #000000 !important;
+}
+
+/* Force proper table styling */
+.invoice-items th {
+  background: #f8fafc !important;
+  color: #000000 !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.invoice-items td {
+  border-bottom: 1px solid #e5e7eb !important;
+  color: #374151 !important;
+}
+
+/* Force proper summary styling */
+.summary-item {
+  color: #374151 !important;
+}
+
+.summary-item.total {
+  color: #000000 !important;
+  border-top: 1px solid #e5e7eb !important;
+}
+
+/* Force proper success status colors */
+.value.success {
+  color: #10b981 !important;
+}
+
+/* Force proper reservation badge styling */
+.reservation-id-badge {
+  background: #f3f4f6 !important;
+  border: 1px solid #d1d5db !important;
+  color: #000000 !important;
+}
+
 /* Tablet specific adjustments */
 @media (min-width: 769px) and (max-width: 1024px) {
   .summary-cards {
@@ -1477,5 +1577,95 @@
 
   .action-btn {
     min-width: 180px;
+  }
+}
+
+/* ========== SPECIFIC TEXT COLOR OVERRIDES ========== */
+
+/* Force black text for "Reservation Details" heading */
+.section-title,
+h2.section-title {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* Force black text for "View All Reservations" button text only */
+.action-btn.secondary span,
+.action-btn span {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* Force white text for Download Invoice button */
+.action-btn.primary span,
+.action-btn:not(.secondary) span,
+button[class*="download"] span,
+button[class*="invoice"] span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* ========== MINIMAL TEXT COLOR OVERRIDES ========== */
+
+/* Force black text for Reservation Details text only */
+.reservation-details,
+.reservation-details h1,
+.reservation-details h2,
+.reservation-details h3,
+.reservation-details h4,
+.reservation-details h5,
+.reservation-details h6,
+.reservation-details p,
+.reservation-details span,
+.reservation-details div,
+.confirmation-details,
+.confirmation-details h1,
+.confirmation-details h2,
+.confirmation-details h3,
+.confirmation-details h4,
+.confirmation-details h5,
+.confirmation-details h6,
+.confirmation-details p,
+.confirmation-details span,
+.confirmation-details div {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* Force black text for View Reservations button text only (no styling changes) */
+.view-reservations-btn,
+.action-btn,
+button[class*="view"],
+button[class*="reservation"] {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* ========== REMOVE BLUE BACKGROUND FROM BUTTONS ========== */
+
+/* Mobile overrides to remove blue background */
+@media (max-width: 768px) {
+  .action-button.back {
+    background: #ffffff !important;
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+  }
+
+  .action-button.download {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: none !important;
+  }
+
+  /* Override any CSS variables that might be causing blue */
+  .action-button {
+    background: var(--primary-bg, #ffffff) !important;
+    border: 1px solid var(--border-color, #000000) !important;
+    color: var(--text-color, #000000) !important;
+  }
+
+  .action-button.download {
+    background: #000000 !important;
+    color: #ffffff !important;
   }
 }

@@ -1,20 +1,13 @@
-import React from "react";
-import PageLayout from "../components/layout/PageLayout";
-import {
-  FiHome,
-  FiCalendar,
-  FiShoppingBag,
-  FiStar,
-  FiTrendingUp,
-  FiUsers,
-} from "react-icons/fi";
-import { Link } from "react-router-dom";
-import { Container, Row, Col, Card } from "react-bootstrap";
-import TestimonialPage from "./TestimonialPage";
-import Slider from "../components/home/Slider";
-import PersonalizedRecommendations from "../components/recommendations/PersonalizedRecommendations";
-import { recommendationHelpers } from "../api/recommendations";
-import "./Home.css";
+import React from 'react';
+import PageLayout from '../components/layout/PageLayout';
+import { FiHome, FiCalendar, FiShoppingBag, FiStar, FiTrendingUp, FiUsers } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { Container, Row, Col, Card } from 'react-bootstrap';
+import TestimonialPage from './TestimonialPage';
+import Slider from '../components/home/Slider';
+import PersonalizedRecommendations from '../components/recommendations/PersonalizedRecommendations';
+import { recommendationHelpers } from '../api/recommendations';
+import './Home.css';
 
 const Home = () => {
   return (
@@ -25,13 +18,13 @@ const Home = () => {
           className="hero-background"
           style={{
             backgroundImage: `linear-gradient(rgba(11, 20, 38, 0.7), rgba(17, 34, 64, 0.8)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            borderRadius: "20px",
-            padding: "4rem 2rem",
-            marginBottom: "3rem",
-            position: "relative",
-            overflow: "hidden",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            borderRadius: '20px',
+            padding: '4rem 2rem',
+            marginBottom: '3rem',
+            position: 'relative',
+            overflow: 'hidden'
           }}
         >
           <div className="hero-content text-center">
@@ -39,8 +32,7 @@ const Home = () => {
               Welcome to <span className="gradient-text">Luxury Hotel</span>
             </h1>
             <p className="modern-hero-subtitle">
-              Experience world-class hospitality with our premium rooms,
-              exquisite dining, and personalized service
+              Experience world-class hospitality with our premium rooms, exquisite dining, and personalized service
             </p>
             <div className="hero-stats">
               <div className="stat-item">
@@ -67,9 +59,7 @@ const Home = () => {
       <Container fluid className="px-0">
         <div className="section-header text-center mb-5">
           <h2 className="section-title">Our Premium Services</h2>
-          <p className="section-subtitle">
-            Choose from our range of luxury services designed for your comfort
-          </p>
+          <p className="section-subtitle">Choose from our range of luxury services designed for your comfort</p>
         </div>
 
         <Row className="g-4 mb-5">
@@ -88,8 +78,7 @@ const Home = () => {
               <Card.Body className="service-content">
                 <h3 className="service-title">Luxury Rooms</h3>
                 <p className="service-description">
-                  Experience ultimate comfort in our beautifully designed rooms
-                  with premium amenities and stunning views.
+                  Experience ultimate comfort in our beautifully designed rooms with premium amenities and stunning views.
                 </p>
                 <div className="service-features">
                   <span className="feature-tag">🛏️ King Size Beds</span>
@@ -119,8 +108,7 @@ const Home = () => {
               <Card.Body className="service-content">
                 <h3 className="service-title">Fine Dining</h3>
                 <p className="service-description">
-                  Reserve your table for an unforgettable culinary journey with
-                  our award-winning chefs and sommelier.
+                  Reserve your table for an unforgettable culinary journey with our award-winning chefs and sommelier.
                 </p>
                 <div className="service-features">
                   <span className="feature-tag">👨‍🍳 Master Chefs</span>
@@ -150,8 +138,7 @@ const Home = () => {
               <Card.Body className="service-content">
                 <h3 className="service-title">Room Service</h3>
                 <p className="service-description">
-                  Order from our extensive menu featuring Pakistani specialties
-                  and international cuisine, delivered to your room.
+                  Order from our extensive menu featuring Pakistani specialties and international cuisine, delivered to your room.
                 </p>
                 <div className="service-features">
                   <span className="feature-tag">🍛 Pakistani Cuisine</span>
@@ -173,10 +160,10 @@ const Home = () => {
         <PersonalizedRecommendations
           maxItems={8}
           onAddToCart={(menuItem) => {
-            console.log("Add to cart:", menuItem);
+            console.log('Add to cart:', menuItem);
           }}
           onRate={(menuItemId, rating) => {
-            console.log("Rate item:", menuItemId, rating);
+            console.log('Rate item:', menuItemId, rating);
           }}
         />
       </div>
@@ -184,4 +171,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Home; 

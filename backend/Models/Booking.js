@@ -10,7 +10,7 @@ const Booking = mongoose.models.Booking || mongoose.model("Booking", new mongoos
   guests: { type: Number, required: true },
   payment: { type: String, enum: ["card", "paypal"], required: true },
   totalPrice: { type: Number, required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // Associate booking with user
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "users", required: true }, // Associate booking with user
   // Add customer information fields
   fullName: { type: String },
   email: { type: String },

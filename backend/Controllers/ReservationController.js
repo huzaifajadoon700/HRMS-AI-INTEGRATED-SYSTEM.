@@ -1,4 +1,3 @@
-// Reservation Controller - Manages table reservations and booking confirmations
 const Reservation = require("../Models/Reservations");
 const Table = require("../Models/Table");
 const PDFDocument = require("pdfkit");
@@ -277,9 +276,13 @@ exports.getReservationsByUser = async (req, res) => {
 // Fetch all reservations (admin only)
 exports.getAllReservations = async (req, res) => {
   try {
-    const reservations = await Reservation.find().populate("tableId");
+    const reservations = await Reservation.find()
+      .populate("tableId")
+      .populate("userId", "name email phone");
+    console.log("🍽️ Found reservations:", reservations.length);
     res.status(200).json(reservations);
   } catch (error) {
+    console.error("Error fetching reservations:", error);
     res.status(500).json({ error: "Error fetching reservations" });
   }
 };

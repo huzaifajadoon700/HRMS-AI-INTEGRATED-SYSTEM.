@@ -1,8 +1,6 @@
-import React from "react";
-import { useHotelInfo } from "../hooks/useHotelInfo";
-import "./Footer.css";
-
-// Footer component for displaying copyright information
+import React from 'react';
+import { useHotelInfo } from '../hooks/useHotelInfo';
+import './Footer.css';
 
 const Footer = () => {
   const hotelInfo = useHotelInfo();
@@ -13,8 +11,7 @@ const Footer = () => {
         <div className="row">
           <div className="col-md-12">
             <p className="text-center">
-              © {new Date().getFullYear()} {hotelInfo.hotelName}. All rights
-              reserved.
+              © {new Date().getFullYear()} {hotelInfo.hotelName}. All rights reserved.
             </p>
           </div>
         </div>
@@ -23,4 +20,4 @@ const Footer = () => {
   );
 };
 
-export default Footer;
+export default Footer; 

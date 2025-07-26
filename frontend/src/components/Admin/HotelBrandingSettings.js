@@ -64,10 +64,7 @@ const HotelBrandingSettings = () => {
   // Sync with context settings when they change (but not during uploads)
   useEffect(() => {
     if (contextSettings && !isAnyLogoUploading && !initialLoading) {
-      console.log(
-        "Syncing with context settings:",
-        contextSettings.branding?.logo
-      );
+
       setSettings((prev) => ({
         ...prev,
         branding: {
@@ -137,11 +134,7 @@ const HotelBrandingSettings = () => {
           },
         };
 
-        console.log("Loading settings with logos:", {
-          primary: newSettings.branding.logo.primary,
-          secondary: newSettings.branding.logo.secondary,
-          loginLogo: newSettings.branding.logo.loginLogo,
-        });
+
 
         setSettings(newSettings);
       }
@@ -167,15 +160,7 @@ const HotelBrandingSettings = () => {
     loadCurrentSettings();
   }, [navigate]);
 
-  // Debug function to check logo state
-  const debugLogoState = () => {
-    console.log("=== LOGO DEBUG STATE ===");
-    console.log("Local settings logos:", settings.branding.logo);
-    console.log("Context settings logos:", contextSettings?.branding?.logo);
-    console.log("Upload states:", logoUploading);
-    console.log("Initial loading:", initialLoading);
-    console.log("========================");
-  };
+
 
   const handleInputChange = (field, value) => {
     if (field.includes(".")) {
@@ -246,7 +231,7 @@ const HotelBrandingSettings = () => {
               },
             },
           };
-          console.log(`Local state updated: ${logoType} = ${newLogoUrl}`);
+
           return updatedSettings;
         });
 
@@ -258,7 +243,7 @@ const HotelBrandingSettings = () => {
         setTimeout(async () => {
           try {
             await loadSettings(true);
-            console.log("Context refreshed after logo upload");
+
           } catch (refreshError) {
             console.error(
               "Error refreshing context after logo upload:",
@@ -282,7 +267,7 @@ const HotelBrandingSettings = () => {
           })
         );
 
-        console.log(`Logo uploaded successfully: ${logoType} = ${newLogoUrl}`);
+
       } else {
         toast.error(result.error || "Failed to upload logo");
       }
@@ -351,7 +336,7 @@ const HotelBrandingSettings = () => {
         setTimeout(async () => {
           try {
             await loadSettings(true);
-            console.log("Context updated after save");
+
           } catch (error) {
             console.error("Error updating context after save:", error);
           }
@@ -364,7 +349,7 @@ const HotelBrandingSettings = () => {
           })
         );
 
-        console.log("Hotel settings saved successfully");
+
       } else {
         toast.error(result.error || "Failed to save settings");
       }
@@ -457,109 +442,11 @@ const HotelBrandingSettings = () => {
               <h1>Hotel Settings</h1>
               <p>Manage your hotel's basic information and contact details</p>
             </div>
-            <div style={{ display: "flex", gap: "10px" }}>
-              <button
-                type="button"
-                onClick={debugLogoState}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#6b7280",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                }}
-              >
-                🐛 Debug Logos
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  console.log("Force refreshing settings...");
-                  loadCurrentSettings();
-                }}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#10b981",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                }}
-              >
-                🔄 Refresh
-              </button>
-              <button
-                type="button"
-                onClick={async () => {
-                  console.log("Testing API directly...");
-                  try {
-                    const result =
-                      await hotelSettingsService.getPublicSettings();
-                    console.log("API Test Result:", result);
-                    toast.success("Check console for API test results");
-                  } catch (error) {
-                    console.error("API Test Error:", error);
-                    toast.error("API test failed - check console");
-                  }
-                }}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#f59e0b",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                }}
-              >
-                🧪 Test API
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  console.log("Force refreshing header...");
-                  // Clear cache and force refresh
-                  hotelSettingsService.clearCache();
-                  loadSettings(true);
-                  // Trigger header refresh
-                  window.dispatchEvent(
-                    new CustomEvent("hotelSettingsChanged", {
-                      detail: { forceRefresh: true },
-                    })
-                  );
-                  toast.success("Header refresh triggered");
-                }}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#8b5cf6",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "12px",
-                }}
-              >
-                🔄 Refresh Header
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/admin/dashboard")}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#3b82f6",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                  fontSize: "14px",
-                }}
-              >
-                🏠 Dashboard
-              </button>
-            </div>
+
+
+
+
+          </div>
           </div>
         </div>
 
@@ -1643,30 +1530,13 @@ const HotelBrandingSettings = () => {
                     >
                       No logos uploaded yet
                     </p>
-                    <div style={{ fontSize: "12px", color: "#9ca3af" }}>
-                      <p style={{ margin: "2px 0" }}>Debug info:</p>
-                      <p style={{ margin: "2px 0" }}>
-                        Primary: "{settings.branding.logo.primary}"
-                      </p>
-                      <p style={{ margin: "2px 0" }}>
-                        Login: "{settings.branding.logo.loginLogo}"
-                      </p>
-                      <p style={{ margin: "2px 0" }}>
-                        Secondary: "{settings.branding.logo.secondary}"
-                      </p>
-                      <p style={{ margin: "2px 0" }}>
-                        Context Primary: "
-                        {contextSettings?.branding?.logo?.primary ||
-                          "undefined"}
-                        "
-                      </p>
-                    </div>
+
                   </div>
                 )}
             </div>
           </div>
         </div>
-      </div>
+      
     </>
   );
 };

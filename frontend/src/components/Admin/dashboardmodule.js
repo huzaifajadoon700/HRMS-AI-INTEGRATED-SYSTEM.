@@ -11,7 +11,7 @@ export default function Dashboardmodule() {
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
   const [recentActivities, setRecentActivities] = useState([]);
-  const [timePeriod, setTimePeriod] = useState("monthly");
+
   const [bookingsData, setBookingsData] = useState(null);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
@@ -53,24 +53,12 @@ export default function Dashboardmodule() {
           const todayStart = new Date(today.setHours(0, 0, 0, 0));
           const todayEnd = new Date(today.setHours(23, 59, 59, 999));
 
-          // Calculate date ranges based on time period
-          let startDate, endDate;
-          if (timePeriod === "daily") {
-            startDate = todayStart;
-            endDate = todayEnd;
-          } else if (timePeriod === "weekly") {
-            const weekStart = new Date(now);
-            weekStart.setDate(now.getDate() - 7);
-            startDate = weekStart;
-            endDate = now;
-          } else {
-            // monthly
-            const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-            startDate = monthStart;
-            endDate = now;
-          }
+          // Use monthly data as default (no time period selection)
+          const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+          const startDate = monthStart;
+          const endDate = now;
 
-          // Filter bookings based on selected time period
+          // Filter bookings for current month
           const periodBookings = bookings.filter((booking) => {
             const bookingDate = new Date(
               booking.createdAt || booking.checkInDate
@@ -131,7 +119,7 @@ export default function Dashboardmodule() {
             totalRevenue: periodRevenue, // Period-specific revenue
             allTimeRevenue: totalRevenue, // All-time revenue
             avgBookingValue: Math.round(avgBookingValue),
-            timePeriod: timePeriod,
+
             recentBookings: bookings.slice(0, 5).map((booking) => ({
               id: booking._id,
               customerName: booking.fullName || booking.userId?.name || "Guest",
@@ -377,16 +365,7 @@ export default function Dashboardmodule() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Handle time period change
-  const handleTimePeriodChange = (newPeriod) => {
-    setTimePeriod(newPeriod);
-    // Refetch data with new time period
-    setLoading(true);
-    fetchDashboardData().finally(() => {
-      setLoading(false);
-    });
-    toast.info(`Switched to ${newPeriod} view`);
-  };
+
 
   if (loading) {
     return (
@@ -498,19 +477,6 @@ export default function Dashboardmodule() {
           }}
         >
           <h3>Revenue Statistics</h3>
-          <select
-            value={timePeriod}
-            onChange={(e) => handleTimePeriodChange(e.target.value)}
-            style={{
-              padding: "8px 12px",
-              border: "1px solid #d1d5db",
-              borderRadius: "6px",
-            }}
-          >
-            <option value="monthly">Monthly</option>
-            <option value="weekly">Weekly</option>
-            <option value="daily">Daily</option>
-          </select>
         </div>
         <div
           className="stat-number"
@@ -597,8 +563,7 @@ export default function Dashboardmodule() {
                 Room Bookings
                 {bookingsData?.total && window.innerWidth > 480 && (
                   <div style={{ fontSize: "10px", marginTop: "2px" }}>
-                    {bookingsData.total} {bookingsData.timePeriod || "total"}{" "}
-                    bookings
+                    {bookingsData.total} monthly bookings
                   </div>
                 )}
               </div>
@@ -987,19 +952,6 @@ export default function Dashboardmodule() {
           }}
         >
           <h3>Bookings Summary</h3>
-          <select
-            value={timePeriod}
-            onChange={(e) => handleTimePeriodChange(e.target.value)}
-            style={{
-              padding: "8px 12px",
-              border: "1px solid #d1d5db",
-              borderRadius: "6px",
-            }}
-          >
-            <option value="monthly">Monthly</option>
-            <option value="weekly">Weekly</option>
-            <option value="daily">Daily</option>
-          </select>
         </div>
         <div
           className="stat-number"

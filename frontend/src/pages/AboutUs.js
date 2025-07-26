@@ -66,30 +66,13 @@ const AboutUs = () => {
     <PageLayout>
       <style>
         {`
-          @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(180deg); }
-          }
-          @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-          }
-          @keyframes glow {
-            0%, 100% { box-shadow: 0 0 5px rgba(100, 255, 218, 0.3); }
-            50% { box-shadow: 0 0 20px rgba(100, 255, 218, 0.6), 0 0 30px rgba(187, 134, 252, 0.4); }
-          }
-          @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-
           /* Responsive Styles for About Us Page */
           @media (max-width: 768px) {
             .about-page-container {
               padding: 2rem 1rem !important;
             }
             .about-page-title {
-              font-size: 2.5rem !important;
+              font-size: 2rem !important;
             }
             .about-page-subtitle {
               font-size: 1rem !important;
@@ -146,70 +129,36 @@ const AboutUs = () => {
       <div style={{
         width: '100%',
         margin: 0,
-        marginTop: '0px', // Top margin for header spacing
-        padding: '3rem 0',
-        background: 'linear-gradient(180deg, #0A192F 0%, #112240 50%, #0A192F 100%)',
-        backdropFilter: 'blur(10px)',
+        padding: '4rem 0',
+        background: '#ffffff',
         position: 'relative',
-        overflow: 'hidden',
         minHeight: '100vh'
       }}>
-        {/* Animated Background Elements */}
-        <div style={{
-          position: 'absolute',
-          top: '10%',
-          right: '5%',
-          width: '200px',
-          height: '200px',
-          background: 'radial-gradient(circle, rgba(187, 134, 252, 0.1) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(30px)',
-          animation: 'float 8s ease-in-out infinite',
-          zIndex: 0
-        }} />
-        <div style={{
-          position: 'absolute',
-          top: '60%',
-          left: '3%',
-          width: '150px',
-          height: '150px',
-          background: 'radial-gradient(circle, rgba(100, 255, 218, 0.08) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(25px)',
-          animation: 'float 10s ease-in-out infinite reverse',
-          zIndex: 0
-        }} />
 
         <div className="about-page-container" style={{
           width: '100%',
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '0 2rem',
-          position: 'relative',
-          zIndex: 1
+          padding: '0 2rem'
         }}>
           {/* Header Section */}
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
             <h1 className="about-page-title" style={{
-              fontSize: '3rem',
-              fontWeight: '900',
-              background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 50%, #bb86fc 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              fontSize: '2.5rem',
+              fontWeight: '700',
+              color: '#000000',
               marginBottom: '1rem',
-              lineHeight: '1.1',
-              animation: 'slideInUp 0.8s ease-out'
+              lineHeight: '1.2',
+              fontFamily: 'Inter, sans-serif'
             }}>
               About {hotelInfo.hotelName}
             </h1>
             <p className="about-page-subtitle" style={{
-              fontSize: '1.2rem',
-              color: 'rgba(255, 255, 255, 0.8)',
+              fontSize: '1.125rem',
+              color: '#6b7280',
               maxWidth: '600px',
               margin: '0 auto',
-              lineHeight: '1.6',
-              animation: 'slideInUp 0.8s ease-out 0.2s both'
+              lineHeight: '1.6'
             }}>
               Experience luxury and comfort in the heart of the city
             </p>
@@ -219,70 +168,62 @@ const AboutUs = () => {
           <div className="about-stats-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: '1.5rem',
-            marginBottom: '4rem',
-            animation: 'slideInUp 0.8s ease-out 0.4s both'
+            gap: '2rem',
+            marginBottom: '5rem'
           }}>
             {achievementStats.map((stat, index) => (
               <div
                 key={index}
                 className="about-stat-card"
                 style={{
-                  background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.8) 0%, rgba(26, 35, 50, 0.6) 100%)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(100, 255, 218, 0.2)',
-                  borderRadius: '1.5rem',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '1rem',
                   padding: '2rem 1.5rem',
                   textAlign: 'center',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transition: 'all 0.2s ease',
                   cursor: 'pointer',
-                  boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)',
-                  position: 'relative',
-                  overflow: 'hidden'
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                  position: 'relative'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
-                  e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(100, 255, 218, 0.4)';
-                  e.currentTarget.style.borderColor = 'rgba(100, 255, 218, 0.5)';
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.1)';
+                  e.currentTarget.style.borderColor = '#d1d5db';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.3)';
-                  e.currentTarget.style.borderColor = 'rgba(100, 255, 218, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                  e.currentTarget.style.borderColor = '#e5e7eb';
                 }}
               >
                 <div style={{
                   width: '3rem',
                   height: '3rem',
-                  background: 'linear-gradient(135deg, #64ffda 0%, #bb86fc 100%)',
+                  background: '#f3f4f6',
                   borderRadius: '1rem',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   margin: '0 auto 1rem',
-                  color: '#0a0a0a',
-                  fontSize: '1.2rem',
-                  boxShadow: '0 4px 15px rgba(100, 255, 218, 0.3)'
+                  color: '#374151',
+                  fontSize: '1.2rem'
                 }}>
                   {stat.icon}
                 </div>
                 <div className="about-stat-number" style={{
                   fontSize: '2.5rem',
-                  fontWeight: '900',
-                  background: 'linear-gradient(135deg, #64ffda 0%, #bb86fc 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  marginBottom: '0.5rem'
+                  fontWeight: '700',
+                  color: '#000000',
+                  marginBottom: '0.5rem',
+                  fontFamily: 'Inter, sans-serif'
                 }}>
                   {stat.number}
                 </div>
                 <div style={{
-                  color: 'rgba(255, 255, 255, 0.8)',
+                  color: '#6b7280',
                   fontSize: '1rem',
-                  fontWeight: '600',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.5px'
+                  fontWeight: '500'
                 }}>
                   {stat.label}
                 </div>
@@ -294,28 +235,24 @@ const AboutUs = () => {
           <div className="about-features-grid" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '1.5rem',
-            marginBottom: '3rem'
+            gap: '2rem',
+            marginBottom: '4rem'
           }}>
             {features.map((feature, index) => (
               <div
                 key={index}
                 className="about-feature-card"
                 style={{
-                  background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
-                  backdropFilter: 'blur(20px)',
-                  border: hoveredFeature === index
-                    ? `1px solid ${feature.color.replace(')', ', 0.4)')}`
-                    : '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '1.25rem',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '1rem',
                   padding: '2rem',
-                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transition: 'all 0.2s ease',
                   cursor: 'pointer',
                   boxShadow: hoveredFeature === index
-                    ? `0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px ${feature.color.replace(')', ', 0.3)')}`
-                    : '0 8px 25px rgba(0, 0, 0, 0.2)',
-                  transform: hoveredFeature === index ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
-                  animation: `slideInUp 0.8s ease-out ${0.6 + index * 0.1}s both`
+                    ? '0 8px 25px rgba(0, 0, 0, 0.1)'
+                    : '0 2px 4px rgba(0, 0, 0, 0.05)',
+                  transform: hoveredFeature === index ? 'translateY(-4px)' : 'translateY(0)'
                 }}
                 onMouseEnter={() => setHoveredFeature(index)}
                 onMouseLeave={() => setHoveredFeature(null)}
@@ -323,37 +260,29 @@ const AboutUs = () => {
                 <div style={{
                   width: '3.5rem',
                   height: '3.5rem',
-                  background: feature.bgColor,
-                  borderRadius: '1.25rem',
+                  background: '#f3f4f6',
+                  borderRadius: '1rem',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: '1.5rem',
-                  color: feature.color,
+                  color: '#374151',
                   fontSize: '1.5rem',
-                  transition: 'all 0.3s ease',
-                  boxShadow: hoveredFeature === index
-                    ? `0 8px 25px ${feature.color.replace(')', ', 0.4)')}`
-                    : 'none',
-                  animation: hoveredFeature === index ? 'pulse 2s ease-in-out infinite' : 'none'
+                  transition: 'all 0.2s ease'
                 }}>
                   {feature.icon}
                 </div>
                 <h3 className="about-feature-title" style={{
-                  fontSize: '1.4rem',
-                  fontWeight: '800',
-                  color: '#fff',
+                  fontSize: '1.25rem',
+                  fontWeight: '600',
+                  color: '#000000',
                   marginBottom: '1rem',
-                  background: 'linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  transition: 'all 0.3s ease'
+                  fontFamily: 'Inter, sans-serif'
                 }}>
                   {feature.title}
                 </h3>
                 <p className="about-feature-description" style={{
-                  color: 'rgba(255, 255, 255, 0.8)',
+                  color: '#6b7280',
                   fontSize: '1rem',
                   lineHeight: '1.6',
                   margin: 0

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FiStar, FiInfo, FiShoppingCart, FiClock, FiThermometer, FiHeart } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { apiConfig } from "../../config/api";
 import { getMenuImageUrl, handleImageError } from "../../utils/imageUtils";
@@ -10,6 +11,31 @@ const MostPopularItems = () => {
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  // Add to cart function
+  const handleAddToCart = (item) => {
+    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const itemIndex = existingCart.findIndex(cartItem => cartItem._id === item._id);
+
+    if (itemIndex !== -1) {
+      existingCart[itemIndex].quantity += 1;
+      toast.success(`${item.name} quantity updated! Click to go to cart.`, {
+        onClick: () => navigate('/cart'),
+        style: { cursor: 'pointer' }
+      });
+    } else {
+      existingCart.push({ ...item, quantity: 1 });
+      toast.success(`${item.name} added to cart! Click to go to cart.`, {
+        onClick: () => navigate('/cart'),
+        style: { cursor: 'pointer' }
+      });
+    }
+
+    localStorage.setItem("cart", JSON.stringify(existingCart));
+    window.dispatchEvent(new Event("cartUpdated"));
+  };
 
 
 
@@ -162,36 +188,23 @@ const MostPopularItems = () => {
     <>
       <style>
         {`
-          @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-          }
-          @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.1); }
-          }
-
           /* Responsive Styles for MostPopularItems */
           @media (max-width: 768px) {
             .popular-items-container {
               padding: 0 1rem !important;
             }
             .popular-items-grid {
-              grid-template-columns: 1fr !important;
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)) !important;
               gap: 1rem !important;
               max-width: 100% !important;
             }
             .popular-items-title {
-              font-size: 2rem !important;
+              font-size: 1.75rem !important;
             }
             .popular-item-card {
               max-width: 100% !important;
-              min-width: auto !important;
+              min-width: 250px !important;
               margin: 0 !important;
-            }
-            .popular-item-features {
-              grid-template-columns: repeat(2, 1fr) !important;
-              gap: 0.3rem !important;
             }
           }
 
@@ -199,15 +212,18 @@ const MostPopularItems = () => {
             .popular-items-container {
               padding: 0 0.75rem !important;
             }
-            .popular-items-title {
-              font-size: 1.75rem !important;
-            }
-            .popular-item-features {
+            .popular-items-grid {
               grid-template-columns: 1fr !important;
-              gap: 0.25rem !important;
+              gap: 1rem !important;
+            }
+            .popular-items-title {
+              font-size: 1.5rem !important;
+            }
+            .popular-item-card {
+              min-width: auto !important;
             }
             .popular-item-content {
-              padding: 0.75rem !important;
+              padding: 1rem !important;
             }
           }
         `}
@@ -216,36 +232,9 @@ const MostPopularItems = () => {
         width: '100%',
         margin: 0,
         padding: '4rem 0',
-        background: 'linear-gradient(180deg, #0A192F 0%, #112240 50%, #0A192F 100%)',
-        backdropFilter: 'blur(10px)',
-        position: 'relative',
-        overflow: 'hidden'
+        background: '#ffffff',
+        position: 'relative'
       }}>
-      {/* Animated Background Elements */}
-      <div style={{
-        position: 'absolute',
-        top: '10%',
-        left: '5%',
-        width: '300px',
-        height: '300px',
-        background: 'radial-gradient(circle, rgba(100, 255, 218, 0.1) 0%, transparent 70%)',
-        borderRadius: '50%',
-        filter: 'blur(40px)',
-        animation: 'float 6s ease-in-out infinite',
-        zIndex: 0
-      }} />
-      <div style={{
-        position: 'absolute',
-        top: '60%',
-        right: '10%',
-        width: '200px',
-        height: '200px',
-        background: 'radial-gradient(circle, rgba(187, 134, 252, 0.08) 0%, transparent 70%)',
-        borderRadius: '50%',
-        filter: 'blur(30px)',
-        animation: 'float 8s ease-in-out infinite reverse',
-        zIndex: 0
-      }} />
 
       <div className="popular-items-container" style={{
         width: '100%',
@@ -255,16 +244,13 @@ const MostPopularItems = () => {
         position: 'relative',
         zIndex: 1
       }}>
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h2 className="popular-items-title" style={{
-            fontSize: '2.5rem',
-            fontWeight: '800',
-            background: 'linear-gradient(135deg, #ffffff 0%, #bb86fc 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
+            fontSize: '2rem',
+            fontWeight: '600',
+            color: '#000000',
             marginBottom: '1rem',
-            lineHeight: '1.1'
+            fontFamily: 'Inter, sans-serif'
           }}>
             Most Popular Items
           </h2>
@@ -275,25 +261,20 @@ const MostPopularItems = () => {
               alignItems: 'center',
               gap: '0.5rem',
               padding: '0.75rem 1.5rem',
-              background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.9), rgba(29, 78, 216, 0.8))',
+              background: '#000000',
               color: '#ffffff',
               textDecoration: 'none',
-              borderRadius: '0.75rem',
-              fontWeight: '600',
+              borderRadius: '0.5rem',
+              fontWeight: '500',
               fontSize: '0.9rem',
-              transition: 'all 0.3s ease',
-              border: '1px solid rgba(30, 64, 175, 0.6)',
-              boxShadow: '0 4px 15px rgba(30, 64, 175, 0.3)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
+              transition: 'all 0.2s ease',
+              border: 'none'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 8px 25px rgba(30, 64, 175, 0.4)';
+              e.currentTarget.style.background = '#333333';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = '0 4px 15px rgba(30, 64, 175, 0.3)';
+              e.currentTarget.style.background = '#000000';
             }}
           >
             View Full Menu
@@ -302,37 +283,43 @@ const MostPopularItems = () => {
 
         <div className="popular-items-grid" style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: '1rem',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '2rem',
           width: '100%',
-          maxWidth: '1000px',
+          maxWidth: '1200px',
           margin: '0 auto',
-          padding: '0.5rem'
+          padding: '0 1rem'
         }}>
           {menuItems.map((item) => (
             <div
               key={item._id}
               className="popular-item-card"
               style={{
-                background: 'linear-gradient(145deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-                borderRadius: '1rem',
+                background: '#ffffff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '0.5rem',
                 overflow: 'hidden',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.2s ease',
                 cursor: 'pointer',
                 width: '100%',
-                maxWidth: '300px',
-                minWidth: '250px',
+                maxWidth: '350px',
                 margin: '0 auto',
                 position: 'relative',
-                boxShadow: '0 4px 15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05)'
+                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                e.currentTarget.style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+                e.currentTarget.style.transform = 'translateY(0)';
               }}
             >
               {/* Image Section */}
               <div style={{
                 position: 'relative',
-                height: '160px',
+                height: '200px',
                 overflow: 'hidden'
               }}>
                 <img
@@ -341,8 +328,7 @@ const MostPopularItems = () => {
                   style={{
                     width: '100%',
                     height: '100%',
-                    objectFit: 'cover',
-                    transition: 'transform 0.3s ease'
+                    objectFit: 'cover'
                   }}
                   onError={(e) => handleImageError(e, "/images/placeholder-food.jpg")}
                 />
@@ -355,16 +341,16 @@ const MostPopularItems = () => {
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.25rem',
-                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                  backdropFilter: 'blur(10px)',
+                  backgroundColor: '#ffffff',
                   padding: '0.25rem 0.5rem',
-                  borderRadius: '0.5rem',
+                  borderRadius: '0.25rem',
                   fontSize: '0.75rem',
-                  fontWeight: '600',
-                  color: '#fff'
+                  fontWeight: '500',
+                  color: '#000000',
+                  border: '1px solid #e5e7eb'
                 }}>
-                  <FiStar style={{ color: '#ffc107', fill: '#ffc107' }} size={12} />
-                  <span style={{ fontWeight: '700' }}>{item.rating?.toFixed(1) || '4.5'}</span>
+                  <FiStar style={{ color: '#fbbf24' }} size={12} />
+                  <span>{item.rating?.toFixed(1) || '4.5'}</span>
                 </div>
 
                 {/* Price Badge */}
@@ -372,50 +358,45 @@ const MostPopularItems = () => {
                   position: 'absolute',
                   top: '0.75rem',
                   right: '0.75rem',
-                  backgroundColor: 'rgba(187, 134, 252, 0.9)',
-                  backdropFilter: 'blur(10px)',
+                  backgroundColor: '#ffffff',
                   padding: '0.25rem 0.5rem',
-                  borderRadius: '0.5rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '700',
-                  color: '#fff'
+                  borderRadius: '0.25rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '600',
+                  color: '#000000',
+                  border: '1px solid #e5e7eb'
                 }}>
                   {formatPrice(item.price)}
                 </div>
               </div>
 
               {/* Content Section */}
-              <div className="popular-item-content" style={{ padding: '1rem' }}>
+              <div className="popular-item-content" style={{ padding: '1.5rem' }}>
                 <h3 style={{
-                  color: '#fff',
-                  fontSize: '1rem',
-                  fontWeight: '700',
-                  marginBottom: '0.25rem',
-                  background: 'linear-gradient(135deg, #ffffff 0%, #bb86fc 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  lineHeight: '1.2'
+                  color: '#000000',
+                  fontSize: '1.125rem',
+                  fontWeight: '600',
+                  marginBottom: '0.5rem',
+                  fontFamily: 'Inter, sans-serif'
                 }}>
                   {item.name || 'Menu Item'}
                 </h3>
 
                 <div style={{
-                  fontSize: '0.7rem',
-                  color: 'rgba(255, 255, 255, 0.7)',
+                  fontSize: '0.75rem',
+                  color: '#374151',
                   marginBottom: '0.75rem',
                   padding: '0.25rem 0.5rem',
-                  backgroundColor: 'rgba(187, 134, 252, 0.1)',
-                  borderRadius: '0.5rem',
-                  display: 'inline-block',
-                  border: '1px solid rgba(187, 134, 252, 0.2)'
+                  backgroundColor: '#f3f4f6',
+                  borderRadius: '0.25rem',
+                  display: 'inline-block'
                 }}>
                   {item.category || 'Delicious'}
                 </div>
 
                 <p style={{
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  fontSize: '0.8rem',
+                  color: '#6b7280',
+                  fontSize: '0.875rem',
                   lineHeight: '1.4',
                   marginBottom: '1rem',
                   display: '-webkit-box',
@@ -430,7 +411,7 @@ const MostPopularItems = () => {
                 <div className="popular-item-features" style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: '0.5rem',
+                  gap: '0.75rem',
                   marginBottom: '1rem'
                 }}>
                   <div style={{
@@ -439,14 +420,14 @@ const MostPopularItems = () => {
                     justifyContent: 'center',
                     gap: '0.25rem',
                     padding: '0.5rem',
-                    backgroundColor: 'rgba(100, 255, 218, 0.1)',
-                    borderRadius: '0.75rem',
-                    fontSize: '0.7rem',
-                    color: 'rgba(100, 255, 218, 0.9)',
-                    border: '1px solid rgba(100, 255, 218, 0.2)'
+                    backgroundColor: '#f9fafb',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    border: '1px solid #e5e7eb'
                   }}>
-                    <FiClock size={10} />
-                    <span>15 min</span>
+                    <FiClock size={12} />
+                    <span>{item.cookingTime || item.prepTime || '15 min'}</span>
                   </div>
                   <div style={{
                     display: 'flex',
@@ -454,14 +435,14 @@ const MostPopularItems = () => {
                     justifyContent: 'center',
                     gap: '0.25rem',
                     padding: '0.5rem',
-                    backgroundColor: 'rgba(255, 107, 157, 0.1)',
-                    borderRadius: '0.75rem',
-                    fontSize: '0.7rem',
-                    color: 'rgba(255, 107, 157, 0.9)',
-                    border: '1px solid rgba(255, 107, 157, 0.2)'
+                    backgroundColor: '#f9fafb',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    border: '1px solid #e5e7eb'
                   }}>
-                    <FiThermometer size={10} />
-                    <span>Spicy</span>
+                    <FiThermometer size={12} />
+                    <span>{item.spiceLevel || item.taste || 'Mild'}</span>
                   </div>
                   <div style={{
                     display: 'flex',
@@ -469,20 +450,20 @@ const MostPopularItems = () => {
                     justifyContent: 'center',
                     gap: '0.25rem',
                     padding: '0.5rem',
-                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
-                    borderRadius: '0.75rem',
-                    fontSize: '0.7rem',
-                    color: 'rgba(255, 193, 7, 0.9)',
-                    border: '1px solid rgba(255, 193, 7, 0.2)'
+                    backgroundColor: '#f9fafb',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.75rem',
+                    color: '#6b7280',
+                    border: '1px solid #e5e7eb'
                   }}>
-                    <FiHeart size={10} />
-                    <span>Popular</span>
+                    <FiHeart size={12} />
+                    <span>{item.dietaryInfo || item.type || 'Popular'}</span>
                   </div>
                 </div>
 
                 {/* Action Button */}
-                <Link
-                  to="/order-food"
+                <button
+                  onClick={() => handleAddToCart(item)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -490,28 +471,26 @@ const MostPopularItems = () => {
                     gap: '0.5rem',
                     width: '100%',
                     padding: '0.75rem',
-                    background: 'linear-gradient(135deg, rgba(187, 134, 252, 0.8) 0%, rgba(255, 107, 157, 0.8) 100%)',
+                    background: '#000000',
                     border: 'none',
-                    borderRadius: '0.75rem',
-                    color: '#fff',
-                    fontSize: '0.8rem',
-                    fontWeight: '600',
+                    borderRadius: '0.5rem',
+                    color: '#ffffff',
+                    fontSize: '0.875rem',
+                    fontWeight: '500',
                     textDecoration: 'none',
-                    transition: 'all 0.3s ease',
+                    transition: 'all 0.2s ease',
                     cursor: 'pointer'
                   }}
                   onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 8px 25px rgba(187, 134, 252, 0.4)';
+                    e.target.style.background = '#333333';
                   }}
                   onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = 'none';
+                    e.target.style.background = '#000000';
                   }}
                 >
                   <FiShoppingCart size={14} />
-                  Order Now
-                </Link>
+                  Add to Cart
+                </button>
               </div>
             </div>
           ))}

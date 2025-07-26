@@ -1,45 +1,221 @@
+/* ========== BLACK & WHITE THEME OVERRIDES FOR MY BOOKINGS ========== */
+
+/* Force white background and black text for all booking elements */
+.bookings-container,
+.bookings-title,
+.section-title,
+.bookings-grid,
+.booking-card,
+.booking-header,
+.booking-details,
+.booking-footer,
+.booking-info,
+.detail-item,
+.status-badge,
+.invoice-modal,
+.invoice-content {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #000000 !important;
+  border-color: #e5e7eb !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Override all text elements */
+.bookings-container h1,
+.bookings-container h2,
+.bookings-container h3,
+.bookings-container h4,
+.bookings-container p,
+.bookings-container span,
+.bookings-container div,
+.bookings-title,
+.section-title,
+.booking-id,
+.booking-date,
+.detail-label,
+.detail-value {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  text-shadow: none !important;
+  background: transparent !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: #000000 !important;
+  background-clip: initial !important;
+}
+
+/* Button styling */
+.cancel-button,
+.modify-button,
+.invoice-button {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+.cancel-button:hover,
+.modify-button:hover,
+.invoice-button:hover {
+  background: #374151 !important;
+}
+
+/* Status badges */
+.status-badge {
+  background: #f3f4f6 !important;
+  color: #000000 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.status-badge.confirmed {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Fix card sizing issues - make cards smaller and prevent conflicts */
+.bookings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 1.5rem !important;
+  padding: 1rem;
+  max-width: 100%;
+}
+
+.booking-card {
+  max-width: 350px !important;
+  width: 100% !important;
+  padding: 1.25rem !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+/* ========== IMPROVED CARD LAYOUT LIKE MY RESERVATIONS ========== */
+
+/* Booking card improvements */
+.booking-card {
+  background: #ffffff !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 1rem !important;
+  padding: 1.5rem !important;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+  max-width: 400px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+  box-sizing: border-box !important;
+}
+
+.booking-card:hover {
+  transform: translateY(-2px);
+  border-color: #d1d5db;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Booking header improvements */
+.booking-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  margin-bottom: 1rem !important;
+}
+
+.booking-info h3 {
+  font-size: 1.1rem !important;
+  color: #000000 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.booking-info p {
+  font-size: 0.85rem !important;
+  color: #6b7280 !important;
+}
+
+/* Booking details layout */
+.booking-details {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 1rem !important;
+  margin: 1rem 0 !important;
+}
+
+.detail-item {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.25rem !important;
+}
+
+.detail-label {
+  font-size: 0.8rem !important;
+  color: #6b7280 !important;
+  font-weight: 500 !important;
+}
+
+.detail-value {
+  font-size: 0.9rem !important;
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+/* Booking footer/actions */
+.booking-footer {
+  display: flex !important;
+  gap: 0.75rem !important;
+  margin-top: 1.5rem !important;
+  flex-wrap: wrap !important;
+}
+
+.booking-footer button {
+  flex: 1 !important;
+  min-width: 100px !important;
+  padding: 0.75rem 1rem !important;
+  font-size: 0.85rem !important;
+}
+
+/* Status badge improvements */
+.status-badge {
+  background: #f3f4f6 !important;
+  color: #000000 !important;
+  border: 1px solid #d1d5db !important;
+  padding: 0.375rem 0.75rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+}
+
+.status-badge.confirmed {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
 /* Enhanced MyBookings.css */
 .bookings-container {
   min-height: 100vh;
   padding: 6rem 2rem 2rem;
-  background: linear-gradient(135deg, #0a192f 0%, #112240 50%, #1a365d 100%);
-  color: #f0f4fc;
+  background: #ffffff;
+  color: #000000;
   position: relative;
   overflow-x: hidden;
-}
-
-.bookings-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background:
-    radial-gradient(circle at 20% 80%, rgba(100, 255, 218, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(187, 134, 252, 0.1) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
 }
 
 .bookings-title {
   font-size: 3rem;
   font-weight: 800;
-  color: #64ffda;
+  color: #000000 !important;
   text-align: center;
   margin-bottom: 3rem;
-  text-shadow: 0 0 20px rgba(100, 255, 218, 0.4);
-  background: linear-gradient(135deg, #64ffda 0%, #bb86fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  text-shadow: none !important;
+  background: transparent !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: #000000 !important;
+  background-clip: initial !important;
   position: relative;
   z-index: 1;
 }
 
 .section-title {
   font-size: 1.8rem;
-  color: #64ffda;
+  color: #000000 !important;
   margin-bottom: 1.5rem;
   margin-top: 3rem;
 }
@@ -53,23 +229,23 @@
 }
 
 .booking-card {
-  background: rgba(17, 34, 64, 0.7);
-  border: 1px solid rgba(100, 255, 218, 0.1);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
   border-radius: 1rem;
   padding: 1.25rem;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  backdrop-filter: blur(10px);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
   overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .booking-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
 .booking-card.past-booking {
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid #e5e7eb;
   opacity: 0.85;
 }
 
@@ -78,52 +254,121 @@
 }
 
 .booking-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(100, 255, 218, 0.1);
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
+  margin-bottom: 1.25rem !important;
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+/* Booking info section */
+.booking-info {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.25rem !important;
+}
+
+/* Status section - separate row */
+.booking-status-wrapper {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
 }
 
 .room-name {
   font-size: 1.4rem;
   font-weight: 600;
-  color: #64ffda;
+  color: #000000;
   margin: 0;
+  font-family: 'Inter', sans-serif;
 }
 
-.booking-status {
-  background: rgba(100, 255, 218, 0.1);
-  color: #64ffda;
-  padding: 0.4rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  white-space: nowrap;
+.booking-status,
+.booking-card .booking-status,
+.bookings-grid .booking-status {
+  background: #f3f4f6 !important;
+  color: #000000 !important;
+  border: 1px solid #d1d5db !important;
+  padding: 0.4rem 0.75rem !important;
+  border-radius: 0.5rem !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  white-space: nowrap !important;
+  display: inline-block !important;
+  min-width: 80px !important;
+  text-align: center !important;
 }
 
-.booking-status.past {
-  background: rgba(255, 255, 255, 0.1);
-  color: #8892b0;
+.booking-status.confirmed,
+.booking-card .booking-status.confirmed,
+.bookings-grid .booking-status.confirmed {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+.booking-status.past,
+.booking-card .booking-status.past,
+.bookings-grid .booking-status.past {
+  background: #6b7280 !important;
+  color: #ffffff !important;
+}
+
+/* Force status text to be visible */
+.booking-status *,
+.booking-card .booking-status *,
+.bookings-grid .booking-status * {
+  color: inherit !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* Specific override for confirmed status text */
+.booking-status.confirmed *,
+.booking-card .booking-status.confirmed *,
+.bookings-grid .booking-status.confirmed * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 .booking-details {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  font-size: 0.9rem;
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 0.75rem !important;
+  margin-bottom: 1.25rem !important;
+  font-size: 0.9rem !important;
+  background: #ffffff !important;
+  padding: 1rem !important;
+  border-radius: 0.75rem !important;
+  border: 1px solid #e5e7eb !important;
 }
 
 .detail-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #f0f4fc;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+  color: #000000 !important;
+  overflow: visible !important;
+  text-overflow: initial !important;
+  white-space: normal !important;
+  padding: 0.5rem !important;
+  background: #f8fafc !important;
+  border-radius: 0.5rem !important;
+  border: 1px solid #e5e7eb !important;
+  margin-bottom: 0.5rem !important;
+  font-size: 0.85rem !important;
+}
+
+.detail-item .detail-icon {
+  color: #6b7280 !important;
+  font-size: 1rem !important;
+  flex-shrink: 0 !important;
+}
+
+.detail-item span {
+  color: #000000 !important;
+  font-weight: 500 !important;
 }
 
 .detail-item span {
@@ -291,7 +536,16 @@
   }
 
   .bookings-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    padding: 0.5rem !important;
+  }
+
+  .booking-card {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 1rem !important;
+    margin: 0 !important;
   }
 
   .booking-details {
@@ -301,6 +555,17 @@
   .booking-footer {
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .booking-details {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .booking-footer button,
+  .booking-actions button {
+    width: 100% !important;
+    min-width: auto !important;
   }
 }
 
@@ -312,6 +577,102 @@
   .booking-card {
     padding: 1rem;
   }
+}
+
+/* ========== ULTRA-AGGRESSIVE BUTTON TEXT OVERRIDES FOR MY BOOKINGS ========== */
+/* Force white text for all buttons with maximum specificity */
+
+html body .bookings-container .tab-btn,
+html body .bookings-container .refresh-btn,
+html body .bookings-container .invoice-btn,
+html body .bookings-container .download-btn,
+html body .bookings-container .cancel-button,
+html body .bookings-container .modify-button,
+html body .bookings-container .invoice-button,
+html body .bookings-container button[class*="tab"],
+html body .bookings-container button[class*="refresh"],
+html body .bookings-container button[class*="invoice"],
+html body .bookings-container button[class*="cancel"],
+html body .bookings-container button[class*="modify"] {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+/* Force white text with maximum specificity */
+html body .bookings-container .tab-btn *,
+html body .bookings-container .refresh-btn *,
+html body .bookings-container .invoice-btn *,
+html body .bookings-container .download-btn *,
+html body .bookings-container .cancel-button *,
+html body .bookings-container .modify-button *,
+html body .bookings-container .invoice-button *,
+html body .bookings-container button[class*="tab"] *,
+html body .bookings-container button[class*="refresh"] *,
+html body .bookings-container button[class*="invoice"] *,
+html body .bookings-container button[class*="cancel"] *,
+html body .bookings-container button[class*="modify"] *,
+html body .bookings-container .tab-btn span,
+html body .bookings-container .refresh-btn span,
+html body .bookings-container .invoice-btn span,
+html body .bookings-container .download-btn span,
+html body .bookings-container .cancel-button span,
+html body .bookings-container .modify-button span,
+html body .bookings-container .invoice-button span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  text-shadow: none !important;
+}
+
+/* Active tab button */
+html body .bookings-container .tab-btn.active {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+html body .bookings-container .tab-btn.active *,
+html body .bookings-container .tab-btn.active span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Hover states */
+html body .bookings-container .tab-btn:hover,
+html body .bookings-container .refresh-btn:hover,
+html body .bookings-container .invoice-btn:hover,
+html body .bookings-container .download-btn:hover,
+html body .bookings-container .cancel-button:hover,
+html body .bookings-container .modify-button:hover,
+html body .bookings-container .invoice-button:hover {
+  background: #374151 !important;
+  color: #ffffff !important;
+}
+
+html body .bookings-container .tab-btn:hover *,
+html body .bookings-container .refresh-btn:hover *,
+html body .bookings-container .invoice-btn:hover *,
+html body .bookings-container .download-btn:hover *,
+html body .bookings-container .cancel-button:hover *,
+html body .bookings-container .modify-button:hover *,
+html body .bookings-container .invoice-button:hover * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Nuclear option - override everything */
+.bookings-container [class*="btn"],
+.bookings-container [class*="tab"],
+.bookings-container button {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.bookings-container [class*="btn"] *,
+.bookings-container [class*="tab"] *,
+.bookings-container button * {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Date Range Styling */

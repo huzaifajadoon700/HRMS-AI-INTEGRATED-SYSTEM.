@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-// Feedback model for storing user reviews and sentiment analysis
-
 const feedbackSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,

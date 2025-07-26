@@ -1,5 +1,6 @@
 import React from "react";
 import { toast } from "react-toastify";
+import { getMenuImageUrl, handleImageError } from "../../utils/imageUtils";
 import "./MenuList.css";
 
 const MenuItemModal = ({ item, onClose, addToCart }) => {
@@ -13,9 +14,10 @@ const MenuItemModal = ({ item, onClose, addToCart }) => {
         <div className="modal-body">
           {item.image && (
             <img
-              src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${item.image}`}
+              src={getMenuImageUrl(item.image)}
               alt={item.name}
               className="modal-image"
+              onError={(e) => handleImageError(e, "/images/placeholder-menu.jpg")}
             />
           )}
           <p className="modal-description">{item.description}</p>

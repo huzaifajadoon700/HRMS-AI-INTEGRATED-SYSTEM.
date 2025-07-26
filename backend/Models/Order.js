@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId, // Reference to the User model
-    ref: "User", // Reference to the User collection
+    ref: "users", // Reference to the users collection (lowercase)
     required: true, // Every order must be associated with a user
   },
   items: [

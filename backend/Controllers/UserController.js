@@ -1,11 +1,5 @@
-// User management controller for HRMS system
 const User = require("../Models/User");
 const bcrypt = require("bcrypt");
-
-/**
- * User Controller
- * Handles user profile management and user-related operations
- */
 
 // ✅ Get User Profile
 exports.getProfile = async (req, res) => {
@@ -17,9 +11,7 @@ exports.getProfile = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching profile", error: error.message });
+    res.status(500).json({ message: "Error fetching profile", error: error.message });
   }
 };
 
@@ -33,9 +25,7 @@ exports.getUserById = async (req, res) => {
     }
     res.status(200).json(user);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching user", error: error.message });
+    res.status(500).json({ message: "Error fetching user", error: error.message });
   }
 };
 
@@ -58,42 +48,36 @@ exports.updateProfile = async (req, res) => {
     await user.save();
     res.status(200).json({ message: "Profile updated successfully", user });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating profile", error: error.message });
+    res.status(500).json({ message: "Error updating profile", error: error.message });
   }
 };
 
 // ✅ Update User Password
 exports.updatePassword = async (req, res) => {
-  try {
-    console.log("Update Password Request Body:", req.body);
-    const userId = req.user._id; // From authentication middleware
-    const { currentPassword, newPassword } = req.body;
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
+    try {
+      console.log("Update Password Request Body:", req.body);
+      const userId = req.user._id; // From authentication middleware
+      const { currentPassword, newPassword } = req.body;
+  
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      // Verify current password
+      const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+      if (!isPasswordValid) {
+        return res.status(400).json({ message: "Current password is incorrect" });
+      }
+  
+      // Hash and update new password
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword;
+  
+      await user.save();
+      res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Error updating password", error: error.message });
     }
-
-    // Verify current password
-    const isPasswordValid = await bcrypt.compare(
-      currentPassword,
-      user.password
-    );
-    if (!isPasswordValid) {
-      return res.status(400).json({ message: "Current password is incorrect" });
-    }
-
-    // Hash and update new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-
-    await user.save();
-    res.status(200).json({ message: "Password updated successfully" });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error updating password", error: error.message });
-  }
-};
+  };
+  

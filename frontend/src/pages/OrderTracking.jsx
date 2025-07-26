@@ -1,50 +1,50 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { FiMapPin, FiWifi, FiWifiOff } from 'react-icons/fi';
-import { MdRestaurant } from 'react-icons/md';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import { 
-  initializeSocket, 
-  disconnectSocket, 
+import React, { useState, useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { FiMapPin, FiWifi, FiWifiOff } from "react-icons/fi";
+import { MdRestaurant } from "react-icons/md";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import {
+  initializeSocket,
+  disconnectSocket,
   subscribeToOrderUpdates,
   formatTimestamp,
-  formatEstimatedDelivery
-} from '../services/socketService';
-import './OrderTracking.css';
+  formatEstimatedDelivery,
+} from "../services/socketService";
+import "./OrderTracking.css";
 
 // Define timeline statuses outside component
 const defaultTimeline = [
   {
-    status: 'Order Received',
-    description: 'Restaurant has received your order',
-    completed: false
+    status: "Order Received",
+    description: "Restaurant has received your order",
+    completed: false,
   },
   {
-    status: 'Preparing',
-    description: 'Your food is being prepared',
-    completed: false
+    status: "Preparing",
+    description: "Your food is being prepared",
+    completed: false,
   },
   {
-    status: 'Ready for Pickup',
-    description: 'Order is ready for delivery pickup',
-    completed: false
+    status: "Ready for Pickup",
+    description: "Order is ready for delivery pickup",
+    completed: false,
   },
   {
-    status: 'On the Way',
-    description: 'Your order is out for delivery',
-    completed: false
+    status: "On the Way",
+    description: "Your order is out for delivery",
+    completed: false,
   },
   {
-    status: 'Arriving Soon',
-    description: 'Driver is near your location',
-    completed: false
+    status: "Arriving Soon",
+    description: "Driver is near your location",
+    completed: false,
   },
   {
-    status: 'Delivered',
-    description: 'Your order has been delivered',
-    completed: false
-  }
+    status: "Delivered",
+    description: "Your order has been delivered",
+    completed: false,
+  },
 ];
 
 const OrderTracking = () => {
@@ -57,34 +57,36 @@ const OrderTracking = () => {
   const [timeline, setTimeline] = useState([]);
   const [estimatedDelivery, setEstimatedDelivery] = useState(null);
   const [socketConnected, setSocketConnected] = useState(false);
-  const [socketStatus, setSocketStatus] = useState('Initializing...');
+  const [socketStatus, setSocketStatus] = useState("Initializing...");
   const [socketEvents, setSocketEvents] = useState([]);
   const [showSocketDebug, setShowSocketDebug] = useState(true);
   const [progressPercentage, setProgressPercentage] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
+  const [trackingStarted, setTrackingStarted] = useState(false);
+  const [manualTrackingActive, setManualTrackingActive] = useState(false);
 
   // Calculate progress percentage based on current status
   useEffect(() => {
     if (order && timeline.length > 0) {
-      const currentStatus = order.status?.toLowerCase() || 'pending';
+      const currentStatus = order.status?.toLowerCase() || "pending";
       let percentage = 0;
-      
+
       // Map status to percentage
-      if (currentStatus === 'pending' || currentStatus === 'order received') {
+      if (currentStatus === "pending" || currentStatus === "order received") {
         percentage = 16; // 1/6 complete
-      } else if (currentStatus === 'preparing') {
+      } else if (currentStatus === "preparing") {
         percentage = 33; // 2/6 complete
-      } else if (currentStatus === 'ready for pickup') {
+      } else if (currentStatus === "ready for pickup") {
         percentage = 50; // 3/6 complete
-      } else if (currentStatus === 'on the way') {
+      } else if (currentStatus === "on the way") {
         percentage = 66; // 4/6 complete
-      } else if (currentStatus === 'arriving soon') {
+      } else if (currentStatus === "arriving soon") {
         percentage = 83; // 5/6 complete
-      } else if (currentStatus === 'delivered') {
+      } else if (currentStatus === "delivered") {
         percentage = 100; // 6/6 complete
       }
-      
+
       setProgressPercentage(percentage);
     }
   }, [order, timeline]);
@@ -95,24 +97,27 @@ const OrderTracking = () => {
       // First check if we have a valid order ID
       let validOrderId = orderId;
 
-      if (!validOrderId || validOrderId === 'undefined') {
+      if (!validOrderId || validOrderId === "undefined") {
         // Try getting from localStorage as fallback
         const storedOrderId = localStorage.getItem("lastOrderId");
         if (storedOrderId) {
-          console.log("Using orderId from localStorage instead:", storedOrderId);
+          console.log(
+            "Using orderId from localStorage instead:",
+            storedOrderId
+          );
           validOrderId = storedOrderId;
-          
+
           // Redirect to the correct URL but keep current state
-          navigate(`/track-order/${storedOrderId}`, { 
+          navigate(`/track-order/${storedOrderId}`, {
             state: location.state,
-            replace: true
+            replace: true,
           });
           return;
         } else {
-        setError('Invalid order ID');
-        setLoading(false);
-        return;
-      }
+          setError("Invalid order ID");
+          setLoading(false);
+          return;
+        }
       }
 
       console.log("Location state:", location.state);
@@ -121,17 +126,26 @@ const OrderTracking = () => {
       if (location.state?.order) {
         console.log("Using order from location state:", location.state.order);
         if (location.state.order._id) {
-          console.log("Setting order from location state with ID:", location.state.order._id);
-        setOrder(location.state.order);
-            
+          console.log(
+            "Setting order from location state with ID:",
+            location.state.order._id
+          );
+          setOrder(location.state.order);
+
           // Initialize timeline with current status
-          const status = location.state.order.status?.toLowerCase() || 'pending';
-          setTimeline([{
-            status: status === 'pending' ? 'Order Received' : status.charAt(0).toUpperCase() + status.slice(1),
-            timestamp: new Date(),
-            completed: true
-          }]);
-            
+          const status =
+            location.state.order.status?.toLowerCase() || "pending";
+          setTimeline([
+            {
+              status:
+                status === "pending"
+                  ? "Order Received"
+                  : status.charAt(0).toUpperCase() + status.slice(1),
+              timestamp: new Date(),
+              completed: true,
+            },
+          ]);
+
           setLoading(false);
           return;
         } else {
@@ -147,17 +161,22 @@ const OrderTracking = () => {
           if (parsedOrder && parsedOrder._id) {
             console.log("Using order from localStorage:", parsedOrder);
             setOrder(parsedOrder);
-            
+
             // Initialize timeline with current status
-            const status = parsedOrder.status?.toLowerCase() || 'pending';
-            setTimeline([{
-              status: status === 'pending' ? 'Order Received' : status.charAt(0).toUpperCase() + status.slice(1),
-              timestamp: new Date(),
-              completed: true
-            }]);
-            
-        setLoading(false);
-        return;
+            const status = parsedOrder.status?.toLowerCase() || "pending";
+            setTimeline([
+              {
+                status:
+                  status === "pending"
+                    ? "Order Received"
+                    : status.charAt(0).toUpperCase() + status.slice(1),
+                timestamp: new Date(),
+                completed: true,
+              },
+            ]);
+
+            setLoading(false);
+            return;
           }
         } catch (err) {
           console.error("Error parsing stored order data:", err);
@@ -165,77 +184,86 @@ const OrderTracking = () => {
       }
 
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (!token) {
-          setError('Please login to track your order');
+          setError("Please login to track your order");
           setLoading(false);
-          setTimeout(() => navigate('/login'), 2000);
+          setTimeout(() => navigate("/login"), 2000);
           return;
         }
 
         console.log("Fetching order data for ID:", validOrderId);
-        console.log("Using token:", token ? "Yes (Token exists)" : "No (Token missing)");
-        
-        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
-        const response = await axios.get(
-          `${apiUrl}/orders/${validOrderId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            }
-          }
+        console.log(
+          "Using token:",
+          token ? "Yes (Token exists)" : "No (Token missing)"
         );
+
+        const apiUrl =
+          process.env.REACT_APP_API_BASE_URL ||
+          "https://hrms-bace.vercel.app/api";
+        const response = await axios.get(`${apiUrl}/orders/${validOrderId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
         console.log("Order response received:", response);
 
         if (response.data) {
           console.log("Order data received:", response.data);
           setOrder(response.data);
-          
+
           // Save complete order data to localStorage
           localStorage.setItem("lastOrderData", JSON.stringify(response.data));
 
           // Initialize timeline with current status
-          const status = response.data.status?.toLowerCase() || 'pending';
+          const status = response.data.status?.toLowerCase() || "pending";
           console.log("Setting initial status:", status);
-          
+
           const statusObject = {
-            status: status === 'pending' ? 'Order Received' : status.charAt(0).toUpperCase() + status.slice(1),
-              timestamp: new Date(),
-              completed: true
+            status:
+              status === "pending"
+                ? "Order Received"
+                : status.charAt(0).toUpperCase() + status.slice(1),
+            timestamp: new Date(),
+            completed: true,
           };
 
           setTimeline([statusObject]);
-          
+
           // Automatically set estimated delivery time if not present
           if (!estimatedDelivery) {
             const createTime = new Date(response.data.createdAt || new Date());
-            const deliveryTime = new Date(createTime.getTime() + (45 * 60 * 1000)); // 45 min delivery
+            const deliveryTime = new Date(
+              createTime.getTime() + 45 * 60 * 1000
+            ); // 45 min delivery
             console.log("Setting estimated delivery time:", deliveryTime);
             setEstimatedDelivery(deliveryTime);
           }
         } else {
           console.error("No data in response");
-          setError('No order data returned from server');
+          setError("No order data returned from server");
         }
       } catch (err) {
-        console.error('Error fetching order:', err);
-        console.error('Error details:', err.response);
-        console.error('Status code:', err.response?.status);
-        console.error('Error data:', err.response?.data);
-        
+        console.error("Error fetching order:", err);
+        console.error("Error details:", err.response);
+        console.error("Status code:", err.response?.status);
+        console.error("Error data:", err.response?.data);
+
         if (err.response?.status === 404) {
-          setError('Order not found. Please check your order ID.');
+          setError("Order not found. Please check your order ID.");
         } else if (err.response?.status === 401) {
-          setError('Authentication error. Please login again.');
-          localStorage.removeItem('token'); // Clear invalid token
+          setError("Authentication error. Please login again.");
+          localStorage.removeItem("token"); // Clear invalid token
           // Redirect to login after a short delay
-          setTimeout(() => navigate('/login'), 2000);
+          setTimeout(() => navigate("/login"), 2000);
         } else if (err.response?.status === 403) {
-          setError('You are not authorized to view this order.');
+          setError("You are not authorized to view this order.");
         } else {
-        setError(err.response?.data?.message || 'Failed to load order details');
+          setError(
+            err.response?.data?.message || "Failed to load order details"
+          );
         }
       } finally {
         setLoading(false);
@@ -247,40 +275,40 @@ const OrderTracking = () => {
 
   // Socket connection and updates
   useEffect(() => {
-    if (!orderId || orderId === 'undefined' || loading) {
-      setSocketStatus('Waiting for order ID...');
+    if (!orderId || orderId === "undefined" || loading) {
+      setSocketStatus("Waiting for order ID...");
       return;
     }
 
     // Always show tracking regardless of order status
-    console.log('Initializing socket for order:', orderId);
-    setSocketStatus('Connecting to tracking server...');
-    
+    console.log("Initializing socket for order:", orderId);
+    setSocketStatus("Connecting to tracking server...");
+
     // Create a single socket connection
     const socket = initializeSocket(orderId);
     setSocketConnected(!!socket);
-    
+
     // Subscribe to order updates
     const unsubscribe = subscribeToOrderUpdates((data) => {
-      console.log('Received order update:', data);
-      
+      console.log("Received order update:", data);
+
       // Show toast notification for each status update
       toast.success(`Order Status: ${data.status}`, {
         duration: 4000,
-        position: 'top-center',
-        icon: '🔄'
+        position: "top-center",
+        icon: "🔄",
       });
-        
+
       // Update timeline with new status
-        setTimeline(prevTimeline => {
+      setTimeline((prevTimeline) => {
         // Format the incoming status properly
         const formattedStatus = data.status;
-        
+
         // Check if this status already exists
         const existingStatusIndex = prevTimeline.findIndex(
-          item => item.status.toLowerCase() === formattedStatus.toLowerCase()
+          (item) => item.status.toLowerCase() === formattedStatus.toLowerCase()
         );
-        
+
         if (existingStatusIndex >= 0) {
           // Update existing status
           const updatedTimeline = [...prevTimeline];
@@ -288,7 +316,7 @@ const OrderTracking = () => {
             ...updatedTimeline[existingStatusIndex],
             timestamp: data.timestamp || new Date(),
             completed: true,
-            highlight: true // Add highlight for animation
+            highlight: true, // Add highlight for animation
           };
           return updatedTimeline;
         } else {
@@ -298,51 +326,54 @@ const OrderTracking = () => {
             timestamp: data.timestamp || new Date(),
             completed: true,
             highlight: true, // Add highlight for animation
-            description: defaultTimeline.find(s => 
-              s.status.toLowerCase() === formattedStatus.toLowerCase()
-            )?.description || `Order ${formattedStatus}`
+            description:
+              defaultTimeline.find(
+                (s) => s.status.toLowerCase() === formattedStatus.toLowerCase()
+              )?.description || `Order ${formattedStatus}`,
           };
-          
+
           // Sort the timeline to ensure proper order
           const updatedTimeline = [...prevTimeline, newStatus];
-          const statusOrder = defaultTimeline.map(s => s.status.toLowerCase());
-          
+          const statusOrder = defaultTimeline.map((s) =>
+            s.status.toLowerCase()
+          );
+
           updatedTimeline.sort((a, b) => {
             const indexA = statusOrder.indexOf(a.status.toLowerCase());
             const indexB = statusOrder.indexOf(b.status.toLowerCase());
             return indexA - indexB;
           });
-          
+
           return updatedTimeline;
         }
       });
 
       // Clear highlight after animation
       setTimeout(() => {
-        setTimeline(prevTimeline => 
-          prevTimeline.map(item => ({...item, highlight: false}))
+        setTimeline((prevTimeline) =>
+          prevTimeline.map((item) => ({ ...item, highlight: false }))
         );
       }, 2000);
 
-        // Update order status
-      setOrder(prev => {
+      // Update order status
+      setOrder((prev) => {
         if (!prev) return null;
-        
+
         const updatedOrder = {
           ...prev,
-          status: data.status.toLowerCase()
+          status: data.status.toLowerCase(),
         };
 
         // Save updated order to localStorage
         localStorage.setItem("lastOrderData", JSON.stringify(updatedOrder));
-        
+
         return updatedOrder;
-          });
       });
+    });
 
     // Clean up function
     return () => {
-      console.log('Cleaning up socket connection');
+      console.log("Cleaning up socket connection");
       if (unsubscribe) {
         unsubscribe();
       }
@@ -352,7 +383,7 @@ const OrderTracking = () => {
 
   // Helper function to add socket event logs
   const addSocketEvent = (message) => {
-    setSocketEvents(prev => {
+    setSocketEvents((prev) => {
       const timestamp = new Date().toLocaleTimeString();
       return [...prev, { timestamp, message }].slice(-10); // Keep last 10 events
     });
@@ -362,47 +393,72 @@ const OrderTracking = () => {
     navigate(-1);
   };
 
-
-
   const handleRefreshOrder = () => {
     // Debounce protection - prevent multiple refreshes in quick succession
     const now = Date.now();
     const timeSinceLastRefresh = now - lastRefreshTime;
-    
+
     // Only allow refresh every 5 seconds
     if (timeSinceLastRefresh < 5000) {
-      toast.error('Please wait before refreshing again', {
+      toast.error("Please wait before refreshing again", {
         duration: 3000,
-        position: 'top-center',
+        position: "top-center",
       });
       return;
     }
-    
+
     setRefreshing(true);
     setLastRefreshTime(now);
-    addSocketEvent('Manual refresh requested');
-    
+    addSocketEvent("Manual refresh requested");
+
     // Disconnect and wait before reconnecting to avoid multiple connections
     disconnectSocket();
-    addSocketEvent('Disconnected socket for refresh');
-    
+    addSocketEvent("Disconnected socket for refresh");
+
     setTimeout(() => {
       // Create new socket connection
       const socket = initializeSocket(orderId);
       if (socket) {
         setSocketConnected(!!socket.connected);
-        setSocketStatus('Reconnected to tracking server');
-        addSocketEvent('Socket reconnected successfully');
+        setSocketStatus("Reconnected to tracking server");
+        addSocketEvent("Socket reconnected successfully");
       } else {
-        setSocketStatus('Reconnection failed');
-        addSocketEvent('Failed to reconnect socket');
+        setSocketStatus("Reconnection failed");
+        addSocketEvent("Failed to reconnect socket");
       }
       setRefreshing(false);
     }, 1500); // Increased delay to ensure cleanup completes
   };
 
   const toggleSocketDebug = () => {
-    setShowSocketDebug(prev => !prev);
+    setShowSocketDebug((prev) => !prev);
+  };
+
+  const startManualTracking = () => {
+    if (!orderId || manualTrackingActive) return;
+
+    setManualTrackingActive(true);
+    setTrackingStarted(true);
+
+    toast.success(
+      "Order tracking started! Status will update every 5 seconds.",
+      {
+        duration: 4000,
+        position: "top-center",
+        icon: "🚀",
+      }
+    );
+
+    // Force socket reconnection to trigger tracking
+    disconnectSocket();
+    setTimeout(() => {
+      const socket = initializeSocket(orderId);
+      if (socket) {
+        setSocketConnected(!!socket.connected);
+        setSocketStatus("Manual tracking started");
+        addSocketEvent("Manual tracking initiated");
+      }
+    }, 1000);
   };
 
   if (loading) {
@@ -417,7 +473,7 @@ const OrderTracking = () => {
     return (
       <div className="tracking-container">
         <div className="error-message">
-          <p>{error || 'Order not found. Please try again later.'}</p>
+          <p>{error || "Order not found. Please try again later."}</p>
           <button className="back-button" onClick={handleBackToConfirmation}>
             Back to Order Confirmation
           </button>
@@ -429,7 +485,7 @@ const OrderTracking = () => {
   // Skip the delivered card view (always show tracking)
 
   const getOrderStatus = () => {
-    if (!order.status || order.status === 'pending') return 'Order Received';
+    if (!order.status || order.status === "pending") return "Order Received";
     return order.status.charAt(0).toUpperCase() + order.status.slice(1);
   };
 
@@ -437,45 +493,46 @@ const OrderTracking = () => {
     if (estimatedDelivery) {
       return formatEstimatedDelivery(estimatedDelivery);
     }
-    return '15-20 minutes';
+    return "15-20 minutes";
   };
 
   // Merge real-time updates with default timeline
-  const mergedTimeline = defaultTimeline.map(defaultStatus => {
+  const mergedTimeline = defaultTimeline.map((defaultStatus) => {
     // Find if we have a real-time update for this status
-    const realTimeStatus = timeline.find(item => 
-      item.status.toLowerCase() === defaultStatus.status.toLowerCase()
+    const realTimeStatus = timeline.find(
+      (item) => item.status.toLowerCase() === defaultStatus.status.toLowerCase()
     );
-    
+
     // Determine current status for comparison
-    const currentOrderStatus = !order.status || order.status === 'pending' 
-      ? 'order received' 
-      : order.status.toLowerCase();
-    
+    const currentOrderStatus =
+      !order.status || order.status === "pending"
+        ? "order received"
+        : order.status.toLowerCase();
+
     // Find indexes for comparison
     const statusIndex = defaultTimeline.findIndex(
-      s => s.status.toLowerCase() === currentOrderStatus
+      (s) => s.status.toLowerCase() === currentOrderStatus
     );
     const thisStatusIndex = defaultTimeline.findIndex(
-      s => s.status.toLowerCase() === defaultStatus.status.toLowerCase()
+      (s) => s.status.toLowerCase() === defaultStatus.status.toLowerCase()
     );
-    
+
     // Mark as completed if this status comes before or is the current status
     const isCompleted = thisStatusIndex <= statusIndex;
-    
+
     if (realTimeStatus) {
       return {
         ...defaultStatus,
         ...realTimeStatus,
         completed: isCompleted || realTimeStatus.completed,
         time: formatTimestamp(realTimeStatus.timestamp),
-        highlight: realTimeStatus.highlight
+        highlight: realTimeStatus.highlight,
       };
     }
     return {
       ...defaultStatus,
       completed: isCompleted,
-      time: isCompleted ? formatTimestamp(new Date()) : 'Pending'
+      time: isCompleted ? formatTimestamp(new Date()) : "Pending",
     };
   });
 
@@ -487,52 +544,80 @@ const OrderTracking = () => {
             <MdRestaurant size={24} />
           </div>
           <h2>{getOrderStatus()}</h2>
-          
+
           {/* Progress bar for order status */}
           <div className="status-progress">
-            <div 
-              className="status-progress-bar" 
+            <div
+              className="status-progress-bar"
               style={{ width: `${progressPercentage}%` }}
             ></div>
           </div>
-          
+
           <p className="estimated-delivery">
-            Estimated delivery by<br />
+            Estimated delivery by
+            <br />
             {getEstimatedDelivery()}
           </p>
-          
+
           {socketConnected && (
-            <div className="realtime-indicator">
-              Live updates active
-            </div>
+            <div className="realtime-indicator">Live updates active</div>
           )}
-          
+
           <div className="delivery-info">
             <FiMapPin className="icon" />
             <div>
-              <p>Delivery to: {order.customerName || 'Customer'}</p>
-              <p className="address">{order.deliveryAddress || 'Loading address...'}</p>
+              <p>Delivery to: {order.customerName || "Customer"}</p>
+              <p className="address">
+                {order.deliveryAddress || "Loading address..."}
+              </p>
             </div>
           </div>
-          
+
+          {/* Manual Tracking Button */}
+          {!manualTrackingActive && !socketConnected && (
+            <div className="manual-tracking-section">
+              <button
+                className="start-tracking-btn"
+                onClick={startManualTracking}
+                disabled={!orderId}
+              >
+                🚀 Start Live Tracking
+              </button>
+              <p className="tracking-info">
+                Click to start real-time order status updates with 5-second
+                intervals
+              </p>
+            </div>
+          )}
+
+          {manualTrackingActive && (
+            <div className="tracking-active-indicator">
+              <span className="pulse-dot"></span>
+              Live tracking active - Updates every 5 seconds
+            </div>
+          )}
+
           <div className="socket-debug-toggle" onClick={toggleSocketDebug}>
             {socketConnected ? <FiWifi /> : <FiWifiOff />}
             <span className="socket-status">{socketStatus}</span>
           </div>
 
           <div className="connection-status">
-            <span className={socketConnected ? 'connected' : 'disconnected'}>
-              {socketConnected ? 'Live Tracking Active' : 'Tracking Disconnected'}
+            <span className={socketConnected ? "connected" : "disconnected"}>
+              {socketConnected
+                ? "Live Tracking Active"
+                : "Tracking Disconnected"}
             </span>
-            {!socketConnected && order.status?.toLowerCase() !== 'delivered' && (
-              <button 
-                className="refresh-button" 
-                onClick={handleRefreshOrder}
-                disabled={refreshing}
-              >
-                {refreshing ? 'Reconnecting...' : 'Reconnect'}
-              </button>
-            )}
+            {!socketConnected &&
+              order.status?.toLowerCase() !== "delivered" && (
+                <button
+                  className="refresh-button"
+                  onClick={handleRefreshOrder}
+                  disabled={refreshing}
+                >
+                  {refreshing ? "Reconnecting..." : "Reconnect"}
+                </button>
+              )}
           </div>
 
           {showSocketDebug && (
@@ -541,7 +626,11 @@ const OrderTracking = () => {
               <div className="socket-info">
                 <div className="socket-info-row">
                   <span className="socket-label">Status:</span>
-                  <span className={`socket-value ${socketConnected ? 'connected' : 'disconnected'}`}>
+                  <span
+                    className={`socket-value ${
+                      socketConnected ? "connected" : "disconnected"
+                    }`}
+                  >
                     {socketStatus}
                   </span>
                 </div>
@@ -551,10 +640,13 @@ const OrderTracking = () => {
                 </div>
                 <div className="socket-info-row">
                   <span className="socket-label">Server:</span>
-                  <span className="socket-value">{process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}</span>
+                  <span className="socket-value">
+                    {process.env.REACT_APP_API_URL ||
+                      "https://hrms-bace.vercel.app"}
+                  </span>
                 </div>
               </div>
-              
+
               <h4>Socket Event Log</h4>
               <div className="socket-events">
                 {socketEvents.length === 0 ? (
@@ -578,19 +670,23 @@ const OrderTracking = () => {
 
         <div className="timeline-container">
           {mergedTimeline.map((event, index) => (
-            <div 
-              key={index} 
-              className={`timeline-message ${event.completed ? 'completed' : ''} ${
-                !event.completed && index > 0 && mergedTimeline[index - 1].completed ? 'current' : ''
-              } ${event.highlight ? 'highlight-animation' : ''}`}
+            <div
+              key={index}
+              className={`timeline-message ${
+                event.completed ? "completed" : ""
+              } ${
+                !event.completed &&
+                index > 0 &&
+                mergedTimeline[index - 1].completed
+                  ? "current"
+                  : ""
+              } ${event.highlight ? "highlight-animation" : ""}`}
             >
               <div className="message-dot"></div>
               <div className="message-content">
                 <h4>{event.status}</h4>
                 <p>{event.description}</p>
-                <span className="message-time">
-                  {event.time || 'Pending'}
-                </span>
+                <span className="message-time">{event.time || "Pending"}</span>
               </div>
             </div>
           ))}
@@ -600,4 +696,4 @@ const OrderTracking = () => {
   );
 };
 
-export default OrderTracking; 
+export default OrderTracking;

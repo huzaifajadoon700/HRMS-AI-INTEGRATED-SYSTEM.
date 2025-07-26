@@ -268,9 +268,9 @@ const MyOrders = () => {
                 className="refresh-btn"
                 onClick={fetchOrders}
                 disabled={loading}
+                title="Refresh orders"
               >
                 <FiRefreshCw className={loading ? 'spinning' : ''} />
-                Refresh
               </button>
             </div>
           </div>

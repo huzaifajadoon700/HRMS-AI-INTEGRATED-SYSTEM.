@@ -1,10 +1,13 @@
 import React, { useEffect } from 'react';
 import { FiX, FiStar, FiMapPin, FiUsers, FiHome } from 'react-icons/fi';
 import { facility } from './data/Data';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './RoomDetailsModal.css';
 
 const RoomDetailsModal = ({ room, onClose }) => {
+  const navigate = useNavigate();
+
   // Record room interaction when modal opens
   useEffect(() => {
     if (!room) return;
@@ -37,6 +40,23 @@ const RoomDetailsModal = ({ room, onClose }) => {
   }, [room]);
 
   if (!room) return null;
+
+  // Helper function to extract room ID
+  const getRoomId = () => {
+    // Since we're now passing the room with the correct _id from Rooms.js,
+    // this should be straightforward
+    const roomId = room._id || room.roomId || room.id;
+
+    console.log('🔍 Modal Room ID debug:', {
+      'room._id': room._id,
+      'room.roomId': room.roomId,
+      'room.id': room.id,
+      'final roomId': roomId,
+      'roomId type': typeof roomId
+    });
+
+    return roomId;
+  };
 
   // Helper function to get the correct image URL
   const getImageUrl = (imagePath) => {
@@ -189,6 +209,13 @@ const RoomDetailsModal = ({ room, onClose }) => {
             <button
               className="btn btn-primary"
               onClick={() => {
+                const roomId = getRoomId();
+
+                if (!roomId) {
+                  console.error('No valid room ID found for booking');
+                  return;
+                }
+
                 // Record booking interaction
                 const token = localStorage.getItem('token');
                 const userId = localStorage.getItem('userId');
@@ -198,7 +225,7 @@ const RoomDetailsModal = ({ room, onClose }) => {
                     `${apiUrl}/rooms/interactions`,
                     {
                       userId,
-                      roomId: room._id,
+                      roomId: roomId,
                       interactionType: 'booking'
                     },
                     {
@@ -206,7 +233,28 @@ const RoomDetailsModal = ({ room, onClose }) => {
                     }
                   ).catch(error => console.error('Error recording booking interaction:', error));
                 }
-                window.location.href = `/booking-page/${room._id}`;
+
+                // Store room details for the booking page (same as in Rooms.js)
+                const roomBookingData = {
+                  roomId: roomId,
+                  roomNumber: room.roomNumber,
+                  roomType: room.roomType,
+                  price: room.price,
+                  description: room.description,
+                  image: room.image,
+                  capacity: room.capacity,
+                  amenities: room.amenities,
+                  averageRating: room.averageRating,
+                  totalRatings: room.totalRatings,
+                };
+                localStorage.setItem(
+                  "roomBookingData",
+                  JSON.stringify(roomBookingData)
+                );
+
+                // Close modal first, then navigate
+                onClose();
+                navigate(`/booking-page/${roomId}`);
               }}
             >
               Book Now - {formatPrice(room.price)}/night

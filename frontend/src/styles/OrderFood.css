@@ -592,3 +592,151 @@
         font-size: 0.75rem !important;
     }
 }
+
+/* ========== PROCEED TO BUTTON VISIBILITY FIX ========== */
+
+/* Make proceed to cart/checkout button always visible */
+.cart-button,
+.proceed-button,
+.checkout-button,
+button[class*="proceed"],
+button[class*="cart"],
+.order-food-cart-button,
+.floating-cart-button {
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+    background: #000000 !important;
+    color: #ffffff !important;
+    border: 1px solid #000000 !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Ensure button text is always visible */
+.cart-button span,
+.proceed-button span,
+.checkout-button span,
+button[class*="proceed"] span,
+button[class*="cart"] span,
+.order-food-cart-button span,
+.floating-cart-button span {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Hover state for better UX */
+.cart-button:hover,
+.proceed-button:hover,
+.checkout-button:hover,
+button[class*="proceed"]:hover,
+button[class*="cart"]:hover,
+.order-food-cart-button:hover,
+.floating-cart-button:hover {
+    background: #374151 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Force visibility for any hidden cart elements */
+[class*="cart"][style*="opacity: 0"],
+[class*="proceed"][style*="opacity: 0"],
+[class*="checkout"][style*="opacity: 0"] {
+    opacity: 1 !important;
+}
+
+/* Mobile cart button visibility */
+@media (max-width: 768px) {
+    .cart-button,
+    .proceed-button,
+    .checkout-button,
+    button[class*="proceed"],
+    button[class*="cart"],
+    .order-food-cart-button,
+    .floating-cart-button {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: flex !important;
+        position: relative !important;
+        z-index: 10 !important;
+    }
+}
+
+/* ========== FLOATING CART TEXT COLOR OVERRIDES ========== */
+
+/* Ensure floating cart text is always white on desktop and mobile */
+.order-food-floating-cart,
+.order-food-floating-cart span,
+.order-food-floating-cart * {
+    color: #ffffff !important;
+}
+
+/* Mobile specific overrides for floating cart text */
+@media (max-width: 768px) {
+    .order-food-floating-cart,
+    .order-food-floating-cart span,
+    .order-food-floating-cart * {
+        color: #ffffff !important;
+    }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+    .order-food-floating-cart,
+    .order-food-floating-cart span,
+    .order-food-floating-cart * {
+        color: #ffffff !important;
+    }
+}
+
+/* ========== SEARCH INPUT SPACING FIX ========== */
+
+/* Fix search icon and placeholder text overlapping */
+.order-food-filters input[type="text"] {
+    padding-left: 3rem !important;
+    padding-right: 1rem !important;
+}
+
+/* Ensure search icon has proper positioning */
+.order-food-filters .FiSearch,
+.order-food-filters svg[data-testid="search-icon"] {
+    position: absolute !important;
+    left: 1rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #9ca3af !important;
+    z-index: 2 !important;
+    pointer-events: none !important;
+}
+
+/* Mobile responsive search input */
+@media (max-width: 768px) {
+    .order-food-filters input[type="text"] {
+        padding-left: 2.75rem !important;
+        padding-right: 0.75rem !important;
+        font-size: 0.9rem !important;
+    }
+
+    .order-food-filters .FiSearch,
+    .order-food-filters svg[data-testid="search-icon"] {
+        left: 0.875rem !important;
+        width: 16px !important;
+        height: 16px !important;
+    }
+}
+
+/* Extra small mobile */
+@media (max-width: 480px) {
+    .order-food-filters input[type="text"] {
+        padding-left: 2.5rem !important;
+        padding-right: 0.5rem !important;
+        font-size: 0.85rem !important;
+    }
+
+    .order-food-filters .FiSearch,
+    .order-food-filters svg[data-testid="search-icon"] {
+        left: 0.75rem !important;
+        width: 14px !important;
+        height: 14px !important;
+    }
+}

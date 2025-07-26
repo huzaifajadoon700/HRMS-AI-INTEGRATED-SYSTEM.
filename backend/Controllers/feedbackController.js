@@ -1,36 +1,21 @@
-// Feedback Controller - Manages customer feedback and sentiment analysis
-const Feedback = require("../Models/Feedback");
-const User = require("../Models/User");
-const natural = require("natural");
+const Feedback = require('../Models/Feedback');
+const User = require('../Models/User');
+const natural = require('natural');
 const tokenizer = new natural.WordTokenizer();
 const stemmer = natural.PorterStemmer;
-const analyzer = new natural.SentimentAnalyzer("English", stemmer, "afinn");
+const analyzer = new natural.SentimentAnalyzer('English', stemmer, 'afinn');
 
 // Enhanced sentiment analysis function
 const analyzeSentiment = (text) => {
   // Preprocess the text
   const tokens = tokenizer.tokenize(text.toLowerCase());
-
+  
   // Remove common stop words and special characters
-  const stopWords = new Set([
-    "the",
-    "a",
-    "an",
-    "and",
-    "or",
-    "but",
-    "in",
-    "on",
-    "at",
-    "to",
-    "for",
-    "of",
-    "with",
-    "by",
-  ]);
-  const filteredTokens = tokens.filter(
-    (token) =>
-      !stopWords.has(token) && /^[a-zA-Z]+$/.test(token) && token.length > 2
+  const stopWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by']);
+  const filteredTokens = tokens.filter(token => 
+    !stopWords.has(token) && 
+    /^[a-zA-Z]+$/.test(token) && 
+    token.length > 2
   );
 
   // Get sentiment score
@@ -39,15 +24,15 @@ const analyzeSentiment = (text) => {
   // Enhanced sentiment classification with more nuanced thresholds
   let sentiment;
   if (sentimentScore > 0.5) {
-    sentiment = "positive";
+    sentiment = 'positive';
   } else if (sentimentScore > 0.2) {
-    sentiment = "slightly_positive";
+    sentiment = 'slightly_positive';
   } else if (sentimentScore < -0.5) {
-    sentiment = "negative";
+    sentiment = 'negative';
   } else if (sentimentScore < -0.2) {
-    sentiment = "slightly_negative";
+    sentiment = 'slightly_negative';
   } else {
-    sentiment = "neutral";
+    sentiment = 'neutral';
   }
 
   // Calculate confidence score (0 to 1)
@@ -57,7 +42,7 @@ const analyzeSentiment = (text) => {
     sentiment,
     sentimentScore,
     confidence,
-    processedTokens: filteredTokens.length,
+    processedTokens: filteredTokens.length
   };
 };
 
@@ -69,7 +54,7 @@ exports.submitFeedback = async (req, res) => {
     // Verify user exists
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res.status(404).json({ success: false, error: 'User not found' });
     }
 
     // Enhanced sentiment analysis
@@ -82,36 +67,36 @@ exports.submitFeedback = async (req, res) => {
       sentiment: sentimentAnalysis.sentiment,
       sentimentScore: sentimentAnalysis.sentimentScore,
       sentimentConfidence: sentimentAnalysis.confidence,
-      processedTokens: sentimentAnalysis.processedTokens,
+      processedTokens: sentimentAnalysis.processedTokens
     });
 
     await feedback.save();
-    res.status(201).json({
-      success: true,
+    res.status(201).json({ 
+      success: true, 
       data: feedback,
-      analysis: sentimentAnalysis,
+      analysis: sentimentAnalysis
     });
   } catch (error) {
-    console.error("Error submitting feedback:", error);
+    console.error('Error submitting feedback:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
 exports.getFeedbackAnalytics = async (req, res) => {
   try {
-    const feedbacks = await Feedback.find().populate({
-      path: "userId",
-      select: "name email",
-      model: "users",
-    });
-
+    const feedbacks = await Feedback.find()
+      .populate({
+        path: 'userId',
+        select: 'name email',
+        model: 'users'
+      });
+    
     // Enhanced analytics
     const totalFeedbacks = feedbacks.length;
-    const averageRating =
-      totalFeedbacks > 0
-        ? feedbacks.reduce((acc, curr) => acc + curr.rating, 0) / totalFeedbacks
-        : 0;
-
+    const averageRating = totalFeedbacks > 0 
+      ? feedbacks.reduce((acc, curr) => acc + curr.rating, 0) / totalFeedbacks 
+      : 0;
+    
     // Detailed sentiment distribution
     const sentimentDistribution = feedbacks.reduce((acc, curr) => {
       acc[curr.sentiment] = (acc[curr.sentiment] || 0) + 1;
@@ -119,25 +104,21 @@ exports.getFeedbackAnalytics = async (req, res) => {
     }, {});
 
     // Calculate average sentiment confidence
-    const averageConfidence =
-      totalFeedbacks > 0
-        ? feedbacks.reduce(
-            (acc, curr) => acc + (curr.sentimentConfidence || 0),
-            0
-          ) / totalFeedbacks
-        : 0;
+    const averageConfidence = totalFeedbacks > 0
+      ? feedbacks.reduce((acc, curr) => acc + (curr.sentimentConfidence || 0), 0) / totalFeedbacks
+      : 0;
 
     // Get recent feedbacks with sentiment details
     const recentFeedbacks = feedbacks
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(0, 10)
-      .map((feedback) => ({
+      .map(feedback => ({
         ...feedback.toObject(),
         sentimentDetails: {
           score: feedback.sentimentScore,
           confidence: feedback.sentimentConfidence,
-          processedTokens: feedback.processedTokens,
-        },
+          processedTokens: feedback.processedTokens
+        }
       }));
 
     res.status(200).json({
@@ -147,11 +128,11 @@ exports.getFeedbackAnalytics = async (req, res) => {
         averageRating,
         sentimentDistribution,
         averageConfidence,
-        recentFeedbacks,
-      },
+        recentFeedbacks
+      }
     });
   } catch (error) {
-    console.error("Error getting feedback analytics:", error);
+    console.error('Error getting feedback analytics:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 };
@@ -161,14 +142,14 @@ exports.getUserFeedback = async (req, res) => {
     const userId = req.user._id;
     const feedbacks = await Feedback.find({ userId })
       .populate({
-        path: "userId",
-        select: "name email",
-        model: "users",
+        path: 'userId',
+        select: 'name email',
+        model: 'users'
       })
       .sort({ createdAt: -1 });
     res.status(200).json({ success: true, data: feedbacks });
   } catch (error) {
-    console.error("Error getting user feedback:", error);
+    console.error('Error getting user feedback:', error);
     res.status(500).json({ success: false, error: error.message });
   }
-};
+}; 

@@ -1,52 +1,72 @@
-// Table Controller - Manages restaurant table operations and reservations
 const Table = require("../Models/Table");
 const Reservation = require("../Models/Reservations");
 
-/**
- * Add a new table to the system
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Object} JSON response with success message and table data
- */
+// Add a new table
 const addTable = async (req, res) => {
   try {
-    const { tableName, tableType, capacity, status, description } = req.body;
-    // Handle image upload
-    let image = null;
+    const {
+      tableName,
+      tableType,
+      capacity,
+      status,
+      description,
+      image,
+      imageUrl,
+    } = req.body;
+
+    // Handle image upload - priority order: file upload, base64 image, image URL
+    let finalImage = null;
+
     if (req.file) {
       if (req.file.filename) {
         // Disk storage (development)
-        image = `/uploads/${req.file.filename}`;
-        console.log("Development table upload - saved to disk:", image);
+        finalImage = `/uploads/${req.file.filename}`;
+        console.log("Development table upload - saved to disk:", finalImage);
       } else {
-        // Memory storage (production) - don't save image path
+        // Memory storage (production) - file exists but can't be saved to disk
         console.log(
           "Production environment detected - table file upload not supported on serverless"
         );
-        image = null;
+        finalImage = null;
       }
-    } else if (req.body.imageUrl) {
+    } else if (image && image.startsWith("data:image/")) {
+      // Handle base64 image data
+      finalImage = image;
+      console.log("Table base64 image provided");
+    } else if (
+      imageUrl &&
+      (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"))
+    ) {
       // Handle image URL
-      image = req.body.imageUrl;
-      console.log("Table image URL provided:", image);
+      finalImage = imageUrl;
+      console.log("Table image URL provided:", finalImage);
+    } else if (
+      image &&
+      (image.startsWith("http://") || image.startsWith("https://"))
+    ) {
+      // Handle image URL in image field
+      finalImage = image;
+      console.log("Table image URL provided in image field:", finalImage);
     }
 
     const newTable = new Table({
       tableName,
       tableType,
       capacity,
-      image,
+      image: finalImage,
       status: status || "Available",
       description: description || "",
     });
 
     await newTable.save();
+    console.log("Table saved with image:", finalImage ? "Yes" : "No");
 
     res.status(201).json({
       message: "Table added successfully!",
       table: newTable,
     });
   } catch (error) {
+    console.error("Error adding table:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -67,9 +87,11 @@ const checkTableAvailability = async (req, res) => {
     const { reservationDate, time, endTime, excludeReservationId } = req.query;
 
     if (!reservationDate || !time || !endTime) {
-      return res.status(400).json({
-        error: "Reservation date, start time, and end time are required",
-      });
+      return res
+        .status(400)
+        .json({
+          error: "Reservation date, start time, and end time are required",
+        });
     }
 
     // Convert times to minutes for comparison

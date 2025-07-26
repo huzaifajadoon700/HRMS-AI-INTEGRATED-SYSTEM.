@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FiSearch, FiFilter, FiShoppingCart, FiStar, FiClock, FiTag, FiInfo } from 'react-icons/fi';
 import axios from 'axios';
+import { getMenuImageUrl, handleImageError } from '../utils/imageUtils';
 import PageLayout from '../components/layout/PageLayout';
 import '../styles/theme.css';
 

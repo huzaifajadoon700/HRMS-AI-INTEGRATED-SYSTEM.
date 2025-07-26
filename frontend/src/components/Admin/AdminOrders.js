@@ -34,18 +34,35 @@ const AdminOrders = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
+      console.log("Orders response:", response.data);
+      console.log("Orders response type:", typeof response.data);
+      console.log("Orders response keys:", Object.keys(response.data || {}));
+
       if (response.data && Array.isArray(response.data.orders)) {
+        console.log("✅ Found orders array in response.data.orders");
+        console.log("Sample order:", response.data.orders[0]);
         setOrders(response.data.orders);
       } else if (Array.isArray(response.data)) {
+        console.log("✅ Found orders array in response.data");
+        console.log("Sample order:", response.data[0]);
         setOrders(response.data);
       } else {
+        console.log("❌ No orders array found, setting empty array");
+        console.log("Response structure:", response.data);
         setOrders([]);
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+
       if (error.response?.status === 401) {
         toast.error("Session expired. Please login again");
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
         navigate("/login");
+      } else if (error.response?.status === 500) {
+        toast.error(`Server error: ${error.response?.data?.message || 'Internal server error'}`);
       } else {
         toast.error("Failed to fetch orders");
       }
@@ -61,17 +78,33 @@ const AdminOrders = () => {
       const apiUrl =
         process.env.REACT_APP_API_BASE_URL ||
         "https://hrms-bace.vercel.app/api";
-      await axios.put(
-        `${apiUrl}/orders/${orderId}`,
+
+      console.log(`Updating order ${orderId} to status: ${newStatus}`);
+      console.log(`API URL: ${apiUrl}/orders/${orderId}/status`);
+      console.log(`Token: ${token ? "Present" : "Missing"}`);
+
+      // Use PATCH method as per the backend route
+      const response = await axios.patch(
+        `${apiUrl}/orders/${orderId}/status`,
         { status: newStatus },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
 
+      console.log("Order update response:", response.data);
       toast.success(`Order status updated to ${newStatus}`);
       fetchOrders();
     } catch (error) {
       console.error("Error updating order:", error);
-      toast.error("Failed to update order status");
+      console.error("Error details:", error.response?.data);
+
+      const errorMessage =
+        error.response?.data?.message || "Failed to update order status";
+      toast.error(errorMessage);
     } finally {
       setUpdatingOrderId(null);
     }
@@ -91,6 +124,16 @@ const AdminOrders = () => {
     switch (status?.toLowerCase()) {
       case "pending":
         return "simple-status-pending";
+      case "confirmed":
+      case "preparing":
+        return "simple-status-processing";
+      case "out_for_delivery":
+        return "simple-status-processing";
+      case "delivered":
+        return "simple-status-available";
+      case "canceled":
+        return "simple-status-unavailable";
+      // Handle legacy status values
       case "processing":
         return "simple-status-processing";
       case "completed":
@@ -99,6 +142,32 @@ const AdminOrders = () => {
         return "simple-status-unavailable";
       default:
         return "simple-status-pending";
+    }
+  };
+
+  const getStatusDisplayName = (status) => {
+    switch (status?.toLowerCase()) {
+      case "pending":
+        return "Pending";
+      case "confirmed":
+        return "Confirmed";
+      case "preparing":
+        return "Preparing";
+      case "out_for_delivery":
+        return "Out for Delivery";
+      case "delivered":
+        return "Delivered";
+      case "canceled":
+        return "Canceled";
+      // Handle legacy status values
+      case "processing":
+        return "Processing";
+      case "completed":
+        return "Completed";
+      case "cancelled":
+        return "Cancelled";
+      default:
+        return "Pending";
     }
   };
 
@@ -168,10 +237,18 @@ const AdminOrders = () => {
                 <td style={{ minWidth: "180px" }}>
                   <div>
                     <div style={{ fontWeight: "bold" }}>
-                      {order.customerName || order.customer?.name || "N/A"}
+                      {order.customerName ||
+                        order.customer?.name ||
+                        order.user?.name ||
+                        order.userDetails?.name ||
+                        "N/A"}
                     </div>
                     <div style={{ fontSize: "12px", color: "#666" }}>
-                      {order.customerEmail || order.customer?.email || ""}
+                      {order.customerEmail ||
+                        order.customer?.email ||
+                        order.user?.email ||
+                        order.userDetails?.email ||
+                        ""}
                     </div>
                   </div>
                 </td>
@@ -205,7 +282,7 @@ const AdminOrders = () => {
                   <span
                     className={`simple-status ${getStatusColor(order.status)}`}
                   >
-                    {order.status || "Pending"}
+                    {getStatusDisplayName(order.status)}
                   </span>
                 </td>
                 <td style={{ minWidth: "120px" }}>
@@ -217,27 +294,27 @@ const AdminOrders = () => {
                       <>
                         <button
                           onClick={() =>
-                            handleStatusUpdate(order._id, "processing")
+                            handleStatusUpdate(order._id, "confirmed")
                           }
                           className="simple-btn simple-btn-small"
                           disabled={updatingOrderId === order._id}
                         >
                           {updatingOrderId === order._id
                             ? "Updating..."
-                            : "Process"}
+                            : "Confirm"}
                         </button>
                         <button
                           onClick={() =>
-                            handleStatusUpdate(order._id, "completed")
+                            handleStatusUpdate(order._id, "preparing")
                           }
                           className="simple-btn simple-btn-small simple-btn-success"
                           disabled={updatingOrderId === order._id}
                         >
-                          Complete
+                          Prepare
                         </button>
                         <button
                           onClick={() =>
-                            handleStatusUpdate(order._id, "cancelled")
+                            handleStatusUpdate(order._id, "canceled")
                           }
                           className="simple-btn simple-btn-small simple-btn-danger"
                           disabled={updatingOrderId === order._id}
@@ -246,21 +323,46 @@ const AdminOrders = () => {
                         </button>
                       </>
                     )}
-                    {order.status === "processing" && (
+                    {(order.status === "confirmed" ||
+                      order.status === "preparing") && (
+                      <>
+                        <button
+                          onClick={() =>
+                            handleStatusUpdate(order._id, "out_for_delivery")
+                          }
+                          className="simple-btn simple-btn-small"
+                          disabled={updatingOrderId === order._id}
+                        >
+                          {updatingOrderId === order._id
+                            ? "Updating..."
+                            : "Out for Delivery"}
+                        </button>
+                        <button
+                          onClick={() =>
+                            handleStatusUpdate(order._id, "delivered")
+                          }
+                          className="simple-btn simple-btn-small simple-btn-success"
+                          disabled={updatingOrderId === order._id}
+                        >
+                          Delivered
+                        </button>
+                      </>
+                    )}
+                    {order.status === "out_for_delivery" && (
                       <button
                         onClick={() =>
-                          handleStatusUpdate(order._id, "completed")
+                          handleStatusUpdate(order._id, "delivered")
                         }
                         className="simple-btn simple-btn-small simple-btn-success"
                         disabled={updatingOrderId === order._id}
                       >
                         {updatingOrderId === order._id
                           ? "Updating..."
-                          : "Complete"}
+                          : "Mark Delivered"}
                       </button>
                     )}
-                    {(order.status === "completed" ||
-                      order.status === "cancelled") && (
+                    {(order.status === "delivered" ||
+                      order.status === "canceled") && (
                       <span style={{ color: "#666", fontSize: "12px" }}>
                         No actions
                       </span>

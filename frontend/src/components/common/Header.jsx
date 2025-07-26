@@ -25,7 +25,8 @@ export default function Header() {
 
   // Force re-render when hotel settings change
   useEffect(() => {
-    const handleSettingsChange = () => {
+    const handleSettingsChange = (event) => {
+      console.log('Header received hotelSettingsChanged event:', event.detail);
       // Force component re-render by updating state
       setForceUpdate(prev => prev + 1);
     };
@@ -37,16 +38,19 @@ export default function Header() {
     };
   }, []);
 
-  // Also listen for hotelInfo changes
+  // Also listen for hotelInfo and logos changes
   useEffect(() => {
-    // This will trigger a re-render when hotelInfo changes
-  }, [hotelInfo.hotelName, hotelInfo.loading]);
+    console.log('Header useEffect triggered - hotelInfo or logos changed');
+    // This will trigger a re-render when hotelInfo or logos change
+  }, [hotelInfo.hotelName, hotelInfo.loading, logos.primary, logos.secondary, logos.loginLogo]);
 
   // Debug logging to check if data is loading (remove in production)
   // console.log('Header.jsx - Hotel Info:', hotelInfo);
   // console.log('Header.jsx - Loading state:', hotelInfo.loading);
   // console.log('Header.jsx - Hotel Name:', hotelInfo.hotelName);
   // console.log('Header.jsx - Logos:', logos);
+  // console.log('Header.jsx - Primary Logo:', logos.primary);
+  // console.log('Header.jsx - Force Update Counter:', forceUpdate);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -175,20 +179,25 @@ export default function Header() {
           as={Link}
           to="/"
           className="d-flex align-items-center gap-2 brand-link"
-          key={hotelInfo.hotelName}
+          key={`${hotelInfo.hotelName}-${logos.primary}-${forceUpdate}`}
+          style={{ marginLeft: '-15px' }}
         >
-          {logos.primary && logos.primary !== '/images/logo-primary.png' ? (
+          {logos.primary && logos.primary !== '/images/logo-primary.png' && logos.primary.trim() !== '' ? (
             <img
               src={logos.primary}
               alt={`${hotelInfo.hotelName} Logo`}
               className="header-logo-image"
               onError={(e) => {
+                console.log('Logo failed to load, hiding image');
                 e.target.style.display = 'none';
                 e.target.nextSibling.style.display = 'block';
               }}
+              onLoad={() => {
+                console.log('Logo loaded successfully');
+              }}
             />
           ) : null}
-          <div className="logo-glow" style={{ display: logos.primary && logos.primary !== '/images/logo-primary.png' ? 'none' : 'block' }}>
+          <div className="logo-glow" style={{ display: logos.primary && logos.primary !== '/images/logo-primary.png' && logos.primary.trim() !== '' ? 'none' : 'block' }}>
             <span className="text-accent">{hotelInfo.hotelName?.split(' ')[0]?.toUpperCase() || 'HOTEL'}</span>
             {hotelInfo.hotelName?.split(' ').length > 1 && (
               <span className="text-light">{hotelInfo.hotelName.split(' ').slice(1).join(' ').toUpperCase()}</span>

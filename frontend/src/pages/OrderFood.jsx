@@ -132,16 +132,40 @@ export default function OrderFood() {
 
     const handleRateItem = (menuItemId, rating) => {
         const userId = recommendationHelpers.getCurrentUserId();
+        const token = localStorage.getItem('token');
+
+        console.log('🔍 Rating Debug Info:', {
+            userId,
+            menuItemId,
+            rating,
+            hasToken: !!token,
+            isLoggedIn: recommendationHelpers.isUserLoggedIn()
+        });
+
         if (userId && recommendationHelpers.isUserLoggedIn()) {
             recommendationAPI.rateMenuItem(userId, menuItemId, rating)
-                .then(() => {
+                .then((response) => {
+                    console.log('✅ Rating success:', response);
                     toast.success('Rating submitted successfully!');
                 })
                 .catch((error) => {
-                    console.error('Error rating item:', error);
-                    toast.error('Failed to submit rating');
+                    console.error('❌ Rating error details:', {
+                        message: error.message,
+                        status: error.response?.status,
+                        data: error.response?.data,
+                        config: error.config
+                    });
+
+                    if (error.response?.status === 401) {
+                        toast.error('Please login again to rate items');
+                    } else if (error.response?.status === 400) {
+                        toast.error(error.response?.data?.message || 'Invalid rating data');
+                    } else {
+                        toast.error('Failed to submit rating. Please try again.');
+                    }
                 });
         } else {
+            console.log('❌ User not logged in or missing data:', { userId, hasToken: !!token });
             toast.info('Please login to rate items');
         }
     };
@@ -161,48 +185,45 @@ export default function OrderFood() {
             <>
                 <Header />
                 <div style={{
-                    background: '#0A192F',
+                    background: '#ffffff',
                     minHeight: '100vh',
                     position: 'relative',
-                    overflow: 'hidden',
                     width: '100%',
                     margin: 0,
                     padding: 0,
                     paddingTop: '80px'
                 }}>
-
                     {/* Main Content */}
                     <div style={{
                         position: 'relative',
-                        zIndex: 2,
                         width: '100%',
                         margin: '0',
-                        padding: '60px 1.5rem 1.5rem'
+                        padding: '2rem 1.5rem 1.5rem'
                     }}>
                         {/* Hero Section */}
                         <div style={{
                             textAlign: 'center',
-                            marginBottom: '2rem',
+                            marginBottom: '3rem',
                             padding: '1rem 0'
                         }}>
                             <h1 style={{
                                 fontSize: '2.5rem',
                                 fontWeight: '700',
-                                background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 30%, #bb86fc 70%, #ff6b9d 100%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                backgroundClip: 'text',
-                                marginBottom: '0.5rem',
-                                lineHeight: '1.1',
-                                textShadow: '0 0 30px rgba(100, 255, 218, 0.3)'
+                                color: '#000000',
+                                marginBottom: '1rem',
+                                lineHeight: '1.2',
+                                fontFamily: 'Inter, sans-serif'
                             }}>
                                 Order Food
                             </h1>
                             <p style={{
-                                fontSize: '1rem',
-                                color: 'rgba(255, 255, 255, 0.8)',
+                                fontSize: '1.125rem',
+                                color: '#6b7280',
                                 margin: '0',
-                                lineHeight: '1.4'
+                                lineHeight: '1.5',
+                                maxWidth: '600px',
+                                marginLeft: 'auto',
+                                marginRight: 'auto'
                             }}>
                                 Loading delicious menu items...
                             </p>
@@ -212,21 +233,19 @@ export default function OrderFood() {
                         <div className="order-food-loading-grid" style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
-                            gap: '1.5rem',
+                            gap: '2rem',
                             marginBottom: '2rem'
                         }}>
                             {Array(6).fill().map((_, index) => (
                                 <div
                                     key={index}
                                     style={{
-                                        background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.8) 0%, rgba(26, 35, 50, 0.6) 100%)',
-                                        backdropFilter: 'blur(20px)',
-                                        border: '1px solid rgba(100, 255, 218, 0.2)',
-                                        borderRadius: '1.5rem',
+                                        background: '#f3f4f6',
+                                        border: '1px solid #e5e7eb',
+                                        borderRadius: '1rem',
                                         overflow: 'hidden',
-                                        height: '500px',
-                                        animation: 'pulse 2s ease-in-out infinite',
-                                        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.3)'
+                                        height: '400px',
+                                        animation: 'pulse 2s ease-in-out infinite'
                                     }}
                                 />
                             ))}
@@ -250,17 +269,18 @@ export default function OrderFood() {
                     justifyContent: 'center'
                 }}>
                     <div style={{
-                        background: 'rgba(255, 87, 87, 0.1)',
-                        border: '1px solid rgba(255, 87, 87, 0.3)',
+                        background: '#ffffff',
+                        border: '1px solid #e5e7eb',
                         borderRadius: '1rem',
                         padding: '2rem',
                         textAlign: 'center',
-                        color: '#fff',
-                        maxWidth: '400px'
+                        color: '#000000',
+                        maxWidth: '400px',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
                     }}>
                         <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>😞</div>
-                        <h3 style={{ color: '#ff5757', marginBottom: '1rem' }}>Oops! Something went wrong</h3>
-                        <p style={{ color: 'rgba(255, 255, 255, 0.8)' }}>{error}</p>
+                        <h3 style={{ color: '#dc2626', marginBottom: '1rem', fontFamily: 'Inter, sans-serif' }}>Oops! Something went wrong</h3>
+                        <p style={{ color: '#6b7280' }}>{error}</p>
                     </div>
                 </div>
             </>
@@ -271,7 +291,7 @@ export default function OrderFood() {
         <>
             <Header />
             <div style={{
-                background: '#0A192F',
+                background: '#ffffff',
                 minHeight: '100vh',
                 paddingTop: '80px',
                 width: '100%',
@@ -281,27 +301,27 @@ export default function OrderFood() {
                 {/* Hero Section */}
                 <div className="order-food-hero" style={{
                     textAlign: 'center',
-                    marginBottom: '2rem',
+                    marginBottom: '3rem',
                     padding: '2rem 1.5rem 1rem'
                 }}>
                     <h1 className="order-food-title" style={{
                         fontSize: '2.5rem',
                         fontWeight: '700',
-                        background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 30%, #bb86fc 70%, #ff6b9d 100%)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent',
-                        backgroundClip: 'text',
-                        marginBottom: '0.5rem',
-                        lineHeight: '1.1',
-                        textShadow: '0 0 30px rgba(100, 255, 218, 0.3)'
+                        color: '#000000',
+                        marginBottom: '1rem',
+                        lineHeight: '1.2',
+                        fontFamily: 'Inter, sans-serif'
                     }}>
                         🍽️ Order Delicious Food
                     </h1>
                     <p className="order-food-subtitle" style={{
-                        fontSize: '1rem',
-                        color: 'rgba(255, 255, 255, 0.8)',
+                        fontSize: '1.125rem',
+                        color: '#6b7280',
                         margin: '0',
-                        lineHeight: '1.4'
+                        lineHeight: '1.5',
+                        maxWidth: '600px',
+                        marginLeft: 'auto',
+                        marginRight: 'auto'
                     }}>
                         Discover amazing dishes crafted with love and passion
                     </p>
@@ -309,11 +329,12 @@ export default function OrderFood() {
 
                 {/* Search and Filters Section */}
                 <div className="order-food-filters" style={{
-                    background: 'rgba(100, 255, 218, 0.05)',
+                    background: '#ffffff',
                     borderRadius: '1rem',
                     padding: '1.5rem',
                     margin: '0 1.5rem 2rem',
-                    border: '1px solid rgba(100, 255, 218, 0.1)'
+                    border: '1px solid #e5e7eb',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
                 }}>
                     <div className="order-food-filters-grid" style={{
                         display: 'grid',
@@ -324,10 +345,11 @@ export default function OrderFood() {
                         <div>
                             <label style={{
                                 display: 'block',
-                                color: '#64ffda',
-                                fontSize: '0.8rem',
-                                fontWeight: '600',
-                                marginBottom: '0.5rem'
+                                color: '#374151',
+                                fontSize: '0.875rem',
+                                fontWeight: '500',
+                                marginBottom: '0.5rem',
+                                fontFamily: 'Inter, sans-serif'
                             }}>
                                 🔍 Search Menu
                             </label>
@@ -339,8 +361,9 @@ export default function OrderFood() {
                                 <FiSearch style={{
                                     position: 'absolute',
                                     left: '0.75rem',
-                                    color: 'rgba(255, 255, 255, 0.6)',
-                                    zIndex: 2
+                                    color: '#9ca3af',
+                                    zIndex: 2,
+                                    marginRight:"2 rem"
                                 }} />
                                 <input
                                     type="text"
@@ -350,12 +373,13 @@ export default function OrderFood() {
                                     style={{
                                         width: '100%',
                                         padding: '0.75rem 0.75rem 0.75rem 2.5rem',
-                                        background: '#0A192F',
-                                        border: '1px solid rgba(100, 255, 218, 0.3)',
-                                        borderRadius: '0.75rem',
-                                        color: '#fff',
-                                        fontSize: '0.9rem',
-                                        outline: 'none'
+                                        background: '#ffffff',
+                                        border: '1px solid #d1d5db',
+                                        borderRadius: '0.5rem',
+                                        color: '#000000',
+                                        fontSize: '0.875rem',
+                                        outline: 'none',
+                                        fontFamily: 'Inter, sans-serif'
                                     }}
                                 />
                             </div>
@@ -364,10 +388,11 @@ export default function OrderFood() {
                         <div>
                             <label style={{
                                 display: 'block',
-                                color: '#64ffda',
-                                fontSize: '0.8rem',
-                                fontWeight: '600',
-                                marginBottom: '0.5rem'
+                                color: '#374151',
+                                fontSize: '0.875rem',
+                                fontWeight: '500',
+                                marginBottom: '0.5rem',
+                                fontFamily: 'Inter, sans-serif'
                             }}>
                                 🏷️ Category
                             </label>
@@ -377,12 +402,13 @@ export default function OrderFood() {
                                 style={{
                                     width: '100%',
                                     padding: '0.75rem',
-                                    background: '#0A192F',
-                                    border: '1px solid rgba(100, 255, 218, 0.3)',
-                                    borderRadius: '0.75rem',
-                                    color: '#fff',
-                                    fontSize: '0.9rem',
-                                    outline: 'none'
+                                    background: '#ffffff',
+                                    border: '1px solid #d1d5db',
+                                    borderRadius: '0.5rem',
+                                    color: '#000000',
+                                    fontSize: '0.875rem',
+                                    outline: 'none',
+                                    fontFamily: 'Inter, sans-serif'
                                 }}
                             >
                                 <option value="">All Categories</option>
@@ -398,8 +424,9 @@ export default function OrderFood() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.5rem',
-                            color: 'rgba(255, 255, 255, 0.8)',
-                            fontSize: '0.85rem'
+                            color: '#6b7280',
+                            fontSize: '0.875rem',
+                            fontFamily: 'Inter, sans-serif'
                         }}>
                             <span>📊 {filteredItems.length} items found</span>
                         </div>
@@ -429,28 +456,29 @@ export default function OrderFood() {
                             position: 'fixed',
                             bottom: '2rem',
                             right: '2rem',
-                            background: 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)',
-                            color: '#0a192f',
+                            background: '#000000',
+                            color: '#ffffff',
                             padding: '1rem 1.5rem',
-                            borderRadius: '2rem',
-                            boxShadow: '0 8px 25px rgba(100, 255, 218, 0.4)',
+                            borderRadius: '0.5rem',
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '0.75rem',
                             cursor: 'pointer',
-                            transition: 'all 0.3s ease',
+                            transition: 'all 0.2s ease',
                             zIndex: 1000,
-                            fontSize: '0.9rem',
-                            fontWeight: '600',
-                            userSelect: 'none'
+                            fontSize: '0.875rem',
+                            fontWeight: '500',
+                            userSelect: 'none',
+                            fontFamily: 'Inter, sans-serif'
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'scale(1.05)';
-                            e.currentTarget.style.boxShadow = '0 12px 35px rgba(100, 255, 218, 0.5)';
+                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.transform = 'scale(1)';
-                            e.currentTarget.style.boxShadow = '0 8px 25px rgba(100, 255, 218, 0.4)';
+                            e.currentTarget.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
                         }}
                         title="Click to view cart"
                     >

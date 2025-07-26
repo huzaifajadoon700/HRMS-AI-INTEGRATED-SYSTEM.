@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiShield, FiCheckCircle, FiHome, FiUsers, FiStar, FiArrowRight } from "react-icons/fi";
@@ -14,11 +14,31 @@ const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, text: '', checks: {} });
+  const [forceUpdate, setForceUpdate] = useState(0);
   const navigate = useNavigate();
 
   // Get dynamic hotel information and logos
   const hotelInfo = useHotelInfo();
   const logos = useLogos();
+
+  // Force re-render when hotel settings change
+  useEffect(() => {
+    const handleSettingsChange = () => {
+      // Force component re-render by updating state
+      setForceUpdate(prev => prev + 1);
+    };
+
+    window.addEventListener('hotelSettingsChanged', handleSettingsChange);
+
+    return () => {
+      window.removeEventListener('hotelSettingsChanged', handleSettingsChange);
+    };
+  }, []);
+
+  // Also listen for hotelInfo and logos changes
+  useEffect(() => {
+    // This will trigger a re-render when hotelInfo or logos change
+  }, [hotelInfo.hotelName, hotelInfo.hotelSubtitle, logos.loginLogo]);
 
   const handleToggle = () => {
     setIsLogin(!isLogin);
@@ -165,23 +185,34 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="modern-login-page">
+    <div key={`${hotelInfo.hotelName}-${logos.loginLogo}-${forceUpdate}`} className="modern-login-page">
       {/* Left Side - Branding */}
       <div className="login-branding">
         <div className="branding-content">
-          <div className="brand-logo">
-            {logos.loginLogo && logos.loginLogo !== '/images/logo-login.png' ? (
+          <div className="brand-logo" key={`login-logo-${logos.loginLogo}-${logos.primary}-${forceUpdate}`}>
+            {(logos.loginLogo && logos.loginLogo !== '/images/logo-login.png' && logos.loginLogo.trim() !== '') ||
+             (logos.primary && logos.primary !== '/images/logo-primary.png' && logos.primary.trim() !== '') ? (
               <img
-                src={logos.loginLogo}
+                src={logos.loginLogo && logos.loginLogo !== '/images/logo-login.png' && logos.loginLogo.trim() !== ''
+                     ? logos.loginLogo
+                     : logos.primary}
                 alt={`${hotelInfo.hotelName} Logo`}
                 className="login-logo-image"
                 onError={(e) => {
+                  console.log('Login logo failed to load, showing fallback');
                   e.target.style.display = 'none';
                   e.target.nextSibling.style.display = 'flex';
                 }}
+                onLoad={() => {
+                  console.log('Login logo loaded successfully');
+                }}
               />
             ) : null}
-            <div className="professional-logo" style={{ display: logos.loginLogo && logos.loginLogo !== '/images/logo-login.png' ? 'none' : 'flex' }}>
+            <div className="professional-logo" style={{
+              display: ((logos.loginLogo && logos.loginLogo !== '/images/logo-login.png' && logos.loginLogo.trim() !== '') ||
+                       (logos.primary && logos.primary !== '/images/logo-primary.png' && logos.primary.trim() !== ''))
+                       ? 'none' : 'flex'
+            }}>
               <span className="logo-text">{hotelInfo.hotelName.substring(0, 2).toUpperCase()}</span>
               <span className="logo-accent">MS</span>
             </div>

@@ -82,21 +82,53 @@ const Footer = () => {
     <>
       <style key={`${contactInfo.phone}-${contactInfo.email}-${forceUpdate}`}>
         {`
-          @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(180deg); }
+          /* Responsive Styles for Footer */
+          @media (max-width: 768px) {
+            .footer-grid {
+              grid-template-columns: 1fr !important;
+              gap: 2rem !important;
+            }
+            .footer-brand {
+              max-width: 100% !important;
+              text-align: center !important;
+            }
+            .footer-links {
+              text-align: center !important;
+            }
+            .footer-stats {
+              gap: 1.5rem !important;
+            }
+            .footer-social {
+              justify-content: center !important;
+            }
+            .newsletter-form {
+              flex-direction: column !important;
+              gap: 0.75rem !important;
+            }
+            .newsletter-input {
+              width: 100% !important;
+            }
           }
-          @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-          }
-          @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-          }
-          @keyframes glow {
-            0%, 100% { box-shadow: 0 0 20px rgba(100, 255, 218, 0.3); }
-            50% { box-shadow: 0 0 30px rgba(100, 255, 218, 0.6); }
+
+          @media (max-width: 480px) {
+            .footer-container {
+              padding: 0 1rem !important;
+            }
+            .footer-brand h3 {
+              font-size: 1.25rem !important;
+            }
+            .footer-stats {
+              flex-direction: column !important;
+              gap: 1rem !important;
+            }
+            .footer-social {
+              gap: 0.5rem !important;
+            }
+            .footer-social a {
+              width: 2rem !important;
+              height: 2rem !important;
+              font-size: 0.875rem !important;
+            }
           }
         `}
       </style>
@@ -104,70 +136,22 @@ const Footer = () => {
         width: '100%',
         margin: 0,
         padding: '3rem 0 1.5rem',
-        background: 'linear-gradient(180deg, #112240 0%, #0A192F 100%)',
-        backdropFilter: 'blur(20px)',
+        background: '#f9fafb',
         position: 'relative',
-        overflow: 'hidden',
-        borderTop: '1px solid rgba(100, 255, 218, 0.2)'
+        borderTop: '1px solid #e5e7eb'
       }}>
-        {/* Animated Background Elements */}
-        <div style={{
-          position: 'absolute',
-          top: '30%',
-          left: '15%',
-          width: '200px',
-          height: '200px',
-          background: 'radial-gradient(circle, rgba(100, 255, 218, 0.03) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(40px)',
-          animation: 'float 15s ease-in-out infinite',
-          zIndex: 0
-        }} />
-        <div style={{
-          position: 'absolute',
-          top: '70%',
-          right: '20%',
-          width: '150px',
-          height: '150px',
-          background: 'radial-gradient(circle, rgba(187, 134, 252, 0.02) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(30px)',
-          animation: 'float 18s ease-in-out infinite reverse',
-          zIndex: 0
-        }} />
-
-        {/* Floating Particles */}
-        {[...Array(8)].map((_, i) => (
-          <div
-            key={i}
-            style={{
-              position: 'absolute',
-              width: '2px',
-              height: '2px',
-              background: `rgba(${100 + i * 10}, ${255 - i * 6}, ${218 - i * 4}, 0.3)`,
-              borderRadius: '50%',
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `float ${10 + Math.random() * 15}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 10}s`,
-              zIndex: 1
-            }}
-          />
-        ))}
 
         <div style={{
           width: '100%',
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '0 2rem',
-          position: 'relative',
-          zIndex: 2
+          padding: '0 2rem'
         }}>
           {/* Main Footer Content */}
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: '2rem',
+            gap: '3rem',
             marginBottom: '2rem'
           }}>
             {/* Brand Section */}
@@ -181,30 +165,27 @@ const Footer = () => {
                 <div style={{
                   width: '2.5rem',
                   height: '2.5rem',
-                  background: 'linear-gradient(135deg, #bb86fc 0%, #64ffda 100%)',
+                  background: '#000000',
                   borderRadius: '0.5rem',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  animation: 'pulse 3s ease-in-out infinite'
+                  justifyContent: 'center'
                 }}>
-                  <FaHotel style={{ color: '#0a0a0a', fontSize: '1rem' }} />
+                  <FaHotel style={{ color: '#ffffff', fontSize: '1rem' }} />
                 </div>
                 <h3 style={{
                   fontSize: '1.5rem',
-                  fontWeight: '800',
-                  background: 'linear-gradient(135deg, #ffffff 0%, #bb86fc 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  margin: 0
+                  fontWeight: '600',
+                  color: '#000000',
+                  margin: 0,
+                  fontFamily: 'Inter, sans-serif'
                 }}>
                   {hotelInfo.hotelName}
                 </h3>
               </div>
 
               <p style={{
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: '#6b7280',
                 fontSize: '0.9rem',
                 lineHeight: '1.5',
                 marginBottom: '1.5rem'
@@ -214,101 +195,96 @@ const Footer = () => {
 
               {/* Contact Info */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{
                     width: '2rem',
                     height: '2rem',
-                    background: 'rgba(100, 255, 218, 0.1)',
-                    borderRadius: '0.4rem',
+                    background: '#f3f4f6',
+                    borderRadius: '0.5rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1px solid rgba(100, 255, 218, 0.2)'
+                    justifyContent: 'center'
                   }}>
-                    <FiMapPin style={{ color: '#64ffda', fontSize: '0.8rem' }} />
+                    <FiMapPin style={{ color: '#6b7280', fontSize: '0.875rem' }} />
                   </div>
-                  <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.8rem' }}>
+                  <span style={{ color: '#374151', fontSize: '0.875rem' }}>
                     {contactInfo.address}
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{
                     width: '2rem',
                     height: '2rem',
-                    background: 'rgba(187, 134, 252, 0.1)',
-                    borderRadius: '0.4rem',
+                    background: '#f3f4f6',
+                    borderRadius: '0.5rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1px solid rgba(187, 134, 252, 0.2)'
+                    justifyContent: 'center'
                   }}>
-                    <FiPhone style={{ color: '#bb86fc', fontSize: '0.8rem' }} />
+                    <FiPhone style={{ color: '#6b7280', fontSize: '0.875rem' }} />
                   </div>
-                  <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.8rem' }}>
+                  <span style={{ color: '#374151', fontSize: '0.875rem' }}>
                     {contactInfo.phone}
                   </span>
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{
                     width: '2rem',
                     height: '2rem',
-                    background: 'rgba(255, 107, 157, 0.1)',
-                    borderRadius: '0.4rem',
+                    background: '#f3f4f6',
+                    borderRadius: '0.5rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1px solid rgba(255, 107, 157, 0.2)'
+                    justifyContent: 'center'
                   }}>
-                    <FiMail style={{ color: '#ff6b9d', fontSize: '0.8rem' }} />
+                    <FiMail style={{ color: '#6b7280', fontSize: '0.875rem' }} />
                   </div>
-                  <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.8rem' }}>
+                  <span style={{ color: '#374151', fontSize: '0.875rem' }}>
                     {contactInfo.email}
                   </span>
                 </div>
 
                 {/* WhatsApp */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{
                     width: '2rem',
                     height: '2rem',
-                    background: 'rgba(37, 211, 102, 0.1)',
-                    borderRadius: '0.4rem',
+                    background: '#f3f4f6',
+                    borderRadius: '0.5rem',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '1px solid rgba(37, 211, 102, 0.2)'
+                    justifyContent: 'center'
                   }}>
-                    <FaWhatsapp style={{ color: '#25D366', fontSize: '0.8rem' }} />
+                    <FaWhatsapp style={{ color: '#6b7280', fontSize: '0.875rem' }} />
                   </div>
-                  <span style={{ color: 'rgba(255, 255, 255, 0.8)', fontSize: '0.8rem' }}>
+                  <span style={{ color: '#374151', fontSize: '0.875rem' }}>
                     {contactInfo.whatsapp}
                   </span>
                 </div>
 
                 {/* Website */}
                 {contactInfo.website && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                     <div style={{
                       width: '2rem',
                       height: '2rem',
-                      background: 'rgba(100, 255, 218, 0.1)',
-                      borderRadius: '0.4rem',
+                      background: '#f3f4f6',
+                      borderRadius: '0.5rem',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '1px solid rgba(100, 255, 218, 0.2)'
+                      justifyContent: 'center'
                     }}>
-                      <FiGlobe style={{ color: '#64ffda', fontSize: '0.8rem' }} />
+                      <FiGlobe style={{ color: '#6b7280', fontSize: '0.875rem' }} />
                     </div>
                     <a
                       href={contactInfo.website}
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        color: 'rgba(255, 255, 255, 0.8)',
-                        fontSize: '0.8rem',
+                        color: '#374151',
+                        fontSize: '0.875rem',
                         textDecoration: 'none'
                       }}
                     >
@@ -322,47 +298,37 @@ const Footer = () => {
             {/* Quick Links */}
             <div>
               <h4 style={{
-                fontSize: '1rem',
-                fontWeight: '700',
-                color: '#fff',
+                fontSize: '1.125rem',
+                fontWeight: '600',
+                color: '#000000',
                 marginBottom: '1rem',
-                background: 'linear-gradient(135deg, #ffffff 0%, #bb86fc 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
+                fontFamily: 'Inter, sans-serif'
               }}>
                 Quick Links
               </h4>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 {quickLinks.map((link, index) => (
                   <Link
                     key={index}
                     to={link.href}
                     style={{
-                      color: 'rgba(255, 255, 255, 0.7)',
+                      color: '#6b7280',
                       textDecoration: 'none',
-                      fontSize: '0.8rem',
+                      fontSize: '0.875rem',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.4rem',
-                      padding: '0.3rem 0',
-                      transition: 'all 0.3s ease',
-                      borderRadius: '0.3rem'
+                      gap: '0.5rem',
+                      padding: '0.25rem 0',
+                      transition: 'all 0.2s ease'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.color = '#64ffda';
-                      e.target.style.transform = 'translateX(3px)';
-                      e.target.style.background = 'rgba(100, 255, 218, 0.05)';
-                      e.target.style.padding = '0.3rem 0.5rem';
+                      e.target.style.color = '#000000';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.color = 'rgba(255, 255, 255, 0.7)';
-                      e.target.style.transform = 'translateX(0)';
-                      e.target.style.background = 'transparent';
-                      e.target.style.padding = '0.3rem 0';
+                      e.target.style.color = '#6b7280';
                     }}
                   >
-                    <FiExternalLink size={12} />
+                    <FiExternalLink size={14} />
                     {link.name}
                   </Link>
                 ))}
@@ -372,18 +338,15 @@ const Footer = () => {
             {/* Services */}
             <div>
               <h4 style={{
-                fontSize: '1rem',
-                fontWeight: '700',
-                color: '#fff',
+                fontSize: '1.125rem',
+                fontWeight: '600',
+                color: '#000000',
                 marginBottom: '1rem',
-                background: 'linear-gradient(135deg, #ffffff 0%, #bb86fc 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
+                fontFamily: 'Inter, sans-serif'
               }}>
                 Our Services
               </h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.5rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
                 {services.slice(0, 4).map((service, index) => (
                   <Link
                     key={index}
@@ -391,28 +354,26 @@ const Footer = () => {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.4rem',
-                      padding: '0.5rem',
-                      background: 'rgba(255, 255, 255, 0.03)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      gap: '0.5rem',
+                      padding: '0.75rem',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
                       borderRadius: '0.5rem',
                       textDecoration: 'none',
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      fontSize: '0.7rem',
-                      transition: 'all 0.3s ease'
+                      color: '#374151',
+                      fontSize: '0.875rem',
+                      transition: 'all 0.2s ease'
                     }}
                     onMouseEnter={(e) => {
-                      e.target.style.background = 'rgba(100, 255, 218, 0.1)';
-                      e.target.style.borderColor = 'rgba(100, 255, 218, 0.3)';
-                      e.target.style.transform = 'translateY(-1px)';
+                      e.target.style.background = '#f9fafb';
+                      e.target.style.borderColor = '#d1d5db';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.background = 'rgba(255, 255, 255, 0.03)';
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
-                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.background = '#ffffff';
+                      e.target.style.borderColor = '#e5e7eb';
                     }}
                   >
-                    <div style={{ color: '#64ffda', fontSize: '0.8rem' }}>
+                    <div style={{ color: '#6b7280', fontSize: '1rem' }}>
                       {service.icon}
                     </div>
                     {service.name}
@@ -424,21 +385,18 @@ const Footer = () => {
             {/* Newsletter */}
             <div>
               <h4 style={{
-                fontSize: '1rem',
-                fontWeight: '700',
-                color: '#fff',
+                fontSize: '1.125rem',
+                fontWeight: '600',
+                color: '#000000',
                 marginBottom: '1rem',
-                background: 'linear-gradient(135deg, #ffffff 0%, #bb86fc 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
+                fontFamily: 'Inter, sans-serif'
               }}>
                 Stay Updated
               </h4>
 
               <p style={{
-                color: 'rgba(255, 255, 255, 0.7)',
-                fontSize: '0.8rem',
+                color: '#6b7280',
+                fontSize: '0.875rem',
                 marginBottom: '1rem',
                 lineHeight: '1.4'
               }}>
@@ -448,7 +406,7 @@ const Footer = () => {
               <form onSubmit={handleSubscribe} style={{ marginBottom: '1.5rem' }}>
                 <div style={{
                   display: 'flex',
-                  gap: '0.4rem',
+                  gap: '0.5rem',
                   marginBottom: '0.75rem'
                 }}>
                   <input
@@ -459,51 +417,49 @@ const Footer = () => {
                     required
                     style={{
                       flex: 1,
-                      padding: '0.5rem 0.75rem',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '1px solid rgba(255, 255, 255, 0.15)',
+                      padding: '0.75rem',
+                      background: '#ffffff',
+                      border: '1px solid #e5e7eb',
                       borderRadius: '0.5rem',
-                      color: '#fff',
-                      fontSize: '0.8rem',
+                      color: '#000000',
+                      fontSize: '0.875rem',
                       outline: 'none',
-                      transition: 'all 0.3s ease'
+                      transition: 'all 0.2s ease'
                     }}
                     onFocus={(e) => {
-                      e.target.style.borderColor = 'rgba(100, 255, 218, 0.5)';
-                      e.target.style.background = 'rgba(100, 255, 218, 0.05)';
+                      e.target.style.borderColor = '#d1d5db';
+                      e.target.style.background = '#f9fafb';
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = 'rgba(255, 255, 255, 0.15)';
-                      e.target.style.background = 'rgba(255, 255, 255, 0.05)';
+                      e.target.style.borderColor = '#e5e7eb';
+                      e.target.style.background = '#ffffff';
                     }}
                   />
                   <button
                     type="submit"
                     style={{
-                      padding: '0.5rem 1rem',
-                      background: isSubscribed
-                        ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)'
-                        : 'linear-gradient(135deg, #bb86fc 0%, #64ffda 100%)',
+                      padding: '0.75rem 1rem',
+                      background: isSubscribed ? '#10b981' : '#000000',
                       border: 'none',
                       borderRadius: '0.5rem',
-                      color: '#0a0a0a',
-                      fontSize: '0.8rem',
-                      fontWeight: '600',
+                      color: '#ffffff',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
                       cursor: 'pointer',
-                      transition: 'all 0.3s ease',
+                      transition: 'all 0.2s ease',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.3rem'
+                      gap: '0.5rem'
                     }}
                     onMouseEnter={(e) => {
                       if (!isSubscribed) {
-                        e.target.style.transform = 'translateY(-1px)';
-                        e.target.style.boxShadow = '0 4px 15px rgba(187, 134, 252, 0.3)';
+                        e.target.style.background = '#333333';
                       }
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.transform = 'translateY(0)';
-                      e.target.style.boxShadow = 'none';
+                      if (!isSubscribed) {
+                        e.target.style.background = '#000000';
+                      }
                     }}
                   >
                     {isSubscribed ? (
@@ -524,17 +480,18 @@ const Footer = () => {
               {/* Social Media */}
               <div>
                 <h5 style={{
-                  color: 'rgba(255, 255, 255, 0.9)',
-                  fontSize: '0.9rem',
+                  color: '#000000',
+                  fontSize: '1rem',
                   fontWeight: '600',
-                  marginBottom: '0.75rem'
+                  marginBottom: '0.75rem',
+                  fontFamily: 'Inter, sans-serif'
                 }}>
                   Follow Us
                 </h5>
                 <div style={{
                   display: 'flex',
                   flexWrap: 'wrap',
-                  gap: '0.5rem'
+                  gap: '0.75rem'
                 }}>
                   {socialLinks.slice(0, 4).map((social, index) => (
                     <a
@@ -543,24 +500,29 @@ const Footer = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
-                        width: '2rem',
-                        height: '2rem',
-                        background: hoveredSocial === index
-                          ? social.color
-                          : 'rgba(255, 255, 255, 0.05)',
+                        width: '2.5rem',
+                        height: '2.5rem',
+                        background: '#ffffff',
                         borderRadius: '0.5rem',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: hoveredSocial === index ? '#fff' : 'rgba(255, 255, 255, 0.7)',
+                        color: '#6b7280',
                         textDecoration: 'none',
-                        transition: 'all 0.3s ease',
-                        border: `1px solid ${hoveredSocial === index ? social.color : 'rgba(255, 255, 255, 0.1)'}`,
-                        transform: hoveredSocial === index ? 'translateY(-2px) scale(1.05)' : 'translateY(0) scale(1)',
-                        fontSize: '0.8rem'
+                        transition: 'all 0.2s ease',
+                        border: '1px solid #e5e7eb',
+                        fontSize: '1rem'
                       }}
-                      onMouseEnter={() => setHoveredSocial(index)}
-                      onMouseLeave={() => setHoveredSocial(null)}
+                      onMouseEnter={(e) => {
+                        e.target.style.background = '#f3f4f6';
+                        e.target.style.borderColor = '#d1d5db';
+                        e.target.style.color = '#374151';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.background = '#ffffff';
+                        e.target.style.borderColor = '#e5e7eb';
+                        e.target.style.color = '#6b7280';
+                      }}
                     >
                       {social.icon}
                     </a>
@@ -572,63 +534,57 @@ const Footer = () => {
 
           {/* Footer Bottom */}
           <div style={{
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-            paddingTop: '1.5rem',
+            borderTop: '1px solid #e5e7eb',
+            paddingTop: '2rem',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '0.75rem'
+            gap: '1rem'
           }}>
             {/* Stats */}
             <div style={{
               display: 'flex',
               flexWrap: 'wrap',
-              gap: '1.5rem',
+              gap: '2rem',
               justifyContent: 'center',
-              marginBottom: '0.75rem'
+              marginBottom: '1rem'
             }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{
-                  fontSize: '1.2rem',
-                  fontWeight: '800',
-                  background: 'linear-gradient(135deg, #64ffda 0%, #bb86fc 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  color: '#000000',
+                  fontFamily: 'Inter, sans-serif'
                 }}>
                   500+
                 </div>
-                <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.7rem' }}>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
                   Happy Guests
                 </div>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{
-                  fontSize: '1.2rem',
-                  fontWeight: '800',
-                  background: 'linear-gradient(135deg, #ff6b9d 0%, #ffc107 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  color: '#000000',
+                  fontFamily: 'Inter, sans-serif'
                 }}>
                   4.9
                 </div>
-                <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.7rem' }}>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
                   Rating
                 </div>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <div style={{
-                  fontSize: '1.2rem',
-                  fontWeight: '800',
-                  background: 'linear-gradient(135deg, #bb86fc 0%, #64ffda 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
+                  fontSize: '1.5rem',
+                  fontWeight: '700',
+                  color: '#000000',
+                  fontFamily: 'Inter, sans-serif'
                 }}>
                   24/7
                 </div>
-                <div style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.7rem' }}>
+                <div style={{ color: '#6b7280', fontSize: '0.875rem' }}>
                   Support
                 </div>
               </div>
@@ -637,13 +593,13 @@ const Footer = () => {
             {/* Copyright */}
             <div style={{
               textAlign: 'center',
-              color: 'rgba(255, 255, 255, 0.5)',
-              fontSize: '0.8rem'
+              color: '#6b7280',
+              fontSize: '0.875rem'
             }}>
               <p style={{ margin: 0 }}>
                 © {new Date().getFullYear()} {hotelInfo.hotelName}. All rights reserved. |
-                <span style={{ color: '#64ffda', marginLeft: '0.5rem' }}>
-                  Made with <FiHeart style={{ color: '#ff6b9d', display: 'inline' }} /> for luxury hospitality
+                <span style={{ color: '#374151', marginLeft: '0.5rem' }}>
+                  Made with <FiHeart style={{ color: '#ef4444', display: 'inline' }} /> for luxury hospitality
                 </span>
               </p>
             </div>

@@ -120,13 +120,13 @@ const PaymentForm = ({ onPaymentSuccess, totalPrice, onCancel, cart }) => {
                 style: {
                   base: {
                     fontSize: '16px',
-                    color: '#424770',
+                    color: '#000000',
                     '::placeholder': {
-                      color: '#aab7c4',
+                      color: '#6b7280',
                     },
                   },
                   invalid: {
-                    color: '#9e2146',
+                    color: '#dc2626',
                   },
                 },
                 hidePostalCode: true
@@ -521,7 +521,7 @@ export default function Cart() {
   if (showPayment) {
     return (
       <div style={{
-        background: '#0A192F',
+        background: 'rgba(0, 0, 0, 0.5)',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'flex-start',
@@ -537,15 +537,15 @@ export default function Cart() {
         overflowY: 'auto'
       }}>
         <div style={{
-          background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
-          backdropFilter: 'blur(20px)',
-          border: '1px solid rgba(100, 255, 218, 0.1)',
+          background: '#ffffff',
+          border: '1px solid #e5e7eb',
           borderRadius: '1rem',
           padding: '2rem',
           maxWidth: '500px',
           width: '100%',
           margin: '2rem 1rem',
-          position: 'relative'
+          position: 'relative',
+          boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)'
         }}>
           <Elements stripe={stripePromise} options={stripeElementsOptions}>
             <PaymentForm

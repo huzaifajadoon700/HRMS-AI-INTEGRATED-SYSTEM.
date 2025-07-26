@@ -1,4 +1,3 @@
-// Room Controller - Manages hotel rooms, availability, and ML-based recommendations
 const Room = require("../Models/Room");
 const Booking = require("../Models/Booking");
 const UserRoomInteraction = require("../Models/UserRoomInteraction");
@@ -118,31 +117,46 @@ exports.addRoom = async (req, res) => {
       petFriendly,
     } = req.body;
 
-    // Handle image upload
-    let image = null;
+    // Handle image upload - priority order: file upload, base64 image, image URL
+    let finalImage = null;
+
     if (req.file) {
       if (req.file.filename) {
         // Disk storage (development)
-        image = `/uploads/${req.file.filename}`;
-        console.log("Development upload - saved to disk:", image);
+        finalImage = `/uploads/${req.file.filename}`;
+        console.log("Development room upload - saved to disk:", finalImage);
       } else {
-        // Memory storage (production) - since we can't save files on Vercel,
-        // we'll set image to null and let frontend handle placeholder
+        // Memory storage (production) - file exists but can't be saved to disk
         console.log(
-          "Production environment detected - file upload not supported on serverless"
+          "Production environment detected - room file upload not supported on serverless"
         );
         console.log("File details:", {
           originalname: req.file.originalname,
           mimetype: req.file.mimetype,
           size: req.file.size,
         });
-        // Don't set image path for production uploads since files can't be served
-        image = null;
+        finalImage = null;
       }
-    } else if (req.body.imageUrl) {
+    } else if (req.body.image && req.body.image.startsWith("data:image/")) {
+      // Handle base64 image data
+      finalImage = req.body.image;
+      console.log("Room base64 image provided");
+    } else if (
+      req.body.imageUrl &&
+      (req.body.imageUrl.startsWith("http://") ||
+        req.body.imageUrl.startsWith("https://"))
+    ) {
       // Handle image URL
-      image = req.body.imageUrl;
-      console.log("Image URL provided:", image);
+      finalImage = req.body.imageUrl;
+      console.log("Room image URL provided:", finalImage);
+    } else if (
+      req.body.image &&
+      (req.body.image.startsWith("http://") ||
+        req.body.image.startsWith("https://"))
+    ) {
+      // Handle image URL in image field
+      finalImage = req.body.image;
+      console.log("Room image URL provided in image field:", finalImage);
     }
 
     // Parse amenities if it's a string
@@ -162,7 +176,7 @@ exports.addRoom = async (req, res) => {
       price: parseFloat(price),
       status: status || "Available",
       description,
-      image,
+      image: finalImage,
       capacity: parseInt(capacity),
       amenities: parsedAmenities,
       floor: floor ? parseInt(floor) : undefined,
@@ -173,6 +187,7 @@ exports.addRoom = async (req, res) => {
     });
 
     await newRoom.save();
+    console.log("Room saved with image:", finalImage ? "Yes" : "No");
     res.status(201).json({
       message: "Room added successfully!",
       room: newRoom,
@@ -313,21 +328,30 @@ exports.checkRoomAvailability = async (req, res) => {
 // Update a room
 exports.updateRoom = async (req, res) => {
   try {
-    const { roomNumber, roomType, price, status, description } = req.body;
+    const { roomNumber, roomType, price, status, description, capacity, image, imageUrl } = req.body;
+
+    // Debug logging
+    console.log("=== ROOM UPDATE DEBUG ===");
+    console.log("Request body keys:", Object.keys(req.body));
+    console.log("Image field:", image ? `${image.substring(0, 50)}...` : "null/undefined");
+    console.log("ImageUrl field:", imageUrl);
+    console.log("Has file upload:", !!req.file);
+
     const updateData = {
       roomNumber,
       roomType,
       price,
       status,
       description,
+      capacity: capacity ? parseInt(capacity) : undefined,
     };
 
-    // Handle image update
+    // Handle image update - exactly like table controller
     if (req.file) {
       if (req.file.filename) {
         // Disk storage (development)
         updateData.image = `/uploads/${req.file.filename}`;
-        console.log("Development update - saved to disk:", updateData.image);
+        console.log("Development room update - saved to disk:", updateData.image);
       } else {
         // Memory storage (production) - don't update image field
         console.log(
@@ -337,10 +361,13 @@ exports.updateRoom = async (req, res) => {
         // Don't update the image field in production
       }
     } else if (req.body.imageUrl) {
-      // Handle image URL update
+      // Handle imageUrl (base64 or URL) - exactly like table controller
       updateData.image = req.body.imageUrl;
-      console.log("Image URL updated:", updateData.image);
+      console.log("Room update imageUrl provided:", req.body.imageUrl ? `${req.body.imageUrl.substring(0, 50)}...` : "null");
     }
+
+    console.log("Final updateData:", { ...updateData, image: updateData.image ? `${updateData.image.substring(0, 50)}...` : updateData.image });
+    console.log("=== END ROOM UPDATE DEBUG ===");
 
     const updatedRoom = await Room.findByIdAndUpdate(
       req.params.id,

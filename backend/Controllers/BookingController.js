@@ -1,7 +1,13 @@
-// Booking Controller - Handles hotel room reservations and booking management
 const Booking = require("../Models/Booking");
 const Room = require("../Models/Room");
+const User = require("../Models/User");
+const mongoose = require("mongoose");
 const stripe = require("../config/stripe");
+
+// Ensure User model is registered
+if (!mongoose.models.User) {
+  require("../Models/User");
+}
 
 // Create a new booking
 exports.createBooking = async (req, res) => {
@@ -190,8 +196,22 @@ exports.getAllBookings = async (req, res) => {
     console.log("🏨 Admin fetching all bookings...");
     console.log("🔐 User making request:", req.user);
 
-    const bookings = await Booking.find().populate("roomId");
-    console.log("🏨 Found bookings:", bookings.length);
+    // First try to get bookings without population to see if basic query works
+    console.log("🔍 Testing basic booking query...");
+    const basicBookings = await Booking.find();
+    console.log("🏨 Basic bookings found:", basicBookings.length);
+
+    if (basicBookings.length === 0) {
+      console.log("ℹ️ No bookings in database");
+      return res.status(200).json([]);
+    }
+
+    // Try with population
+    console.log("🔍 Testing booking query with population...");
+    const bookings = await Booking.find()
+      .populate("roomId")
+      .populate("userId", "name email phone");
+    console.log("🏨 Populated bookings found:", bookings.length);
 
     if (bookings.length > 0) {
       console.log("🏨 Sample booking:", {
@@ -200,13 +220,24 @@ exports.getAllBookings = async (req, res) => {
         roomType: bookings[0].roomType,
         checkInDate: bookings[0].checkInDate,
         checkOutDate: bookings[0].checkOutDate,
+        userId: bookings[0].userId,
+        roomId: bookings[0].roomId
       });
     }
 
     res.status(200).json(bookings);
   } catch (error) {
     console.error("❌ Error fetching bookings:", error);
-    res.status(500).json({ error: "Error fetching bookings" });
+    console.error("❌ Error details:", {
+      name: error.name,
+      message: error.message,
+      stack: error.stack
+    });
+    res.status(500).json({
+      error: "Error fetching bookings",
+      details: error.message,
+      type: error.name
+    });
   }
 };
 

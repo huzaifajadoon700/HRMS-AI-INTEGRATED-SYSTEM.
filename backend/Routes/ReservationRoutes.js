@@ -1,4 +1,3 @@
-// Reservation Routes - Handles table reservation and booking management endpoints
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../Middlewares/Auth");
@@ -11,7 +10,7 @@ const {
   getReservationById,
   generateInvoice,
   downloadInvoice,
-  getReservationUserDetails,
+  getReservationUserDetails
 } = require("../Controllers/ReservationController");
 
 // Create a new reservation (authenticated users only)

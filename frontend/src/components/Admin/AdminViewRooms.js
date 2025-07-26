@@ -6,6 +6,18 @@ import "./simple-admin.css";
 
 const AdminViewRooms = () => {
   const navigate = useNavigate();
+
+  // Function to handle navigation within admin dashboard
+  const handleAdminNavigation = (module) => {
+    console.log("=== ADMIN NAVIGATION TRIGGERED ===");
+    console.log("Navigating to module:", module);
+
+    // Dispatch custom event to trigger sidebar module change
+    const event = new CustomEvent('adminModuleChange', {
+      detail: { module: module }
+    });
+    window.dispatchEvent(event);
+  };
   const [loading, setLoading] = useState(true);
   const [rooms, setRooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,7 +111,7 @@ const AdminViewRooms = () => {
           className="simple-search-input"
         />
         <button
-          onClick={() => navigate("/admin/add-room")}
+          onClick={() => handleAdminNavigation("AdminAddRoom")}
           className="simple-btn simple-btn-primary"
         >
           Add New Room
@@ -206,7 +218,7 @@ const AdminViewRooms = () => {
         <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No rooms found.</p>
           <button
-            onClick={() => navigate("/admin/add-room")}
+            onClick={() => handleAdminNavigation("AdminAddRoom")}
             className="simple-btn simple-btn-primary"
           >
             Add First Room

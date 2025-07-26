@@ -1,4 +1,3 @@
-// Booking Routes - Handles hotel room booking and reservation API endpoints
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated, ensureAdmin } = require("../Middlewares/Auth");
@@ -24,24 +23,20 @@ router.get("/test", [ensureAuthenticated, ensureAdmin], async (req, res) => {
     console.log("🧪 Testing booking data...");
 
     // Get all bookings with detailed info
-    const bookings = await Booking.find().select(
-      "totalPrice roomType roomNumber checkInDate checkOutDate createdAt userId"
-    );
+    const bookings = await Booking.find().select('totalPrice roomType roomNumber checkInDate checkOutDate createdAt userId');
     console.log("🧪 Found bookings:", bookings.length);
 
     // Calculate total revenue
     const totalRevenue = bookings.reduce((sum, booking) => {
       const price = booking.totalPrice || 0;
-      console.log(
-        `🧪 Booking ${booking._id}: Rs.${price} (${booking.roomType})`
-      );
+      console.log(`🧪 Booking ${booking._id}: Rs.${price} (${booking.roomType})`);
       return sum + price;
     }, 0);
 
     console.log("🧪 Total Revenue:", totalRevenue);
 
     // Check for your specific booking amount
-    const highValueBookings = bookings.filter((b) => b.totalPrice >= 20000);
+    const highValueBookings = bookings.filter(b => b.totalPrice >= 20000);
     console.log("🧪 High value bookings (>=20k):", highValueBookings.length);
 
     res.json({
@@ -51,15 +46,12 @@ router.get("/test", [ensureAuthenticated, ensureAdmin], async (req, res) => {
       highValueBookings: highValueBookings.length,
       bookings: bookings.slice(0, 10), // Show first 10 bookings
       message: "Booking data test successful",
-      sampleBooking:
-        bookings.length > 0
-          ? {
-              id: bookings[0]._id,
-              totalPrice: bookings[0].totalPrice,
-              roomType: bookings[0].roomType,
-              checkIn: bookings[0].checkInDate,
-            }
-          : null,
+      sampleBooking: bookings.length > 0 ? {
+        id: bookings[0]._id,
+        totalPrice: bookings[0].totalPrice,
+        roomType: bookings[0].roomType,
+        checkIn: bookings[0].checkInDate
+      } : null
     });
   } catch (error) {
     console.error("🧪 Test error:", error);
@@ -68,43 +60,39 @@ router.get("/test", [ensureAuthenticated, ensureAdmin], async (req, res) => {
 });
 
 // Direct database check (admin only)
-router.get(
-  "/db-check",
-  [ensureAuthenticated, ensureAdmin],
-  async (req, res) => {
-    try {
-      const mongoose = require("mongoose");
-      const db = mongoose.connection.db;
+router.get("/db-check", [ensureAuthenticated, ensureAdmin], async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const db = mongoose.connection.db;
 
-      // Get raw booking data from database
-      const rawBookings = await db.collection("bookings").find({}).toArray();
-      console.log("🔍 Raw bookings from DB:", rawBookings.length);
+    // Get raw booking data from database
+    const rawBookings = await db.collection('bookings').find({}).toArray();
+    console.log("🔍 Raw bookings from DB:", rawBookings.length);
 
-      if (rawBookings.length > 0) {
-        console.log("🔍 Sample raw booking:", rawBookings[0]);
+    if (rawBookings.length > 0) {
+      console.log("🔍 Sample raw booking:", rawBookings[0]);
 
-        // Calculate revenue from raw data
-        const rawRevenue = rawBookings.reduce((sum, booking) => {
-          const price = booking.totalPrice || 0;
-          console.log(`🔍 Raw booking ${booking._id}: Rs.${price}`);
-          return sum + price;
-        }, 0);
+      // Calculate revenue from raw data
+      const rawRevenue = rawBookings.reduce((sum, booking) => {
+        const price = booking.totalPrice || 0;
+        console.log(`🔍 Raw booking ${booking._id}: Rs.${price}`);
+        return sum + price;
+      }, 0);
 
-        console.log("🔍 Raw revenue total:", rawRevenue);
-      }
-
-      res.json({
-        success: true,
-        rawCount: rawBookings.length,
-        rawBookings: rawBookings.slice(0, 5),
-        message: "Direct database check completed",
-      });
-    } catch (error) {
-      console.error("🔍 DB check error:", error);
-      res.status(500).json({ error: error.message });
+      console.log("🔍 Raw revenue total:", rawRevenue);
     }
+
+    res.json({
+      success: true,
+      rawCount: rawBookings.length,
+      rawBookings: rawBookings.slice(0, 5),
+      message: "Direct database check completed"
+    });
+  } catch (error) {
+    console.error("🔍 DB check error:", error);
+    res.status(500).json({ error: error.message });
   }
-);
+});
 
 // Fetch all bookings (admin only)
 router.get("/", [ensureAuthenticated, ensureAdmin], getAllBookings);

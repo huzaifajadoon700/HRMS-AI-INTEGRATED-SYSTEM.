@@ -100,3 +100,21 @@
     padding: 0.5rem !important;
   }
 }
+
+/* Force Learn More button text to be white */
+.about-section-mobile a[href="/about"] {
+  color: #ffffff !important;
+}
+
+.about-section-mobile a[href="/about"] span {
+  color: #ffffff !important;
+}
+
+.about-section-mobile a[href="/about"] svg {
+  color: #ffffff !important;
+}
+
+/* Additional override for any conflicting styles */
+.about-section-mobile a[href="/about"] * {
+  color: #ffffff !important;
+}

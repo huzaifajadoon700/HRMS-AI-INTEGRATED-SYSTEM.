@@ -676,3 +676,248 @@ textarea.form-control {
     font-size: 1.8rem;
   }
 }
+
+/* ========== BLACK & WHITE THEME OVERRIDES ========== */
+
+/* Remove blue background and apply white background */
+.modern-feedback-page {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #000000 !important;
+}
+
+.feedback-success-page {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #000000 !important;
+}
+
+/* Hero section overrides */
+.hero-background {
+  background: #f8f9fa !important;
+  background-color: #f8f9fa !important;
+  background-image: none !important;
+}
+
+.hero-overlay {
+  background: none !important;
+  background-image: none !important;
+}
+
+.hero-title {
+  background: #000000 !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: #000000 !important;
+}
+
+.hero-subtitle {
+  color: #6b7280 !important;
+}
+
+/* Form containers */
+.feedback-form-container,
+.success-container,
+.info-card {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid #e5e7eb !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Form headers and text */
+.form-header h2 {
+  color: #000000 !important;
+}
+
+.form-header p {
+  color: #6b7280 !important;
+}
+
+/* Form sections */
+.form-section {
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.section-title {
+  color: #000000 !important;
+}
+
+.section-subtitle {
+  color: #6b7280 !important;
+}
+
+/* Form inputs */
+.form-input,
+.form-textarea {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #000000 !important;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #000000 !important;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1) !important;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Category options */
+.category-option {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #000000 !important;
+}
+
+.category-option:hover {
+  background: #f3f4f6 !important;
+  border-color: #000000 !important;
+}
+
+.category-option.selected {
+  background: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.category-icon {
+  color: inherit !important;
+}
+
+/* Rating stars */
+.star-btn {
+  color: #d1d5db !important;
+}
+
+.star-btn.filled {
+  color: #fbbf24 !important;
+}
+
+.star-btn:hover {
+  color: #fbbf24 !important;
+}
+
+/* Recommendation options */
+.recommend-option {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  color: #000000 !important;
+}
+
+.recommend-option:hover {
+  background: #f3f4f6 !important;
+  border-color: #000000 !important;
+}
+
+.recommend-option.selected {
+  background: #000000 !important;
+  border-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+/* Checkbox */
+.checkbox-custom {
+  border: 2px solid #d1d5db !important;
+  background: #ffffff !important;
+}
+
+.checkbox-input:checked + .checkbox-custom {
+  background: #000000 !important;
+  border-color: #000000 !important;
+}
+
+.checkbox-input:checked + .checkbox-custom::after {
+  color: #ffffff !important;
+}
+
+/* Buttons */
+.btn-primary,
+.submit-feedback-btn {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+.btn-primary:hover,
+.submit-feedback-btn:hover {
+  background: #374151 !important;
+  background-color: #374151 !important;
+  border-color: #374151 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Info sidebar */
+.info-header h3 {
+  color: #000000 !important;
+}
+
+.info-icon {
+  color: #000000 !important;
+}
+
+.info-card p {
+  color: #6b7280 !important;
+}
+
+.commitment-list li {
+  color: #6b7280 !important;
+}
+
+.commitment-list li::before {
+  color: #000000 !important;
+}
+
+/* Success page elements */
+.success-icon {
+  color: #10b981 !important;
+}
+
+.success-container h1 {
+  color: #000000 !important;
+}
+
+.success-container p {
+  color: #6b7280 !important;
+}
+
+.stat-item {
+  color: #000000 !important;
+}
+
+.stat-icon {
+  color: #000000 !important;
+}
+
+/* Mobile responsive overrides */
+@media (max-width: 768px) {
+  .modern-feedback-page,
+  .feedback-success-page {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .hero-background {
+    background: #f8f9fa !important;
+  }
+
+  .feedback-form-container,
+  .info-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+  }
+}

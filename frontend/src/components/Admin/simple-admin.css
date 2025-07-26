@@ -972,3 +972,84 @@
     padding: 10px 14px;
   }
 }
+
+/* ===== ADMIN ADD FORMS MOBILE IMPROVEMENTS ===== */
+
+/* Ensure form sections don't overflow on mobile */
+@media (max-width: 768px) {
+  .simple-form-section {
+    margin-bottom: 1.5rem;
+    padding: 0;
+  }
+
+  .simple-form-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    word-wrap: break-word;
+  }
+
+  /* Fix input field overflow issues */
+  .simple-form input,
+  .simple-form select,
+  .simple-form textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+  }
+
+  /* Ensure form rows stack properly on mobile */
+  .simple-form-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+    margin-bottom: 1rem;
+  }
+
+  /* Image upload specific mobile fixes */
+  .simple-form-section div[style*="display: flex"] {
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+
+  .simple-form-section div[style*="flex: 1"] {
+    flex: none !important;
+    min-width: auto !important;
+    width: 100% !important;
+  }
+
+  /* Button containers in forms */
+  .simple-form-section div[style*="display: flex"][style*="gap: 0.5rem"] {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  .simple-form-section div[style*="display: flex"][style*="gap: 0.5rem"] button {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small mobile adjustments */
+  .simple-form-section {
+    margin-bottom: 1rem;
+  }
+
+  .simple-form-section h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .simple-form input,
+  .simple-form select,
+  .simple-form textarea {
+    padding: 0.75rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Smaller buttons on very small screens */
+  .simple-form-section button {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+  }
+}

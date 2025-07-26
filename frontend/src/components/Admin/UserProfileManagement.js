@@ -15,10 +15,8 @@ const UserProfileManagement = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "User",
+    role: "user",
     status: "Active",
-    phone: "",
-    department: "",
     password: "",
   });
 
@@ -100,8 +98,15 @@ const UserProfileManagement = () => {
         "https://hrms-bace.vercel.app/api";
 
       if (editingUser) {
-        // Update existing user
-        await axios.put(`${apiUrl}/admin/users/${editingUser._id}`, formData, {
+        // Update existing user - transform status to isActive for backend
+        const updateData = {
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+          isActive: formData.status === "Active"
+        };
+
+        await axios.put(`${apiUrl}/admin/users/${editingUser._id}`, updateData, {
           headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("User updated successfully");
@@ -117,13 +122,21 @@ const UserProfileManagement = () => {
       resetForm();
     } catch (error) {
       console.error("Error saving user:", error);
-      toast.error("Failed to save user");
+      console.error("Error response:", error.response?.data);
+      const errorMessage = error.response?.data?.message || error.message || "Failed to save user";
+      toast.error(`Failed to save user: ${errorMessage}`);
     }
   };
 
   const handleEdit = (user) => {
     setEditingUser(user);
-    setFormData({ ...user, password: "" }); // Don't show password
+    setFormData({
+      name: user.name || "",
+      email: user.email || "",
+      role: user.role || "User",
+      status: user.isActive ? "Active" : "Inactive",
+      password: ""
+    });
     setShowAddForm(true);
   };
 
@@ -152,8 +165,6 @@ const UserProfileManagement = () => {
       email: "",
       role: "User",
       status: "Active",
-      phone: "",
-      department: "",
       password: "",
     });
     setEditingUser(null);
@@ -170,9 +181,9 @@ const UserProfileManagement = () => {
 
   const userStats = {
     total: users.length,
-    active: users.filter((u) => u.status === "Active").length,
-    inactive: users.filter((u) => u.status === "Inactive").length,
-    admins: users.filter((u) => u.role === "Administrator").length,
+    active: users.filter((u) => u.isActive === true).length,
+    inactive: users.filter((u) => u.isActive === false).length,
+    admins: users.filter((u) => u.role === "admin").length,
   };
 
   if (loading)
@@ -231,10 +242,8 @@ const UserProfileManagement = () => {
             style={{ minWidth: "150px", maxWidth: "200px" }}
           >
             <option value="All Roles">All Roles</option>
-            <option value="Administrator">Administrator</option>
-            <option value="Manager">Manager</option>
-            <option value="Staff">Staff</option>
-            <option value="User">User</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
           </select>
         </div>
         <button
@@ -268,22 +277,7 @@ const UserProfileManagement = () => {
                 required
               />
             </div>
-            <div className="simple-form-row">
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Phone Number"
-                value={formData.phone}
-                onChange={handleInputChange}
-              />
-              <input
-                type="text"
-                name="department"
-                placeholder="Department"
-                value={formData.department}
-                onChange={handleInputChange}
-              />
-            </div>
+
             <div className="simple-form-row">
               <select
                 name="role"
@@ -291,10 +285,8 @@ const UserProfileManagement = () => {
                 onChange={handleInputChange}
                 required
               >
-                <option value="User">User</option>
-                <option value="Staff">Staff</option>
-                <option value="Manager">Manager</option>
-                <option value="Administrator">Administrator</option>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
               </select>
               <select
                 name="status"
@@ -352,14 +344,12 @@ const UserProfileManagement = () => {
       >
         <table
           className="simple-table"
-          style={{ minWidth: "800px", width: "100%" }}
+          style={{ minWidth: "600px", width: "100%" }}
         >
           <thead>
             <tr>
               <th style={{ minWidth: "120px" }}>Name</th>
               <th style={{ minWidth: "180px" }}>Email</th>
-              <th style={{ minWidth: "120px" }}>Phone</th>
-              <th style={{ minWidth: "120px" }}>Department</th>
               <th style={{ minWidth: "100px" }}>Role</th>
               <th style={{ minWidth: "100px" }}>Status</th>
               <th style={{ minWidth: "160px" }}>Actions</th>
@@ -370,16 +360,12 @@ const UserProfileManagement = () => {
               <tr key={user._id}>
                 <td style={{ minWidth: "120px" }}>{user.name}</td>
                 <td style={{ minWidth: "180px" }}>{user.email}</td>
-                <td style={{ minWidth: "120px" }}>{user.phone || "N/A"}</td>
-                <td style={{ minWidth: "120px" }}>
-                  {user.department || "N/A"}
-                </td>
                 <td style={{ minWidth: "100px" }}>{user.role}</td>
                 <td style={{ minWidth: "100px" }}>
                   <span
-                    className={`simple-status simple-status-${user.status?.toLowerCase()}`}
+                    className={`simple-status simple-status-${user.isActive ? 'active' : 'inactive'}`}
                   >
-                    {user.status}
+                    {user.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
                 <td style={{ minWidth: "160px" }}>

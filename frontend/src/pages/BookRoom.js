@@ -21,12 +21,28 @@ const BookRoom = () => {
     specialRequests: ''
   });
   
-  // Extract the edit booking ID from URL query parameters (if it exists)
+  // Extract the edit booking ID from URL query parameters or state
   const queryParams = new URLSearchParams(location.search);
-  const editBookingId = queryParams.get('edit');
+  const editBookingId = queryParams.get('edit') || (location.state?.editMode ? location.state.bookingId : null);
+  const existingBooking = location.state?.existingBooking;
 
   useEffect(() => {
-    // If we're editing a booking, don't fetch room details
+    // If we're editing a booking, populate form with existing data
+    if (editBookingId && existingBooking) {
+      setFormData({
+        checkIn: existingBooking.checkInDate || '',
+        checkOut: existingBooking.checkOutDate || '',
+        guests: existingBooking.guests || 1,
+        name: existingBooking.fullName || '',
+        email: existingBooking.email || '',
+        phone: existingBooking.phone || '',
+        specialRequests: existingBooking.specialRequests || ''
+      });
+      setLoading(false);
+      return;
+    }
+
+    // If we're editing a booking without existing data, don't fetch room details
     if (editBookingId) {
       setLoading(false);
       return;
@@ -51,7 +67,7 @@ const BookRoom = () => {
     };
 
     fetchRoomDetails();
-  }, [roomId, editBookingId]);
+  }, [roomId, editBookingId, existingBooking]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -64,11 +80,44 @@ const BookRoom = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Add your booking API call here
-      console.log('Booking submitted:', { roomId, ...formData });
-      navigate('/booking-confirmation');
+      if (editBookingId) {
+        // Update existing booking
+        const token = localStorage.getItem("token");
+        const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+
+        const updateData = {
+          checkInDate: formData.checkIn,
+          checkOutDate: formData.checkOut,
+          guests: formData.guests,
+          fullName: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          specialRequests: formData.specialRequests
+        };
+
+        const response = await fetch(`${apiUrl}/bookings/${editBookingId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(updateData)
+        });
+
+        if (response.ok) {
+          alert('Booking updated successfully!');
+          navigate('/my-bookings');
+        } else {
+          throw new Error('Failed to update booking');
+        }
+      } else {
+        // Create new booking
+        console.log('Booking submitted:', { roomId, ...formData });
+        navigate('/booking-confirmation');
+      }
     } catch (error) {
       console.error('Error submitting booking:', error);
+      alert('Error updating booking. Please try again.');
     }
   };
   

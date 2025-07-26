@@ -111,6 +111,75 @@ const MyBookings = () => {
     return new Date(checkIn) >= new Date();
   };
 
+  // Handle view booking details
+  const handleViewDetails = (booking) => {
+    navigate('/booking-confirmation', {
+      state: {
+        booking: {
+          ...booking,
+          checkIn: booking.checkInDate,
+          checkOut: booking.checkOutDate,
+          totalAmount: booking.totalPrice,
+          roomType: booking.roomType,
+          roomNumber: booking.roomNumber,
+          guests: booking.guests,
+          payment: booking.payment,
+          fullName: booking.fullName,
+          email: booking.email,
+          phone: booking.phone,
+          specialRequests: booking.specialRequests
+        }
+      }
+    });
+  };
+
+  // Handle modify booking
+  const handleModifyBooking = (booking) => {
+    navigate('/book-room', {
+      state: {
+        editMode: true,
+        bookingId: booking.id,
+        existingBooking: {
+          roomId: booking.roomId,
+          roomType: booking.roomType,
+          roomNumber: booking.roomNumber,
+          checkInDate: booking.checkInDate,
+          checkOutDate: booking.checkOutDate,
+          guests: booking.guests,
+          payment: booking.payment,
+          totalPrice: booking.totalPrice,
+          fullName: booking.fullName,
+          email: booking.email,
+          phone: booking.phone,
+          specialRequests: booking.specialRequests
+        }
+      }
+    });
+  };
+
+  // Handle delete/cancel booking
+  const handleDeleteBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const apiUrl = process.env.REACT_APP_API_BASE_URL || 'https://hrms-bace.vercel.app/api';
+
+      await axios.delete(`${apiUrl}/bookings/${bookingId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      // Refresh bookings after deletion
+      fetchBookings();
+      alert('Booking cancelled successfully');
+    } catch (error) {
+      console.error('Error cancelling booking:', error);
+      alert('Failed to cancel booking. Please try again.');
+    }
+  };
+
   const filteredBookings = bookings.filter(booking =>
     activeTab === 'upcoming' ? isUpcoming(booking.checkIn) : !isUpcoming(booking.checkIn)
   );
@@ -158,7 +227,7 @@ const MyBookings = () => {
               <div className="stat-icon">
                 <FiClock />
               </div>
-              <div className="stat-content">
+              <div className="stat-content" style={{marginRight: '0.5rem'}}>
                 <h3>{bookings.filter(b => isUpcoming(b.checkIn)).length}</h3>
                 <p>Upcoming</p>
               </div>
@@ -205,14 +274,14 @@ const MyBookings = () => {
                 Past
               </button>
             </div>
-            <div className="refresh-section">
+            <div className="refresh-section" >
               <button
                 className="refresh-btn"
                 onClick={fetchBookings}
                 disabled={loading}
+                title="Refresh bookings"
               >
                 <FiRefreshCw className={loading ? 'spinning' : ''} />
-                Refresh
               </button>
             </div>
           </div>
@@ -258,11 +327,13 @@ const MyBookings = () => {
                         Booked on {new Date(booking.bookingDate).toLocaleDateString()}
                       </p>
                     </div>
-                    <div className={`booking-status status-${booking.status.toLowerCase()}`}>
-                      {booking.status === 'Pending' && <FiClock />}
-                      {booking.status === 'Confirmed' && <FiCheckCircle />}
-                      {booking.status === 'Cancelled' && <FiXCircle />}
-                      <span>{booking.status}</span>
+                    <div className="booking-status-wrapper">
+                      <div className={`booking-status status-${booking.status.toLowerCase()}`}>
+                        {booking.status === 'Pending' && <FiClock />}
+                        {booking.status === 'Confirmed' && <FiCheckCircle />}
+                        {booking.status === 'Cancelled' && <FiXCircle />}
+                        <span>{booking.status}</span>
+                      </div>
                     </div>
                   </div>
 
@@ -339,22 +410,33 @@ const MyBookings = () => {
                   </div>
 
                   <div className="booking-actions">
-                    {booking.status === 'Pending' && isUpcoming(booking.checkIn) && (
-                      <button className="action-btn cancel-btn">
-                        <FiX className="btn-icon" />
-                        Cancel
-                      </button>
-                    )}
+                    <button
+                      className="action-btn view-btn"
+                      onClick={() => handleViewDetails(booking)}
+                    >
+                      <FiEye className="btn-icon" />
+                      View Details
+                    </button>
+
                     {isUpcoming(booking.checkIn) && (
-                      <button className="action-btn modify-btn">
+                      <button
+                        className="action-btn modify-btn"
+                        onClick={() => handleModifyBooking(booking)}
+                      >
                         <FiEdit className="btn-icon" />
                         Modify
                       </button>
                     )}
-                    <button className="action-btn view-btn">
-                      <FiEye className="btn-icon" />
-                      View Details
-                    </button>
+
+                    {isUpcoming(booking.checkIn) && (
+                      <button
+                        className="action-btn delete-btn"
+                        onClick={() => handleDeleteBooking(booking.id)}
+                      >
+                        <FiX className="btn-icon" />
+                        Cancel
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}

@@ -68,23 +68,6 @@ const ServicesPage = () => {
     <PageLayout>
       <style>
         {`
-          @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(180deg); }
-          }
-          @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.05); }
-          }
-          @keyframes slideInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-          }
-
           /* Responsive Styles for Services Page */
           @media (max-width: 768px) {
             .services-page-container {
@@ -139,70 +122,36 @@ const ServicesPage = () => {
       <div style={{
         width: '100%',
         margin: 0,
-        marginTop: '0px', // Top margin for header spacing
-        padding: '3rem 0',
-        background: 'linear-gradient(180deg, #0A192F 0%, #112240 50%, #0A192F 100%)',
-        backdropFilter: 'blur(10px)',
+        padding: '4rem 0',
+        background: '#ffffff',
         position: 'relative',
-        overflow: 'hidden',
         minHeight: '100vh'
       }}>
-        {/* Animated Background Elements */}
-        <div style={{
-          position: 'absolute',
-          top: '15%',
-          right: '8%',
-          width: '200px',
-          height: '200px',
-          background: 'radial-gradient(circle, rgba(187, 134, 252, 0.1) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(30px)',
-          animation: 'float 8s ease-in-out infinite',
-          zIndex: 0
-        }} />
-        <div style={{
-          position: 'absolute',
-          top: '60%',
-          left: '5%',
-          width: '150px',
-          height: '150px',
-          background: 'radial-gradient(circle, rgba(100, 255, 218, 0.08) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(25px)',
-          animation: 'float 10s ease-in-out infinite reverse',
-          zIndex: 0
-        }} />
 
         <div className="services-page-container" style={{
           width: '100%',
           maxWidth: '1200px',
           margin: '0 auto',
-          padding: '0 2rem',
-          position: 'relative',
-          zIndex: 1
+          padding: '0 2rem'
         }}>
           {/* Header Section */}
-          <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
             <h1 className="services-page-title" style={{
-              fontSize: '3rem',
-              fontWeight: '900',
-              background: 'linear-gradient(135deg, #ffffff 0%, #64ffda 50%, #bb86fc 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
+              fontSize: '2.5rem',
+              fontWeight: '700',
+              color: '#000000',
               marginBottom: '1rem',
-              lineHeight: '1.1',
-              animation: 'slideInUp 0.8s ease-out'
+              lineHeight: '1.2',
+              fontFamily: 'Inter, sans-serif'
             }}>
               Premium Services
             </h1>
             <p className="services-page-subtitle" style={{
-              fontSize: '1.2rem',
-              color: 'rgba(255, 255, 255, 0.8)',
+              fontSize: '1.125rem',
+              color: '#6b7280',
               maxWidth: '600px',
               margin: '0 auto',
-              lineHeight: '1.6',
-              animation: 'slideInUp 0.8s ease-out 0.2s both'
+              lineHeight: '1.6'
             }}>
               Discover the exceptional services that make your stay unforgettable
             </p>
@@ -213,74 +162,49 @@ const ServicesPage = () => {
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
             gap: '2rem',
-            marginBottom: '3rem'
+            marginBottom: '4rem'
           }}>
             {services.map((service, index) => (
               <div
                 key={index}
                 className="service-card-responsive"
                 style={{
-                  background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
-                  backdropFilter: 'blur(20px)',
-                  border: hoveredService === index
-                    ? `1px solid ${service.color.replace(')', ', 0.4)')}`
-                    : '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '1.5rem',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '1rem',
                   padding: '2rem',
-                  transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transition: 'all 0.2s ease',
                   cursor: 'pointer',
                   boxShadow: hoveredService === index
-                    ? `0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px ${service.color.replace(')', ', 0.3)')}`
-                    : '0 8px 25px rgba(0, 0, 0, 0.2)',
-                  transform: hoveredService === index ? 'translateY(-8px) scale(1.02)' : 'translateY(0) scale(1)',
-                  animation: `slideInUp 0.8s ease-out ${0.4 + index * 0.1}s both`,
+                    ? '0 8px 25px rgba(0, 0, 0, 0.1)'
+                    : '0 2px 4px rgba(0, 0, 0, 0.05)',
+                  transform: hoveredService === index ? 'translateY(-4px)' : 'translateY(0)',
                   position: 'relative',
-                  overflow: 'hidden',
-                  minHeight: '280px', // Fixed height to prevent text overflow
+                  minHeight: '280px',
                   display: 'flex',
                   flexDirection: 'column'
                 }}
                 onMouseEnter={() => setHoveredService(index)}
                 onMouseLeave={() => setHoveredService(null)}
               >
-                {/* Shimmer Effect */}
-                {hoveredService === index && (
-                  <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: '-100%',
-                    width: '100%',
-                    height: '100%',
-                    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)',
-                    animation: 'shimmer 1.5s ease-in-out',
-                    zIndex: 1
-                  }} />
-                )}
-
                 {/* Header with Icon and Rating */}
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  marginBottom: '1.5rem',
-                  position: 'relative',
-                  zIndex: 2
+                  marginBottom: '1.5rem'
                 }}>
                   <div style={{
                     width: '4rem',
                     height: '4rem',
-                    background: service.bgColor,
-                    borderRadius: '1.25rem',
+                    background: '#f3f4f6',
+                    borderRadius: '1rem',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: service.color,
+                    color: '#374151',
                     fontSize: '1.5rem',
-                    transition: 'all 0.3s ease',
-                    boxShadow: hoveredService === index
-                      ? `0 8px 25px ${service.color.replace(')', ', 0.4)')}`
-                      : 'none',
-                    animation: hoveredService === index ? 'pulse 2s ease-in-out infinite' : 'none'
+                    transition: 'all 0.2s ease'
                   }}>
                     {service.icon}
                   </div>
@@ -290,17 +214,16 @@ const ServicesPage = () => {
                     display: 'flex',
                     alignItems: 'center',
                     gap: '0.25rem',
-                    padding: '0.4rem 0.75rem',
-                    background: 'rgba(255, 193, 7, 0.2)',
-                    borderRadius: '1rem',
-                    border: '1px solid rgba(255, 193, 7, 0.3)',
-                    backdropFilter: 'blur(10px)'
+                    padding: '0.25rem 0.5rem',
+                    background: '#ffffff',
+                    borderRadius: '0.5rem',
+                    border: '1px solid #e5e7eb'
                   }}>
-                    <FiStar style={{ color: '#ffc107', fill: '#ffc107' }} size={12} />
+                    <FiStar style={{ color: '#fbbf24' }} size={12} />
                     <span style={{
-                      color: '#ffc107',
-                      fontSize: '0.8rem',
-                      fontWeight: '700'
+                      color: '#000000',
+                      fontSize: '0.875rem',
+                      fontWeight: '500'
                     }}>
                       {service.rating}
                     </span>
@@ -311,26 +234,20 @@ const ServicesPage = () => {
                 <div style={{
                   flex: 1,
                   display: 'flex',
-                  flexDirection: 'column',
-                  position: 'relative',
-                  zIndex: 2
+                  flexDirection: 'column'
                 }}>
                   <h3 className="service-card-title" style={{
-                    fontSize: '1.5rem',
-                    fontWeight: '800',
-                    color: '#fff',
+                    fontSize: '1.25rem',
+                    fontWeight: '600',
+                    color: '#000000',
                     marginBottom: '1rem',
-                    background: 'linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    transition: 'all 0.3s ease'
+                    fontFamily: 'Inter, sans-serif'
                   }}>
                     {service.title}
                   </h3>
 
                   <p className="service-card-description" style={{
-                    color: 'rgba(255, 255, 255, 0.8)',
+                    color: '#6b7280',
                     fontSize: '1rem',
                     lineHeight: '1.6',
                     marginBottom: '1.5rem',
@@ -348,17 +265,20 @@ const ServicesPage = () => {
                   }}>
                     <button style={{
                       padding: '0.75rem 1.5rem',
-                      background: 'rgba(255, 255, 255, 0.1)',
-                      border: '1px solid rgba(255, 255, 255, 0.2)',
-                      borderRadius: '0.75rem',
-                      color: '#fff',
-                      fontSize: '0.9rem',
-                      fontWeight: '600',
+                      background: '#000000',
+                      border: 'none',
+                      borderRadius: '0.5rem',
+                      color: '#ffffff',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
                       cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      backdropFilter: 'blur(10px)',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.5px'
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#333333';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#000000';
                     }}>
                       Learn More
                     </button>
@@ -366,18 +286,15 @@ const ServicesPage = () => {
                     <div style={{
                       width: '2.5rem',
                       height: '2.5rem',
-                      background: hoveredService === index
-                        ? 'rgba(255, 255, 255, 0.2)'
-                        : 'rgba(255, 255, 255, 0.1)',
+                      background: '#f3f4f6',
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      transition: 'all 0.3s ease',
-                      transform: hoveredService === index ? 'rotate(45deg)' : 'rotate(0deg)',
-                      backdropFilter: 'blur(10px)'
+                      transition: 'all 0.2s ease',
+                      cursor: 'pointer'
                     }}>
-                      <FiArrowRight style={{ color: '#fff' }} size={14} />
+                      <FiArrowRight style={{ color: '#374151' }} size={14} />
                     </div>
                   </div>
                 </div>

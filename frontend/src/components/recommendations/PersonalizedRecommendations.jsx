@@ -429,23 +429,25 @@ const PersonalizedRecommendations = ({
         }}>
           {/* Title Section */}
           <h3 style={{
-            color: '#64ffda',
-            fontSize: '1.3rem',
+            color: '#000000',
+            fontSize: '1.5rem',
             fontWeight: '700',
             margin: '0 0 0.5rem 0',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: '0.5rem'
+            gap: '0.5rem',
+            fontFamily: 'Inter, sans-serif'
           }}>
             {getTabIcon(activeTab)}
             {getTabTitle()}
           </h3>
           <p style={{
-            color: 'rgba(255, 255, 255, 0.8)',
-            fontSize: '0.9rem',
+            color: '#6b7280',
+            fontSize: '1rem',
             margin: '0 0 1.5rem 0',
-            lineHeight: '1.4'
+            lineHeight: '1.4',
+            fontFamily: 'Inter, sans-serif'
           }}>
             {getTabSubtitle()}
           </p>
@@ -461,32 +463,29 @@ const PersonalizedRecommendations = ({
             <button
               onClick={() => setActiveTab('personalized')}
               style={{
-                padding: '0.6rem 1.2rem',
-                background: activeTab === 'personalized'
-                  ? 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)'
-                  : 'rgba(255, 255, 255, 0.1)',
-                color: activeTab === 'personalized' ? '#0a192f' : '#64ffda',
-                border: activeTab === 'personalized' ? 'none' : '1px solid rgba(100, 255, 218, 0.3)',
-                borderRadius: '1.5rem',
-                fontSize: '0.85rem',
-                fontWeight: '600',
+                padding: '0.75rem 1.5rem',
+                background: activeTab === 'personalized' ? '#000000' : '#f3f4f6',
+                color: activeTab === 'personalized' ? '#ffffff' : '#374151',
+                border: 'none',
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                boxShadow: activeTab === 'personalized' ? '0 4px 12px rgba(100, 255, 218, 0.3)' : 'none'
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                fontFamily: 'Inter, sans-serif'
               }}
               onMouseEnter={(e) => {
                 if (activeTab !== 'personalized') {
-                  e.target.style.background = 'rgba(100, 255, 218, 0.2)';
-                  e.target.style.borderColor = 'rgba(100, 255, 218, 0.5)';
+                  e.target.style.background = '#e5e7eb';
                 }
               }}
               onMouseLeave={(e) => {
                 if (activeTab !== 'personalized') {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.borderColor = 'rgba(100, 255, 218, 0.3)';
+                  e.target.style.background = '#f3f4f6';
                 }
               }}
             >
@@ -497,32 +496,29 @@ const PersonalizedRecommendations = ({
             <button
               onClick={() => setActiveTab('allmenu')}
               style={{
-                padding: '0.6rem 1.2rem',
-                background: activeTab === 'allmenu'
-                  ? 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)'
-                  : 'rgba(255, 255, 255, 0.1)',
-                color: activeTab === 'allmenu' ? '#0a192f' : '#64ffda',
-                border: activeTab === 'allmenu' ? 'none' : '1px solid rgba(100, 255, 218, 0.3)',
-                borderRadius: '1.5rem',
-                fontSize: '0.85rem',
-                fontWeight: '600',
+                padding: '0.75rem 1.5rem',
+                background: activeTab === 'allmenu' ? '#000000' : '#f3f4f6',
+                color: activeTab === 'allmenu' ? '#ffffff' : '#374151',
+                border: 'none',
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                boxShadow: activeTab === 'allmenu' ? '0 4px 12px rgba(100, 255, 218, 0.3)' : 'none'
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                fontFamily: 'Inter, sans-serif'
               }}
               onMouseEnter={(e) => {
                 if (activeTab !== 'allmenu') {
-                  e.target.style.background = 'rgba(100, 255, 218, 0.2)';
-                  e.target.style.borderColor = 'rgba(100, 255, 218, 0.5)';
+                  e.target.style.background = '#e5e7eb';
                 }
               }}
               onMouseLeave={(e) => {
                 if (activeTab !== 'allmenu') {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.borderColor = 'rgba(100, 255, 218, 0.3)';
+                  e.target.style.background = '#f3f4f6';
                 }
               }}
             >
@@ -535,31 +531,21 @@ const PersonalizedRecommendations = ({
               onClick={handleRefresh}
               disabled={refreshing}
               style={{
-                padding: '0.6rem 1rem',
-                background: 'rgba(255, 255, 255, 0.1)',
-                color: '#64ffda',
-                border: '1px solid rgba(100, 255, 218, 0.3)',
-                borderRadius: '1.5rem',
-                fontSize: '0.85rem',
-                fontWeight: '600',
+                padding: '0.75rem 1rem',
+                background: refreshing ? '#9ca3af' : '#000000',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                fontWeight: '500',
                 cursor: refreshing ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '0.5rem',
-                opacity: refreshing ? 0.6 : 1
-              }}
-              onMouseEnter={(e) => {
-                if (!refreshing) {
-                  e.target.style.background = 'rgba(100, 255, 218, 0.2)';
-                  e.target.style.borderColor = 'rgba(100, 255, 218, 0.5)';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!refreshing) {
-                  e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                  e.target.style.borderColor = 'rgba(100, 255, 218, 0.3)';
-                }
+                opacity: refreshing ? 0.6 : 1,
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                fontFamily: 'Inter, sans-serif'
               }}
             >
               <FiRefreshCw
@@ -583,18 +569,19 @@ const PersonalizedRecommendations = ({
 
       {error && (
         <div style={{
-          background: 'rgba(255, 193, 7, 0.1)',
-          border: '1px solid rgba(255, 193, 7, 0.3)',
+          background: 'rgba(239, 68, 68, 0.1)',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
           borderRadius: '0.75rem',
           padding: '1rem',
-          marginBottom: '1rem',
+          marginBottom: '1.5rem',
           display: 'flex',
           alignItems: 'center',
           gap: '0.5rem',
-          color: '#ffc107'
+          color: '#dc2626',
+          fontFamily: 'Inter, sans-serif'
         }}>
           <FiStar size={18} />
-          <span style={{ fontSize: '0.9rem' }}>{error}</span>
+          <span style={{ fontSize: '0.875rem' }}>{error}</span>
         </div>
       )}
 
@@ -602,10 +589,10 @@ const PersonalizedRecommendations = ({
         <div style={{
           textAlign: 'center',
           padding: '3rem 1rem',
-          color: 'rgba(255, 255, 255, 0.8)'
+          color: '#6b7280'
         }}>
-          <FiStar size={48} style={{ color: '#64ffda', marginBottom: '1rem' }} />
-          <h4 style={{ color: '#fff', marginBottom: '0.5rem', fontSize: '1.2rem' }}>
+          <FiStar size={48} style={{ color: '#9ca3af', marginBottom: '1rem' }} />
+          <h4 style={{ color: '#111827', marginBottom: '0.5rem', fontSize: '1.2rem' }}>
             No recommendations available
           </h4>
           <p style={{ marginBottom: '1.5rem', fontSize: '0.9rem' }}>
@@ -617,15 +604,15 @@ const PersonalizedRecommendations = ({
             onClick={handleRefresh}
             style={{
               padding: '0.75rem 1.5rem',
-              background: 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)',
-              color: '#0a192f',
+              background: '#000000',
+              color: '#ffffff',
               border: 'none',
-              borderRadius: '1.5rem',
+              borderRadius: '0.5rem',
               fontSize: '0.9rem',
               fontWeight: '600',
               cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              boxShadow: '0 4px 12px rgba(100, 255, 218, 0.3)'
+              transition: 'all 0.2s ease',
+              fontFamily: 'Inter, sans-serif'
             }}
           >
             Try Again
@@ -645,6 +632,14 @@ const PersonalizedRecommendations = ({
             const menuItemData = recommendation.menuItemId && typeof recommendation.menuItemId === 'object'
               ? recommendation.menuItemId  // Nested structure (new users)
               : recommendation;            // Flat structure (existing users)
+
+            // Debug: Log the price data
+            console.log('PersonalizedRecommendations - Price Debug:', {
+              name: menuItemData.name || recommendation.name,
+              menuItemPrice: menuItemData.price,
+              recommendationPrice: recommendation.price,
+              finalPrice: menuItemData.price || recommendation.price || 0
+            });
 
             // Ensure the recommendation has the required structure
             const normalizedRecommendation = {

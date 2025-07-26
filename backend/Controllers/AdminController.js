@@ -1,30 +1,17 @@
-// Admin Controller - Handles administrative operations and user management
-const User = require("../Models/User");
-const bcrypt = require("bcrypt");
-
-// HTTP Status Codes for consistent error handling
-const HTTP_STATUS = {
-  OK: 200,
-  CREATED: 201,
-  BAD_REQUEST: 400,
-  UNAUTHORIZED: 401,
-  FORBIDDEN: 403,
-  NOT_FOUND: 404,
-  INTERNAL_SERVER_ERROR: 500,
-};
+const User = require('../Models/User');
+const bcrypt = require('bcrypt');
 
 // Get all users (admin only)
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().select("-password");
+    const users = await User.find().select('-password');
     res.status(200).json(users);
   } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({
-      message: "Error fetching users",
+    console.error('Error fetching users:', error);
+    res.status(500).json({ 
+      message: 'Error fetching users', 
       error: error.message,
-      details:
-        "Please try again later or contact support if the issue persists",
+      details: 'Please try again later or contact support if the issue persists'
     });
   }
 };
@@ -36,12 +23,14 @@ exports.updateUser = async (req, res) => {
     const { name, email, role, isActive } = req.body;
     const adminId = req.user._id;
 
+
+
     // Check if user exists
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        details: "The requested user does not exist in the system",
+      return res.status(404).json({ 
+        message: 'User not found',
+        details: 'The requested user does not exist in the system'
       });
     }
 
@@ -49,34 +38,31 @@ exports.updateUser = async (req, res) => {
     if (email && email !== user.email) {
       const emailExists = await User.findOne({ email });
       if (emailExists) {
-        return res.status(400).json({
-          message: "Email already exists",
-          details: "Please choose a different email address",
+        return res.status(400).json({ 
+          message: 'Email already exists',
+          details: 'Please choose a different email address'
         });
       }
     }
 
     // Prevent changing role of the last admin
-    if (role && role !== user.role && user.role === "admin") {
-      const adminCount = await User.countDocuments({ role: "admin" });
+    if (role && role !== user.role && user.role === 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin' });
       if (adminCount <= 1) {
-        return res.status(400).json({
-          message: "Cannot change role of the last admin user",
-          details: "At least one admin user must remain in the system",
+        return res.status(400).json({ 
+          message: 'Cannot change role of the last admin user',
+          details: 'At least one admin user must remain in the system'
         });
       }
     }
 
     // Prevent deactivating the last admin
-    if (isActive === false && user.role === "admin") {
-      const activeAdminCount = await User.countDocuments({
-        role: "admin",
-        isActive: true,
-      });
+    if (isActive === false && user.role === 'admin') {
+      const activeAdminCount = await User.countDocuments({ role: 'admin', isActive: true });
       if (activeAdminCount <= 1) {
-        return res.status(400).json({
-          message: "Cannot deactivate the last active admin user",
-          details: "At least one active admin user must remain in the system",
+        return res.status(400).json({ 
+          message: 'Cannot deactivate the last active admin user',
+          details: 'At least one active admin user must remain in the system'
         });
       }
     }
@@ -85,32 +71,24 @@ exports.updateUser = async (req, res) => {
     if (name) user.name = name;
     if (email) user.email = email;
     if (role) user.role = role;
-    if (typeof isActive === "boolean") user.isActive = isActive;
+    if (typeof isActive === 'boolean') user.isActive = isActive;
 
     await user.save();
-    const updatedUser = await User.findById(id).select("-password");
-
+    const updatedUser = await User.findById(id).select('-password');
+    
     // Log the admin action
-    console.log(
-      `Admin ${adminId} updated user ${id}: ${JSON.stringify({
-        name,
-        email,
-        role,
-        isActive,
-      })}`
-    );
-
+    console.log(`Admin ${adminId} updated user ${id}: ${JSON.stringify({ name, email, role, isActive })}`);
+    
     res.status(200).json({
-      message: "User updated successfully",
-      user: updatedUser,
+      message: 'User updated successfully',
+      user: updatedUser
     });
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({
-      message: "Error updating user",
+    console.error('Error updating user:', error);
+    res.status(500).json({ 
+      message: 'Error updating user', 
       error: error.message,
-      details:
-        "Please try again later or contact support if the issue persists",
+      details: 'Please try again later or contact support if the issue persists'
     });
   }
 };
@@ -124,22 +102,19 @@ exports.toggleUserStatus = async (req, res) => {
     // Check if user exists
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        details: "The requested user does not exist in the system",
+      return res.status(404).json({ 
+        message: 'User not found',
+        details: 'The requested user does not exist in the system'
       });
     }
 
     // Prevent deactivating the last admin
-    if (user.role === "admin" && !user.isActive) {
-      const activeAdminCount = await User.countDocuments({
-        role: "admin",
-        isActive: true,
-      });
+    if (user.role === 'admin' && !user.isActive) {
+      const activeAdminCount = await User.countDocuments({ role: 'admin', isActive: true });
       if (activeAdminCount <= 1) {
-        return res.status(400).json({
-          message: "Cannot deactivate the last active admin user",
-          details: "At least one active admin user must remain in the system",
+        return res.status(400).json({ 
+          message: 'Cannot deactivate the last active admin user',
+          details: 'At least one active admin user must remain in the system'
         });
       }
     }
@@ -149,31 +124,24 @@ exports.toggleUserStatus = async (req, res) => {
     await user.save();
 
     // Log the admin action
-    console.log(
-      `Admin ${adminId} toggled user ${id} status to ${
-        user.isActive ? "active" : "inactive"
-      }`
-    );
-
+    console.log(`Admin ${adminId} toggled user ${id} status to ${user.isActive ? 'active' : 'inactive'}`);
+    
     res.status(200).json({
-      message: `User ${
-        user.isActive ? "activated" : "deactivated"
-      } successfully`,
+      message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
-        isActive: user.isActive,
-      },
+        isActive: user.isActive
+      }
     });
   } catch (error) {
-    console.error("Error toggling user status:", error);
-    res.status(500).json({
-      message: "Error toggling user status",
+    console.error('Error toggling user status:', error);
+    res.status(500).json({ 
+      message: 'Error toggling user status', 
       error: error.message,
-      details:
-        "Please try again later or contact support if the issue persists",
+      details: 'Please try again later or contact support if the issue persists'
     });
   }
 };
@@ -186,48 +154,47 @@ exports.deleteUser = async (req, res) => {
 
     // Prevent self-deletion
     if (id === adminId.toString()) {
-      return res.status(400).json({
-        message: "Cannot delete your own account",
-        details: "Please use a different admin account to delete this user",
+      return res.status(400).json({ 
+        message: 'Cannot delete your own account',
+        details: 'Please use a different admin account to delete this user'
       });
     }
 
     // Check if user exists
     const user = await User.findById(id);
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        details: "The requested user does not exist in the system",
+      return res.status(404).json({ 
+        message: 'User not found',
+        details: 'The requested user does not exist in the system'
       });
     }
 
     // Prevent deleting the last admin
-    if (user.role === "admin") {
-      const adminCount = await User.countDocuments({ role: "admin" });
+    if (user.role === 'admin') {
+      const adminCount = await User.countDocuments({ role: 'admin' });
       if (adminCount <= 1) {
-        return res.status(400).json({
-          message: "Cannot delete the last admin user",
-          details: "At least one admin user must remain in the system",
+        return res.status(400).json({ 
+          message: 'Cannot delete the last admin user',
+          details: 'At least one admin user must remain in the system'
         });
       }
     }
 
     await User.findByIdAndDelete(id);
-
+    
     // Log the admin action
     console.log(`Admin ${adminId} deleted user ${id}`);
-
-    res.status(200).json({
-      message: "User deleted successfully",
-      details: "The user has been permanently removed from the system",
+    
+    res.status(200).json({ 
+      message: 'User deleted successfully',
+      details: 'The user has been permanently removed from the system'
     });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({
-      message: "Error deleting user",
+    console.error('Error deleting user:', error);
+    res.status(500).json({ 
+      message: 'Error deleting user', 
       error: error.message,
-      details:
-        "Please try again later or contact support if the issue persists",
+      details: 'Please try again later or contact support if the issue persists'
     });
   }
-};
+}; 

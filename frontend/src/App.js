@@ -1,23 +1,6 @@
 import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
-import {
-  Home,
-  Booking,
-  AboutUs,
-  Contact,
-  PageNotFound,
-  Room,
-  Services,
-  Team,
-  Testimonial,
-  Help,
-} from "./pages/index";
+import { BrowserRouter as Router, Route, Routes, Navigate, useLocation } from "react-router-dom";
+import { Home, Booking, AboutUs, Contact, PageNotFound, Room, Services, Team, Testimonial, Help } from "./pages/index";
 import Header from "./components/common/Header";
 import Footer from "./components/layout/Footer";
 import ScrollToTop from "./components/common/ScrollToTop";
@@ -47,11 +30,10 @@ import Profile from "./pages/Profile";
 import Feedback from "./components/User/Feedback";
 import "./styles/simple-theme.css";
 import "./styles/global.css";
-import "./styles/bootstrap-overrides.css";
-import BookingPage from "./pages/BookingPage";
+import BookingPage from './pages/BookingPage';
 import BookingConfirmation from "./pages/BookingConfirmation";
 import OrderTracking from "./pages/OrderTracking";
-import { Toaster, toast } from "react-hot-toast";
+import { Toaster, toast } from 'react-hot-toast';
 import PersonalizedRecommendations from "./components/recommendations/PersonalizedRecommendations";
 
 /**
@@ -83,7 +65,9 @@ const Layout = ({ children }) => {
   return (
     <>
       {!excludeHeaderFooter && <Header />}
-      <main className="main-content">{children}</main>
+      <main className="main-content">
+        {children}
+      </main>
       {!excludeHeaderFooter && <Footer />}
     </>
   );
@@ -104,17 +88,14 @@ const AdminRestrictedRoute = ({ children }) => {
   if (token && role === "admin") {
     // Show notification to admin
     setTimeout(() => {
-      toast.error(
-        "🚫 Access Restricted: Admins can only access the Dashboard",
-        {
-          duration: 4000,
-          style: {
-            background: "#dc3545",
-            color: "white",
-            fontWeight: "bold",
-          },
-        }
-      );
+      toast.error("🚫 Access Restricted: Admins can only access the Dashboard", {
+        duration: 4000,
+        style: {
+          background: '#dc3545',
+          color: 'white',
+          fontWeight: 'bold',
+        },
+      });
     }, 100);
 
     return <Navigate to="/dashboard" replace />;
@@ -134,9 +115,9 @@ const AdminOnlyRoute = ({ children }) => {
       toast.error("🔐 Please login to access the Dashboard", {
         duration: 3000,
         style: {
-          background: "#ffc107",
-          color: "#000",
-          fontWeight: "bold",
+          background: '#ffc107',
+          color: '#000',
+          fontWeight: 'bold',
         },
       });
     }, 100);
@@ -149,9 +130,9 @@ const AdminOnlyRoute = ({ children }) => {
       toast.error("⚠️ Access Denied: Admin privileges required", {
         duration: 4000,
         style: {
-          background: "#dc3545",
-          color: "white",
-          fontWeight: "bold",
+          background: '#dc3545',
+          color: 'white',
+          fontWeight: 'bold',
         },
       });
     }, 100);
@@ -161,366 +142,208 @@ const AdminOnlyRoute = ({ children }) => {
   return children;
 };
 
+
+
 function App() {
   return (
-    <GoogleOAuthProvider
-      clientId={
-        process.env.REACT_APP_GOOGLE_CLIENT_ID ||
-        "940737064009-sf2stfd9kf6dq9e6s188l2pe1hh6q75o.apps.googleusercontent.com"
-      }
-    >
+    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || "940737064009-sf2stfd9kf6dq9e6s188l2pe1hh6q75o.apps.googleusercontent.com"}>
       <HotelSettingsProvider>
         <Toaster
           position="top-right"
           toastOptions={{
             duration: 3000,
             style: {
-              background: "rgba(17, 34, 64, 0.9)",
-              color: "#f0f4fc",
-              border: "1px solid rgba(100, 255, 218, 0.1)",
+              background: 'rgba(17, 34, 64, 0.9)',
+              color: '#f0f4fc',
+              border: '1px solid rgba(100, 255, 218, 0.1)',
             },
           }}
         />
         <Router>
-          <ScrollToTop />
-          <Routes>
-            {/* Public routes - Admins are redirected to dashboard */}
-            <Route
-              path="/"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Home />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/booking"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Booking />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/about"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <AboutUs />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/contact"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Contact />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/rooms"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Room />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/services"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Services />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/team"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Team />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/testimonial"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Testimonial />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/help"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Help />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
+        <ScrollToTop />
+        <Routes>
+          {/* Public routes - Admins are redirected to dashboard */}
+          <Route path="/" element={
+            <AdminRestrictedRoute>
+              <Layout><Home /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/booking" element={
+            <AdminRestrictedRoute>
+              <Layout><Booking /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/about" element={
+            <AdminRestrictedRoute>
+              <Layout><AboutUs /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/contact" element={
+            <AdminRestrictedRoute>
+              <Layout><Contact /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/rooms" element={
+            <AdminRestrictedRoute>
+              <Layout><Room /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/services" element={
+            <AdminRestrictedRoute>
+              <Layout><Services /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/team" element={
+            <AdminRestrictedRoute>
+              <Layout><Team /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/testimonial" element={
+            <AdminRestrictedRoute>
+              <Layout><Testimonial /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/help" element={
+            <AdminRestrictedRoute>
+              <Layout><Help /></Layout>
+            </AdminRestrictedRoute>
+          } />
 
-            {/* Login page - accessible to all */}
-            <Route path="/login" element={<LoginPage />} />
+          {/* Login page - accessible to all */}
+          <Route path="/login" element={<LoginPage />} />
 
-            {/* Admin-only dashboard */}
-            <Route
-              path="/dashboard"
-              element={
-                <AdminOnlyRoute>
-                  <Layout>
-                    <Dashboard />
-                  </Layout>
-                </AdminOnlyRoute>
-              }
-            />
+          {/* Admin-only dashboard */}
+          <Route path="/dashboard" element={
+            <AdminOnlyRoute>
+              <Layout><Dashboard /></Layout>
+            </AdminOnlyRoute>
+          } />
 
-            {/* User routes - Admins are redirected to dashboard */}
-            <Route
-              path="/book-room"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <BookRoom />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/order-food"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <OrderFood />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/cart"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Cart />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/my-orders"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <MyOrders />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/invoice/:orderId"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Invoice />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/my-bookings"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <MyBookings />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/my-reservations"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <MyReservations />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/admin-orders"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <AdminOrders />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/delivery-tracking"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <DeliveryTrackingPage />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/reserve-table"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <ReserveTable />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/table-recommendations"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <TableRecommendations />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/table-reservation"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <TableReservationPage />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/table-confirmation"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <TableConfirmationPage />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/profile"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Profile />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/feedback"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <Feedback />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/booking-page/:id"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <BookingPage />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/booking-confirmation"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <BookingConfirmation />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/order-confirmation"
-              element={
-                <AdminRestrictedRoute>
-                  <AuthenticatedRoute>
-                    <Layout>
-                      <OrderConfirmation />
-                    </Layout>
-                  </AuthenticatedRoute>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/track-order/:orderId"
-              element={
-                <AdminRestrictedRoute>
-                  <AuthenticatedRoute>
-                    <Layout>
-                      <OrderTracking />
-                    </Layout>
-                  </AuthenticatedRoute>
-                </AdminRestrictedRoute>
-              }
-            />
-            <Route
-              path="/recommendations"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <PersonalizedRecommendations />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
+          {/* User routes - Admins are redirected to dashboard */}
+          <Route path="/book-room" element={
+            <AdminRestrictedRoute>
+              <Layout><BookRoom /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/order-food" element={
+            <AdminRestrictedRoute>
+              <Layout><OrderFood /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/cart" element={
+            <AdminRestrictedRoute>
+              <Layout><Cart /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/my-orders" element={
+            <AdminRestrictedRoute>
+              <Layout><MyOrders /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/invoice/:orderId" element={
+            <AdminRestrictedRoute>
+              <Layout><Invoice /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/my-bookings" element={
+            <AdminRestrictedRoute>
+              <Layout><MyBookings /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/my-reservations" element={
+            <AdminRestrictedRoute>
+              <Layout><MyReservations /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/admin-orders" element={
+            <AdminRestrictedRoute>
+              <Layout><AdminOrders /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/delivery-tracking" element={
+            <AdminRestrictedRoute>
+              <Layout><DeliveryTrackingPage /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/reserve-table" element={
+            <AdminRestrictedRoute>
+              <Layout><ReserveTable /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/table-recommendations" element={
+            <AdminRestrictedRoute>
+              <Layout><TableRecommendations /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/table-reservation" element={
+            <AdminRestrictedRoute>
+              <Layout><TableReservationPage /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/table-confirmation" element={
+            <AdminRestrictedRoute>
+              <Layout><TableConfirmationPage /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/profile" element={
+            <AdminRestrictedRoute>
+              <Layout><Profile /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/feedback" element={
+            <AdminRestrictedRoute>
+              <Layout><Feedback /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/booking-page/:id" element={
+            <AdminRestrictedRoute>
+              <Layout><BookingPage /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/booking-confirmation" element={
+            <AdminRestrictedRoute>
+              <Layout><BookingConfirmation /></Layout>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/order-confirmation" element={
+            <AdminRestrictedRoute>
+              <AuthenticatedRoute>
+                <Layout><OrderConfirmation /></Layout>
+              </AuthenticatedRoute>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/track-order/:orderId" element={
+            <AdminRestrictedRoute>
+              <AuthenticatedRoute>
+                <Layout><OrderTracking /></Layout>
+              </AuthenticatedRoute>
+            </AdminRestrictedRoute>
+          } />
+          <Route path="/recommendations" element={
+            <AdminRestrictedRoute>
+              <Layout><PersonalizedRecommendations /></Layout>
+            </AdminRestrictedRoute>
+          } />
 
-            {/* 404 page - Admins are redirected to dashboard */}
-            <Route
-              path="*"
-              element={
-                <AdminRestrictedRoute>
-                  <Layout>
-                    <PageNotFound />
-                  </Layout>
-                </AdminRestrictedRoute>
-              }
-            />
-          </Routes>
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="light"
-          />
+          {/* 404 page - Admins are redirected to dashboard */}
+          <Route path="*" element={
+            <AdminRestrictedRoute>
+              <Layout><PageNotFound /></Layout>
+            </AdminRestrictedRoute>
+          } />
+        </Routes>
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+        />
         </Router>
       </HotelSettingsProvider>
     </GoogleOAuthProvider>

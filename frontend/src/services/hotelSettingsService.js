@@ -40,6 +40,9 @@ class HotelSettingsService {
   async getPublicSettings() {
     try {
       const response = await axios.get(apiConfig.endpoints.hotelSettingsPublic);
+
+      console.log('Public settings response branding:', response.data.data.branding);
+
       return {
         success: true,
         data: response.data.data,
@@ -354,6 +357,176 @@ class HotelSettingsService {
       console.warn('Failed to get cached hotel settings:', error);
     }
     return null;
+  }
+
+  /**
+   * Upload logo file with fallback methods
+   */
+  async uploadLogo(logoFile, logoType) {
+    try {
+      // Method 1: Try backend upload first
+      const formData = new FormData();
+      formData.append('logo', logoFile);
+      formData.append('logoType', logoType);
+
+      const token = localStorage.getItem('token');
+      const response = await axios.post(
+        `${apiConfig.endpoints.hotelSettings}/upload-logo`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      // Clear cache after successful upload
+      this.clearCache();
+
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message
+      };
+    } catch (error) {
+      console.error('Backend upload failed, trying alternative method:', error);
+
+      // Method 2: Fallback to imgur upload (free service)
+      try {
+        const imgurUrl = await this.uploadToImgur(logoFile);
+
+        // Update branding settings with the imgur URL
+        const brandingData = {
+          logo: {
+            [logoType]: imgurUrl
+          }
+        };
+
+        const updateResult = await this.updateBrandingSettings(brandingData);
+
+        if (updateResult.success) {
+          return {
+            success: true,
+            data: { logoUrl: imgurUrl, logoType },
+            message: 'Logo uploaded successfully via external service'
+          };
+        } else {
+          throw new Error('Failed to update branding settings');
+        }
+      } catch (imgurError) {
+        console.error('Imgur upload also failed:', imgurError);
+
+        // Method 3: Final fallback - convert to base64 and save directly
+        try {
+          const base64Url = await this.convertToBase64(logoFile);
+
+          const brandingData = {
+            logo: {
+              [logoType]: base64Url
+            }
+          };
+
+          const updateResult = await this.updateBrandingSettings(brandingData);
+
+          if (updateResult.success) {
+            return {
+              success: true,
+              data: { logoUrl: base64Url, logoType },
+              message: 'Logo uploaded successfully (base64 format)'
+            };
+          } else {
+            throw new Error('Failed to save base64 logo');
+          }
+        } catch (base64Error) {
+          console.error('All upload methods failed:', base64Error);
+          return {
+            success: false,
+            error: 'All upload methods failed. Please try using a direct image URL instead.'
+          };
+        }
+      }
+    }
+  }
+
+  /**
+   * Upload to Imgur (free image hosting)
+   */
+  async uploadToImgur(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          const base64Data = reader.result.split(',')[1]; // Remove data:image/...;base64, prefix
+
+          const response = await axios.post('https://api.imgur.com/3/image', {
+            image: base64Data,
+            type: 'base64'
+          }, {
+            headers: {
+              'Authorization': 'Client-ID 546c25a59c58ad7', // Public imgur client ID
+              'Content-Type': 'application/json'
+            }
+          });
+
+          if (response.data.success) {
+            resolve(response.data.data.link);
+          } else {
+            reject(new Error('Imgur upload failed'));
+          }
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = () => reject(new Error('Failed to read file'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /**
+   * Convert file to base64 data URL
+   */
+  async convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Failed to convert file to base64'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  /**
+   * Update branding settings (including logo URLs)
+   */
+  async updateBrandingSettings(brandingData) {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `${apiConfig.endpoints.hotelSettings}/branding`,
+        brandingData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
+
+      // Clear cache after successful update
+      this.clearCache();
+
+      return {
+        success: true,
+        data: response.data.data,
+        message: response.data.message
+      };
+    } catch (error) {
+      console.error('Error updating branding settings:', error);
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Failed to update branding settings'
+      };
+    }
   }
 
   clearCache() {

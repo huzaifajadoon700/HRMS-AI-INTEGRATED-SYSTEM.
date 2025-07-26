@@ -1,14 +1,46 @@
-// Order Controller - Manages food orders, payments, and real-time order tracking
 const Order = require("../Models/Order");
 const User = require("../Models/User");
 const UserFoodInteraction = require("../Models/UserFoodInteraction");
+const mongoose = require("mongoose");
+
+// Ensure User model is registered
+if (!mongoose.models.User) {
+  require("../Models/User");
+}
 const http = require("http");
 const socketIo = require("socket.io");
-const mongoose = require("mongoose");
 const stripe = require("../config/stripe");
 
 const server = http.createServer();
 const io = socketIo(server);
+
+// Automatic order progression for demo purposes
+const startAutomaticOrderProgression = (orderId) => {
+  const statusProgression = [
+    { status: 'confirmed', delay: 2000 },      // 2 seconds
+    { status: 'preparing', delay: 8000 },      // 8 seconds
+    { status: 'ready_for_pickup', delay: 5000 }, // 5 seconds
+    { status: 'out_for_delivery', delay: 10000 }, // 10 seconds
+    { status: 'arriving_soon', delay: 8000 },   // 8 seconds
+    { status: 'delivered', delay: 5000 }        // 5 seconds
+  ];
+
+  console.log(`[Order] Starting automatic progression for order: ${orderId}`);
+
+  statusProgression.forEach(({ status, delay }, index) => {
+    setTimeout(async () => {
+      try {
+        await Order.findByIdAndUpdate(orderId, {
+          status: status,
+          updatedAt: new Date()
+        });
+        console.log(`[Order] ${orderId} status updated to: ${status}`);
+      } catch (error) {
+        console.error(`[Order] Error updating status for ${orderId}:`, error);
+      }
+    }, delay);
+  });
+};
 
 // ✅ Create Order (Logged-in users only)
 exports.createOrder = async (req, res) => {
@@ -202,32 +234,11 @@ exports.createOrder = async (req, res) => {
       // Don't fail the order if interaction recording fails
     }
 
-    // Get socket.io instance
-    const socketModule = require("../socket");
-    const io = socketModule.getIO();
-
-    // Emit socket event for real-time updates
-    if (io) {
-      const orderUpdate = {
-        orderId: savedOrder._id,
-        status: "pending",
-        timestamp: new Date(),
-        estimatedDelivery: new Date(Date.now() + 30 * 60000), // 30 minutes from now
-        completed: false,
-      };
-
-      // Emit to everyone in the room for this order
-      io.to(`order_${savedOrder._id}`).emit("orderUpdate", orderUpdate);
-
-      // Also emit a global event for any page that might be displaying this order
-      io.emit("orderStatusUpdate", orderUpdate);
-
-      console.log(
-        `[Socket] Order ${savedOrder._id} created with status: pending`
-      );
-    } else {
-      console.warn("[Socket] Socket.io instance not available");
-    }
+    // Start automatic order progression for demo purposes
+    setTimeout(() => {
+      startAutomaticOrderProgression(savedOrder._id);
+      console.log(`[Order] Automatic progression started for order: ${savedOrder._id}`);
+    }, 1000); // Wait 1 second before starting progression
 
     res.status(201).json({
       message: "Order created successfully",
@@ -256,52 +267,94 @@ exports.getOrders = async (req, res) => {
     let query = {};
     let orders = [];
 
-    if (!req.user.isAdmin) {
+    // Check if user is admin (check both isAdmin flag and role)
+    const isAdmin = req.user.isAdmin || req.user.role === 'admin';
+    console.log("🔍 User admin status:", {
+      id: req.user._id,
+      isAdmin: req.user.isAdmin,
+      role: req.user.role,
+      finalIsAdmin: isAdmin
+    });
+
+    // Check if there are any orders in the database at all
+    const totalOrdersInDB = await Order.countDocuments({});
+    console.log("🔍 Total orders in database:", totalOrdersInDB);
+
+    let totalOrders;
+
+    if (!isAdmin) {
       // Regular users can only see their own orders
-      console.log("🔍 User is not admin, searching for user-specific orders");
-
-      // Try current user ID format first
+      console.log("🔍 Regular user, searching for user-specific orders");
       query.user = userId;
-      orders = await Order.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
 
-      console.log("Orders found with current userId:", orders.length);
+      try {
+        orders = await Order.find(query)
+          .populate("user", "name email phone")
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit);
+        console.log("✅ User orders found:", orders.length);
 
-      // If no orders found, try string version of user ID
-      if (orders.length === 0) {
-        console.log("🔄 Trying to find orders with string userId...");
-        query.user = userId.toString();
+        totalOrders = await Order.countDocuments(query);
+      } catch (error) {
+        console.error("❌ Error fetching user orders:", error);
+        // Fallback without population
         orders = await Order.find(query)
           .sort({ createdAt: -1 })
           .skip(skip)
           .limit(limit);
-        console.log("Orders found with string userId:", orders.length);
+        totalOrders = await Order.countDocuments(query);
       }
     } else {
       // Admin can see all orders
       console.log("🔍 Admin user, fetching all orders");
-      orders = await Order.find(query)
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
-    }
 
-    // Get total count for pagination (use the same query logic)
-    let totalOrders;
-    if (!req.user.isAdmin) {
-      // Try to count with current user ID first
-      totalOrders = await Order.countDocuments({ user: userId });
-      if (totalOrders === 0) {
-        totalOrders = await Order.countDocuments({ user: userId.toString() });
+      try {
+        orders = await Order.find(query)
+          .populate("user", "name email phone")
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit);
+        console.log("✅ Admin orders found:", orders.length);
+
+        totalOrders = await Order.countDocuments(query);
+
+        if (orders.length > 0) {
+          console.log("🔍 Sample order:", {
+            id: orders[0]._id,
+            user: orders[0].user?.name || 'No user',
+            status: orders[0].status,
+            totalPrice: orders[0].totalPrice,
+            items: orders[0].items?.length || 0
+          });
+        }
+      } catch (populationError) {
+        console.error("❌ Error during admin order population:", populationError);
+        // Fallback: return orders without user population
+        orders = await Order.find(query)
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit);
+        totalOrders = await Order.countDocuments(query);
+        console.log("🔄 Fallback admin orders (no user population):", orders.length);
       }
-    } else {
-      totalOrders = await Order.countDocuments({});
     }
 
+    // Calculate pagination
     const totalPages = Math.ceil(totalOrders / limit);
-    console.log("Final orders found:", orders.length);
+    console.log("🔍 Pagination info:", { totalOrders, totalPages, page, limit });
+    console.log("✅ Final orders found:", orders.length);
+
+    // Debug: Log sample order data
+    if (orders.length > 0) {
+      console.log("Sample order data:", {
+        id: orders[0]._id,
+        user: orders[0].user,
+        items: orders[0].items,
+        status: orders[0].status,
+        totalPrice: orders[0].totalPrice,
+      });
+    }
 
     // Ensure all price fields are valid numbers
     const validatedOrders = orders.map((order) => ({
@@ -462,12 +515,10 @@ exports.updateDeliveryLocation = async (req, res) => {
     res.json({ message: "Delivery location updated", order });
   } catch (error) {
     console.error("Error updating delivery location:", error);
-    res
-      .status(500)
-      .json({
-        message: "Error updating delivery location",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error updating delivery location",
+      error: error.message,
+    });
   }
 };
 
@@ -532,6 +583,19 @@ exports.updateOrderStatus = async (req, res) => {
     const { orderId } = req.params;
     const { status } = req.body;
 
+    console.log(
+      `[updateOrderStatus] Admin ${req.user.id} updating order ${orderId} to status: ${status}`
+    );
+
+    // Double-check admin privileges
+    if (!req.user.isAdmin && req.user.role !== "admin") {
+      return res.status(403).json({
+        message: "Access denied. Administrator privileges required.",
+        userRole: req.user.role,
+        isAdmin: req.user.isAdmin,
+      });
+    }
+
     // Validate status
     const validStatuses = [
       "pending",
@@ -587,3 +651,33 @@ exports.updateOrderStatus = async (req, res) => {
       .json({ message: "Error updating order status", error: error.message });
   }
 };
+
+// Get order status for real-time tracking (polling-based)
+exports.getOrderStatus = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const userId = req.user.id;
+
+    const order = await Order.findOne({ _id: orderId, userId })
+      .select('status createdAt updatedAt _id');
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    res.json({
+      success: true,
+      order: {
+        _id: order._id,
+        status: order.status,
+        createdAt: order.createdAt,
+        updatedAt: order.updatedAt
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching order status:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+

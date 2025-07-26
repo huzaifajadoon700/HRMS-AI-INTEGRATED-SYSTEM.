@@ -7,6 +7,9 @@ import "./simple-admin.css";
 const AdminAddRoom = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     roomNumber: '',
     roomType: '',
@@ -22,6 +25,95 @@ const AdminAddRoom = () => {
       ...formData,
       [e.target.name]: e.target.value
     });
+  };
+
+  // Handle file selection
+  const handleFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Please select a valid image file (JPEG, PNG, or GIF)');
+        return;
+      }
+
+      // Validate file size (5MB limit)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+
+      setSelectedFile(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Upload image to Cloudinary
+  const uploadImageToCloudinary = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', 'hrms_images'); // You'll need to create this preset in Cloudinary
+    formData.append('cloud_name', 'your_cloud_name'); // Replace with your Cloudinary cloud name
+
+    try {
+      const response = await axios.post(
+        'https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', // Replace with your cloud name
+        formData
+      );
+      return response.data.secure_url;
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      throw new Error('Failed to upload image to cloud storage');
+    }
+  };
+
+  // Handle image upload
+  const handleImageUpload = async () => {
+    if (!selectedFile) {
+      toast.error('Please select an image first');
+      return;
+    }
+
+    setImageUploading(true);
+    try {
+      // For now, we'll use a placeholder service or fallback to URL input
+      // In production, you would integrate with Cloudinary, AWS S3, or similar
+
+      // Temporary solution: Convert to base64 for demo (not recommended for production)
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64Image = e.target.result;
+        setFormData(prev => ({
+          ...prev,
+          image: base64Image
+        }));
+        toast.success('Image uploaded successfully!');
+        setImageUploading(false);
+      };
+      reader.readAsDataURL(selectedFile);
+
+    } catch (error) {
+      console.error('Image upload error:', error);
+      toast.error('Failed to upload image. Please try again.');
+      setImageUploading(false);
+    }
+  };
+
+  // Clear image
+  const clearImage = () => {
+    setSelectedFile(null);
+    setImagePreview(null);
+    setFormData(prev => ({
+      ...prev,
+      image: ''
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -47,11 +139,60 @@ const AdminAddRoom = () => {
   };
 
   return (
-    <div className="simple-admin-container">
-      <div className="simple-admin-header">
-        <h1>Add New Room</h1>
-        <p>Add a new room to the system</p>
-      </div>
+    <>
+      {/* Mobile Responsive CSS */}
+      <style>
+        {`
+          @media (max-width: 768px) {
+            .admin-image-upload-container {
+              flex-direction: column !important;
+              gap: 1rem !important;
+            }
+
+            .admin-image-upload-section {
+              flex: none !important;
+              min-width: auto !important;
+              width: 100% !important;
+            }
+
+            .admin-image-upload-buttons {
+              flex-direction: column !important;
+              gap: 0.5rem !important;
+            }
+
+            .admin-image-upload-buttons button {
+              width: 100% !important;
+            }
+
+            .admin-image-preview {
+              max-width: 100% !important;
+              text-align: center !important;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .simple-form-section h3 {
+              font-size: 1rem !important;
+              margin-bottom: 0.75rem !important;
+            }
+
+            .admin-image-upload-section label {
+              font-size: 0.8rem !important;
+            }
+
+            .admin-image-upload-section input {
+              padding: 0.5rem !important;
+              font-size: 0.875rem !important;
+            }
+          }
+        `}
+      </style>
+
+      <div className="simple-admin-container">
+        <div className="simple-admin-header">
+          <h1>Add New Room</h1>
+          <p>Add a new room to the system</p>
+        </div>
 
       <div className="simple-form-container">
         <form onSubmit={handleSubmit} className="simple-form">
@@ -109,13 +250,166 @@ const AdminAddRoom = () => {
               <option value="Occupied">Occupied</option>
               <option value="Maintenance">Maintenance</option>
             </select>
-            <input
-              type="url"
-              name="image"
-              placeholder="Image URL (optional)"
-              value={formData.image}
-              onChange={handleInputChange}
-            />
+            <div></div>
+          </div>
+
+          {/* Image Upload Section */}
+          <div className="simple-form-section">
+            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', color: '#374151' }}>
+              Room Image
+            </h3>
+
+            {/* Image Upload Options */}
+            <div style={{ marginBottom: '1rem' }}>
+              <div className="admin-image-upload-container" style={{
+                display: 'flex',
+                gap: '1rem',
+                marginBottom: '1rem',
+                flexWrap: 'wrap'
+              }}>
+                {/* File Upload */}
+                <div className="admin-image-upload-section" style={{ flex: '1', minWidth: '250px' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    color: '#374151'
+                  }}>
+                    Upload Image File
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: '2px dashed #d1d5db',
+                      borderRadius: '0.5rem',
+                      backgroundColor: '#f9fafb',
+                      cursor: 'pointer'
+                    }}
+                  />
+                  {selectedFile && (
+                    <div className="admin-image-upload-buttons" style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+                      <button
+                        type="button"
+                        onClick={handleImageUpload}
+                        disabled={imageUploading}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          backgroundColor: imageUploading ? '#9ca3af' : '#059669',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '0.375rem',
+                          cursor: imageUploading ? 'not-allowed' : 'pointer',
+                          fontSize: '0.875rem'
+                        }}
+                      >
+                        {imageUploading ? 'Uploading...' : 'Upload Image'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={clearImage}
+                        style={{
+                          padding: '0.5rem 1rem',
+                          backgroundColor: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '0.375rem',
+                          cursor: 'pointer',
+                          fontSize: '0.875rem'
+                        }}
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* OR Divider */}
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '0 1rem',
+                  color: '#6b7280',
+                  fontSize: '0.875rem',
+                  fontWeight: '500'
+                }}>
+                  OR
+                </div>
+
+                {/* URL Input */}
+                <div className="admin-image-upload-section" style={{ flex: '1', minWidth: '250px' }}>
+                  <label style={{
+                    display: 'block',
+                    marginBottom: '0.5rem',
+                    fontSize: '0.9rem',
+                    fontWeight: '500',
+                    color: '#374151'
+                  }}>
+                    Image URL
+                  </label>
+                  <input
+                    type="url"
+                    name="image"
+                    placeholder="https://example.com/image.jpg"
+                    value={formData.image}
+                    onChange={handleInputChange}
+                    style={{
+                      width: '100%',
+                      padding: '0.75rem',
+                      border: '1px solid #d1d5db',
+                      borderRadius: '0.375rem',
+                      fontSize: '0.875rem'
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Image Preview */}
+              {(imagePreview || formData.image) && (
+                <div className="admin-image-preview" style={{
+                  marginTop: '1rem',
+                  padding: '1rem',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '0.5rem',
+                  backgroundColor: '#f9fafb'
+                }}>
+                  <h4 style={{
+                    margin: '0 0 0.5rem 0',
+                    fontSize: '0.9rem',
+                    color: '#374151'
+                  }}>
+                    Image Preview
+                  </h4>
+                  <img
+                    src={imagePreview || formData.image}
+                    alt="Room preview"
+                    style={{
+                      maxWidth: '200px',
+                      maxHeight: '150px',
+                      objectFit: 'cover',
+                      borderRadius: '0.375rem',
+                      border: '1px solid #d1d5db'
+                    }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  <div style={{
+                    display: 'none',
+                    color: '#ef4444',
+                    fontSize: '0.875rem',
+                    marginTop: '0.5rem'
+                  }}>
+                    Failed to load image
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <textarea
@@ -145,6 +439,7 @@ const AdminAddRoom = () => {
         </form>
       </div>
     </div>
+    </>
   );
 };
 

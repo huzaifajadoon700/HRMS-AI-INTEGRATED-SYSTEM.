@@ -208,4 +208,16 @@
     width: 100%;
     justify-content: center;
   }
-} 
+
+  /* Remove blue background from buttons on mobile */
+  .action-button.download {
+    background: #000000 !important;
+    color: #ffffff !important;
+  }
+
+  .action-button.back {
+    background: transparent !important;
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+  }
+}

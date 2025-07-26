@@ -1,34 +1,29 @@
-// Admin Routes - Defines API endpoints for administrative operations and analytics
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const {
-  getAllUsers,
-  updateUser,
-  deleteUser,
-  toggleUserStatus,
-} = require("../Controllers/AdminController");
-const {
-  getDashboardAnalytics,
-} = require("../Controllers/AdminAnalyticsController");
-const { ensureAuthenticated, ensureAdmin } = require("../Middlewares/Auth");
+const { getAllUsers, updateUser, deleteUser, toggleUserStatus } = require('../Controllers/AdminController');
+const { getDashboardAnalytics, getRecentActivities } = require('../Controllers/AdminAnalyticsController');
+const { ensureAuthenticated, ensureAdmin } = require('../Middlewares/Auth');
 
 // Apply authentication and admin middleware to all routes
 router.use(ensureAuthenticated);
 router.use(ensureAdmin);
 
 // Get all users
-router.get("/users", getAllUsers);
+router.get('/users', getAllUsers);
 
 // Update user
-router.put("/users/:id", updateUser);
+router.put('/users/:id', updateUser);
 
 // Delete user
-router.delete("/users/:id", deleteUser);
+router.delete('/users/:id', deleteUser);
 
 // Toggle user status
-router.patch("/users/:id/toggle-status", toggleUserStatus);
+router.patch('/users/:id/toggle-status', toggleUserStatus);
 
 // Dashboard analytics
-router.get("/dashboard/analytics", getDashboardAnalytics);
+router.get('/dashboard/analytics', getDashboardAnalytics);
+
+// Recent activities
+router.get('/dashboard/recent-activities', getRecentActivities);
 
 module.exports = router;

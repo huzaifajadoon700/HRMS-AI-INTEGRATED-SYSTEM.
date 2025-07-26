@@ -1,4 +1,3 @@
-// Menu Controller - Manages restaurant menu items and categories
 const Menu = require("../Models/Menu");
 
 // Get all menu items
@@ -25,25 +24,49 @@ exports.getMenusByCategory = async (req, res) => {
 // Add a new menu item
 exports.addMenu = async (req, res) => {
   try {
-    const { name, description, price, category, availability } = req.body;
-    // Handle image upload
-    let image = null;
+    const {
+      name,
+      description,
+      price,
+      category,
+      availability,
+      image,
+      imageUrl,
+    } = req.body;
+
+    // Handle image upload - priority order: file upload, base64 image, image URL
+    let finalImage = null;
+
     if (req.file) {
       if (req.file.filename) {
         // Disk storage (development)
-        image = `/uploads/${req.file.filename}`;
-        console.log("Development menu upload - saved to disk:", image);
+        finalImage = `/uploads/${req.file.filename}`;
+        console.log("Development menu upload - saved to disk:", finalImage);
       } else {
-        // Memory storage (production) - don't save image path
+        // Memory storage (production) - file exists but can't be saved to disk
         console.log(
-          "Production environment detected - menu file upload not supported on serverless"
+          "Production environment detected - file upload not supported on serverless"
         );
-        image = null;
+        finalImage = null;
       }
-    } else if (req.body.imageUrl) {
+    } else if (image && image.startsWith("data:image/")) {
+      // Handle base64 image data
+      finalImage = image;
+      console.log("Menu base64 image provided");
+    } else if (
+      imageUrl &&
+      (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"))
+    ) {
       // Handle image URL
-      image = req.body.imageUrl;
-      console.log("Menu image URL provided:", image);
+      finalImage = imageUrl;
+      console.log("Menu image URL provided:", finalImage);
+    } else if (
+      image &&
+      (image.startsWith("http://") || image.startsWith("https://"))
+    ) {
+      // Handle image URL in image field
+      finalImage = image;
+      console.log("Menu image URL provided in image field:", finalImage);
     }
 
     const newMenu = new Menu({
@@ -52,12 +75,14 @@ exports.addMenu = async (req, res) => {
       price,
       category,
       availability,
-      image,
+      image: finalImage,
     });
 
     const savedMenu = await newMenu.save();
+    console.log("Menu saved with image:", finalImage ? "Yes" : "No");
     res.status(201).json(savedMenu);
   } catch (error) {
+    console.error("Error adding menu:", error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -65,13 +90,49 @@ exports.addMenu = async (req, res) => {
 // Update a menu item
 exports.updateMenu = async (req, res) => {
   try {
-    const { name, description, price, category, availability } = req.body;
+    const {
+      name,
+      description,
+      price,
+      category,
+      availability,
+      image,
+      imageUrl,
+    } = req.body;
     const updateData = { name, description, price, category, availability };
 
+    // Handle image update - priority order: file upload, base64 image, image URL
     if (req.file) {
-      updateData.image = `/uploads/${req.file.filename}`;
-    } else if (req.body.imageUrl) {
-      updateData.image = req.body.imageUrl;
+      if (req.file.filename) {
+        // Disk storage (development)
+        updateData.image = `/uploads/${req.file.filename}`;
+        console.log(
+          "Development menu update - saved to disk:",
+          updateData.image
+        );
+      } else {
+        console.log(
+          "Production environment detected - file upload not supported on serverless"
+        );
+      }
+    } else if (image && image.startsWith("data:image/")) {
+      // Handle base64 image data
+      updateData.image = image;
+      console.log("Menu update base64 image provided");
+    } else if (
+      imageUrl &&
+      (imageUrl.startsWith("http://") || imageUrl.startsWith("https://"))
+    ) {
+      // Handle image URL
+      updateData.image = imageUrl;
+      console.log("Menu update image URL provided:", imageUrl);
+    } else if (
+      image &&
+      (image.startsWith("http://") || image.startsWith("https://"))
+    ) {
+      // Handle image URL in image field
+      updateData.image = image;
+      console.log("Menu update image URL provided in image field:", image);
     }
 
     const updatedMenu = await Menu.findByIdAndUpdate(
@@ -84,8 +145,10 @@ exports.updateMenu = async (req, res) => {
       return res.status(404).json({ error: "Menu item not found" });
     }
 
+    console.log("Menu updated with image:", updateData.image ? "Yes" : "No");
     res.status(200).json(updatedMenu);
   } catch (error) {
+    console.error("Error updating menu:", error);
     res.status(400).json({ error: error.message });
   }
 };

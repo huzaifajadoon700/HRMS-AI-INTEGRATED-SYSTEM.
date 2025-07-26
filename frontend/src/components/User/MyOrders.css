@@ -1,19 +1,152 @@
 /* Modern MyOrders CSS */
 
+/* ========== BLACK & WHITE THEME OVERRIDES ========== */
+/* Simple targeted overrides for consistent theme */
+
+/* Remove any dark backgrounds that might exist */
+.modern-orders-page,
+.orders-hero,
+.orders-content,
+.orders-stats,
+.stats-grid,
+.stat-card,
+.orders-controls,
+.orders-list,
+.order-card,
+.order-header,
+.order-content,
+.order-items,
+.order-item,
+.order-actions {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Ensure all text is black */
+.modern-orders-page h1,
+.modern-orders-page h2,
+.modern-orders-page h3,
+.modern-orders-page h4,
+.modern-orders-page h5,
+.modern-orders-page h6,
+.modern-orders-page p,
+.modern-orders-page span,
+.modern-orders-page div,
+.modern-orders-page label,
+.hero-title,
+.hero-subtitle,
+.stat-content h3,
+.stat-content p,
+.order-title,
+.order-status,
+.order-date,
+.order-total {
+  color: #000000 !important;
+}
+
+/* Icons should have appropriate colors - NOT all black */
+.hero-icon {
+  color: #6b7280 !important;
+  fill: #6b7280 !important;
+}
+
+/* Remove any global overrides that might hide icons */
+.modern-orders-page svg,
+.modern-orders-page i {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+}
+
+.stat-icon {
+  color: #64ffda !important;
+  fill: #64ffda !important;
+}
+
+.search-icon {
+  color: #374151 !important;
+  fill: #374151 !important;
+  position: absolute !important;
+  left: 1rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+}
+
+.date-icon {
+  color: #374151 !important;
+  fill: #374151 !important;
+}
+
+/* Status icons with appropriate colors */
+.order-status svg {
+  color: inherit !important;
+  fill: currentColor !important;
+}
+
+/* Action button icons should be white when on dark buttons */
+.action-btn svg,
+.order-btn svg,
+.btn-icon {
+  color: currentColor !important;
+  fill: currentColor !important;
+}
+
+/* Form elements */
+.search-input,
+.filter-select,
+input,
+select {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+/* Buttons */
+.view-btn,
+.filter-btn,
+.refresh-btn {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+.view-btn svg,
+.view-btn i,
+.filter-btn svg,
+.filter-btn i,
+.refresh-btn svg,
+.refresh-btn i {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Remove any pseudo-element backgrounds */
+.modern-orders-page::before,
+.modern-orders-page::after,
+.order-card::before,
+.order-card::after,
+.stat-card::before,
+.stat-card::after {
+  display: none !important;
+}
+
 /* Modern Orders Page */
 .modern-orders-page {
   width: 100%;
   min-height: 100vh;
-  background: #0a192f;
-  color: #ffffff;
+  background: #ffffff;
+  color: #000000;
   margin-top: 80px;
 }
 
 /* Hero Section - Ultra Compact */
 .orders-hero {
-  padding: 1rem 0;
+  padding: 2rem 0;
   text-align: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .hero-content {
@@ -25,26 +158,27 @@
 .hero-icon {
   width: 40px;
   height: 40px;
-  background: rgba(100, 255, 218, 0.1);
-  border: 2px solid #64ffda;
+  background: #f3f4f6;
+  border: 2px solid #d1d5db;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 0.75rem;
-  color: #64ffda;
+  color: #374151;
 }
 
 .hero-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #ffffff;
-  margin-bottom: 0.2rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 0.5rem;
+  font-family: 'Inter', sans-serif;
 }
 
 .hero-subtitle {
-  font-size: 0.85rem;
-  color: #b0b0b0;
+  font-size: 1rem;
+  color: #6b7280;
   margin: 0;
 }
 
@@ -138,25 +272,26 @@
 }
 
 .search-input {
-  width: 100%;
-  padding: 0.875rem 1rem 0.875rem 3rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.5rem;
-  color: #ffffff;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
+  width: 100% !important;
+  padding: 0.875rem 1rem 0.875rem 3rem !important;
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 0.5rem !important;
+  color: #000000 !important;
+  font-size: 0.9rem !important;
+  transition: all 0.3s ease !important;
 }
 
 .search-input:focus {
-  outline: none;
-  border-color: #64ffda;
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 0 3px rgba(100, 255, 218, 0.1);
+  outline: none !important;
+  border-color: #6b7280 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1) !important;
 }
 
 .search-input::placeholder {
-  color: #666;
+  color: #9ca3af !important;
+  opacity: 1 !important;
 }
 
 .status-filter {
@@ -179,21 +314,29 @@
 .refresh-btn {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.875rem 1.25rem;
-  background: rgba(100, 255, 218, 0.1);
-  border: 1px solid rgba(100, 255, 218, 0.2);
+  justify-content: center;
+  padding: 0.875rem;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  color: #64ffda;
-  font-size: 0.9rem;
-  font-weight: 500;
+  color: #374151;
+  font-size: 1.1rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  width: 44px;
+  height: 44px;
 }
 
 .refresh-btn:hover {
-  background: rgba(100, 255, 218, 0.2);
+  background: #e5e7eb;
+  color: #111827;
   transform: translateY(-1px);
+}
+
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .refresh-btn:disabled {
@@ -319,18 +462,19 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: rgba(100, 255, 218, 0.1);
-  border: 1px solid rgba(100, 255, 218, 0.2);
+  background: #000000;
+  border: 1px solid #000000;
   border-radius: 0.5rem;
-  color: #64ffda;
+  color: #ffffff;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   margin: 0 auto;
+  font-family: 'Inter', sans-serif;
 }
 
 .order-btn:hover {
-  background: rgba(100, 255, 218, 0.2);
+  background: #333333;
   transform: translateY(-1px);
 }
 
@@ -342,17 +486,17 @@
 .orders-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 /* Modern Order Card */
 .modern-order-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 0.6rem;
-  padding: 1rem;
-  transition: all 0.3s ease;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .modern-order-card:hover {
@@ -548,35 +692,38 @@
 }
 
 .cancel-btn {
-  background: rgba(255, 87, 87, 0.1);
-  border-color: rgba(255, 87, 87, 0.2);
-  color: #ff5757;
+  background: #ef4444;
+  border-color: #ef4444;
+  color: #ffffff;
 }
 
 .cancel-btn:hover {
-  background: rgba(255, 87, 87, 0.2);
+  background: #dc2626;
+  border-color: #dc2626;
   transform: translateY(-1px);
 }
 
 .track-btn {
-  background: rgba(100, 255, 218, 0.1);
-  border-color: rgba(100, 255, 218, 0.2);
-  color: #64ffda;
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
 }
 
 .track-btn:hover {
-  background: rgba(100, 255, 218, 0.2);
+  background: #2563eb;
+  border-color: #2563eb;
   transform: translateY(-1px);
 }
 
 .invoice-btn {
-  background: rgba(23, 162, 184, 0.1);
-  border-color: rgba(23, 162, 184, 0.2);
-  color: #17a2b8;
+  background: #6b7280;
+  border-color: #6b7280;
+  color: #ffffff;
 }
 
 .invoice-btn:hover {
-  background: rgba(23, 162, 184, 0.2);
+  background: #4b5563;
+  border-color: #4b5563;
   transform: translateY(-1px);
 }
 
@@ -632,7 +779,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .modern-orders-page {
-    margin-top: 60px;
+    margin-top: 100px;
   }
 
   .orders-hero {
@@ -700,8 +847,17 @@
   }
 
   .search-input {
-    padding: 0.75rem 1rem 0.75rem 2.5rem;
-    font-size: 0.9rem;
+    padding: 0.75rem 1rem 0.75rem 2.5rem !important;
+    font-size: 0.9rem !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #d1d5db !important;
+  }
+
+  .search-icon {
+    left: 0.875rem !important;
+    color: #6b7280 !important;
+    font-size: 1rem !important;
   }
 
   .status-filter,
@@ -828,7 +984,7 @@
 
 @media (max-width: 480px) {
   .modern-orders-page {
-    margin-top: 50px;
+    margin-top: 90px;
   }
 
   .orders-hero {
@@ -887,12 +1043,17 @@
   }
 
   .search-input {
-    padding: 0.625rem 0.875rem 0.625rem 2.25rem;
-    font-size: 0.85rem;
+    padding: 0.625rem 0.875rem 0.625rem 2.25rem !important;
+    font-size: 0.85rem !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #d1d5db !important;
   }
 
   .search-icon {
-    font-size: 0.9rem;
+    font-size: 0.9rem !important;
+    left: 0.75rem !important;
+    color: #6b7280 !important;
   }
 
   .status-filter,
@@ -1040,4 +1201,399 @@
     padding: 0.75rem 1.25rem;
     font-size: 0.85rem;
   }
+}
+
+/* ========== SEARCH INPUT FIXES ========== */
+
+/* Comprehensive search input and icon fixes */
+.search-box {
+  position: relative !important;
+  max-width: 400px !important;
+}
+
+.search-box .search-icon {
+  position: absolute !important;
+  left: 1rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  color: #6b7280 !important;
+  fill: #6b7280 !important;
+  font-size: 1.1rem !important;
+  z-index: 10 !important;
+  pointer-events: none !important;
+}
+
+.search-box .search-input {
+  width: 100% !important;
+  padding: 0.875rem 1rem 0.875rem 3rem !important;
+  background: #ffffff !important;
+  border: 1px solid #d1d5db !important;
+  border-radius: 0.5rem !important;
+  color: #000000 !important;
+  font-size: 0.9rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.search-box .search-input:focus {
+  outline: none !important;
+  border-color: #6b7280 !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1) !important;
+}
+
+.search-box .search-input::placeholder {
+  color: #9ca3af !important;
+  opacity: 1 !important;
+}
+
+/* Mobile search fixes */
+@media (max-width: 768px) {
+  .search-box .search-input {
+    padding: 0.75rem 1rem 0.75rem 2.5rem !important;
+    font-size: 0.9rem !important;
+  }
+
+  .search-box .search-icon {
+    left: 0.875rem !important;
+    font-size: 1rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-box .search-input {
+    padding: 0.625rem 0.875rem 0.625rem 2.25rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .search-box .search-icon {
+    left: 0.75rem !important;
+    font-size: 0.9rem !important;
+  }
+}
+
+/* ========== ICON COLOR FIXES ========== */
+
+/* Fix status icons to have proper colors */
+.status-pending svg {
+  color: #f59e0b !important;
+  fill: #f59e0b !important;
+}
+
+.status-confirmed svg {
+  color: #10b981 !important;
+  fill: #10b981 !important;
+}
+
+.status-preparing svg {
+  color: #3b82f6 !important;
+  fill: #3b82f6 !important;
+}
+
+.status-ready svg {
+  color: #8b5cf6 !important;
+  fill: #8b5cf6 !important;
+}
+
+.status-delivered svg {
+  color: #10b981 !important;
+  fill: #10b981 !important;
+}
+
+.status-cancelled svg {
+  color: #ef4444 !important;
+  fill: #ef4444 !important;
+}
+
+/* Fix action button icons */
+.cancel-btn svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+.track-btn svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+.invoice-btn svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Fix empty state and error icons */
+.empty-icon {
+  color: #6b7280 !important;
+  fill: #6b7280 !important;
+}
+
+.error-icon {
+  color: #ef4444 !important;
+  fill: #ef4444 !important;
+}
+
+/* Fix items icon */
+.items-icon {
+  color: #6b7280 !important;
+  fill: #6b7280 !important;
+}
+
+/* Ensure button icons inherit proper colors */
+.order-btn .btn-icon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+.action-btn .btn-icon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Mobile specific icon fixes */
+@media (max-width: 768px) {
+  .stat-icon {
+    color: #64ffda !important;
+    fill: #64ffda !important;
+  }
+
+  .search-icon {
+    color: #374151 !important;
+    fill: #374151 !important;
+  }
+
+  .date-icon {
+    color: #374151 !important;
+    fill: #374151 !important;
+  }
+}
+
+/* ========== COMPREHENSIVE ICON AND BUTTON FIXES ========== */
+
+/* Fix search and calendar icons to be darker and more visible */
+.search-icon,
+.date-icon {
+  color: #374151 !important;
+  fill: #374151 !important;
+}
+
+/* Refresh button icon styling */
+.refresh-btn svg {
+  color: #374151 !important;
+  fill: #374151 !important;
+}
+
+.refresh-btn:hover svg {
+  color: #111827 !important;
+  fill: #111827 !important;
+}
+
+/* Action button text and icon overrides */
+.action-btn,
+.action-btn span,
+.action-btn * {
+  color: #ffffff !important;
+}
+
+.cancel-btn,
+.cancel-btn span,
+.cancel-btn *,
+.track-btn,
+.track-btn span,
+.track-btn *,
+.invoice-btn,
+.invoice-btn span,
+.invoice-btn * {
+  color: #ffffff !important;
+}
+
+/* Ensure button icons are white */
+.cancel-btn svg,
+.track-btn svg,
+.invoice-btn svg,
+.action-btn svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* Mobile specific fixes */
+@media (max-width: 768px) {
+  .search-icon,
+  .date-icon {
+    color: #374151 !important;
+    fill: #374151 !important;
+  }
+
+  .refresh-btn svg {
+    color: #374151 !important;
+    fill: #374151 !important;
+  }
+
+  .action-btn,
+  .action-btn span,
+  .action-btn * {
+    color: #ffffff !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-icon,
+  .date-icon {
+    color: #374151 !important;
+    fill: #374151 !important;
+  }
+}
+
+/* ========== ULTRA AGGRESSIVE ICON AND BUTTON VISIBILITY FIXES ========== */
+
+/* Force search icon visibility with maximum specificity */
+html body .modern-orders-page .search-box .search-icon,
+html body .modern-orders-page .search-icon,
+.modern-orders-page .search-box .search-icon,
+.orders-controls .search-icon {
+  color: #111827 !important;
+  fill: #111827 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  position: absolute !important;
+  left: 1rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 100 !important;
+  font-size: 1.1rem !important;
+}
+
+/* Force calendar icon visibility */
+html body .modern-orders-page .date-icon,
+.modern-orders-page .date-icon,
+.order-date .date-icon {
+  color: #111827 !important;
+  fill: #111827 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+  font-size: 0.9rem !important;
+}
+
+/* Ultra aggressive action button fixes */
+html body .modern-orders-page .action-btn,
+html body .modern-orders-page .cancel-btn,
+html body .modern-orders-page .track-btn,
+html body .modern-orders-page .invoice-btn {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: flex !important;
+  color: #ffffff !important;
+  background: #000000 !important;
+  border: 1px solid #000000 !important;
+}
+
+/* Force button text visibility */
+html body .modern-orders-page .action-btn *,
+html body .modern-orders-page .cancel-btn *,
+html body .modern-orders-page .track-btn *,
+html body .modern-orders-page .invoice-btn *,
+html body .modern-orders-page .action-btn span,
+html body .modern-orders-page .cancel-btn span,
+html body .modern-orders-page .track-btn span,
+html body .modern-orders-page .invoice-btn span {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline !important;
+}
+
+/* Force button icons visibility */
+html body .modern-orders-page .action-btn svg,
+html body .modern-orders-page .cancel-btn svg,
+html body .modern-orders-page .track-btn svg,
+html body .modern-orders-page .invoice-btn svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: inline-block !important;
+}
+
+/* Specific button color overrides */
+html body .modern-orders-page .cancel-btn {
+  background: #ef4444 !important;
+  border-color: #ef4444 !important;
+}
+
+html body .modern-orders-page .track-btn {
+  background: #3b82f6 !important;
+  border-color: #3b82f6 !important;
+}
+
+html body .modern-orders-page .invoice-btn {
+  background: #6b7280 !important;
+  border-color: #6b7280 !important;
+}
+
+/* Mobile ultra aggressive fixes */
+@media (max-width: 768px) {
+  html body .modern-orders-page .search-icon,
+  html body .modern-orders-page .date-icon {
+    color: #111827 !important;
+    fill: #111827 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  html body .modern-orders-page .action-btn,
+  html body .modern-orders-page .action-btn *,
+  html body .modern-orders-page .action-btn span,
+  html body .modern-orders-page .action-btn svg {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: flex !important;
+  }
+}
+
+/* ========== NUCLEAR OPTION - OVERRIDE ALL POSSIBLE HIDING STYLES ========== */
+
+/* Remove any styles that might hide elements */
+.modern-orders-page [style*="display: none"],
+.modern-orders-page [style*="visibility: hidden"],
+.modern-orders-page [style*="opacity: 0"] {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Force all buttons to be visible */
+.modern-orders-page button,
+.modern-orders-page .action-btn,
+.modern-orders-page .cancel-btn,
+.modern-orders-page .track-btn,
+.modern-orders-page .invoice-btn {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Force all icons to be visible */
+.modern-orders-page svg,
+.modern-orders-page i,
+.modern-orders-page .search-icon,
+.modern-orders-page .date-icon,
+.modern-orders-page .btn-icon {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* Override any text hiding */
+.modern-orders-page button span,
+.modern-orders-page .action-btn span,
+.modern-orders-page button *:not(svg) {
+  display: inline !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: inherit !important;
 }

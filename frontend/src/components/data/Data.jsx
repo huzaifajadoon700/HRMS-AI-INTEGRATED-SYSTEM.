@@ -28,8 +28,8 @@ export const navList = [
         id: 42,
         path: "/my-reservations",
         text: "My Reservations",
-      },
-    ],
+      }
+    ]
   },
   {
     id: 5,
@@ -86,25 +86,27 @@ export const carouselData = [
     subtitle: "Your Perfect Stay Awaits",
     btn1: "Book Room",
     btn2: "Reserve Table",
-  },
+  }
 ];
-// Note: This data is now dynamic and should be replaced with useHotelStats() hook in components
-// Keeping this as fallback data only
+// Dynamic statistics - use useHotelStats() hook in components for real-time data
 export const about = [
   {
     icon: <i class="fa fa-hotel fa-2x text-primary mb-2"></i>,
     text: "Rooms",
-    count: "150", // Fallback - use useHotelStats().totalRooms in components
+    count: "0", // Dynamic - fetched from API
+    apiField: "totalRooms"
+  },
+  {
+    icon: <i class="fa fa-utensils fa-2x text-primary mb-2"></i>,
+    text: "Menu Items",
+    count: "0", // Dynamic - fetched from API
+    apiField: "totalMenuItems"
   },
   {
     icon: <i class="fa fa-users fa-2x text-primary mb-2"></i>,
-    text: "Staffs",
-    count: "85", // Fallback - use useHotelStats().totalStaff in components
-  },
-  {
-    icon: <i class="fa fa-users-cog fa-2x text-primary mb-2"></i>,
-    text: "Clients",
-    count: "2500", // Fallback - use useHotelStats().totalClients in components
+    text: "Happy Clients",
+    count: "0", // Dynamic - fetched from API
+    apiField: "totalUsers"
   },
 ];
 

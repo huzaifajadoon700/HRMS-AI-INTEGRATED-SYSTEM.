@@ -1,4 +1,3 @@
-// Encryption utility functions for sensitive data. No business logic is present in this file.
 const crypto = require('crypto');
 
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || 'your-secret-key-32-chars-long!!';

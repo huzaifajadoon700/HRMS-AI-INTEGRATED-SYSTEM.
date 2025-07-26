@@ -34,9 +34,9 @@ const orderRoutes = require("../Routes/orderRoutes");
 const reservationRoutes = require("../Routes/ReservationRoutes");
 const userRoutes = require("../Routes/UserRoutes");
 const feedbackRoutes = require("../Routes/feedbackRoutes");
-const adminRoutes = require('../Routes/AdminRoutes');
-const paymentRoutes = require('../Routes/paymentRoutes');
-const recommendationRoutes = require('../Routes/recommendationRoutes');
+const adminRoutes = require("../Routes/AdminRoutes");
+const paymentRoutes = require("../Routes/paymentRoutes");
+const recommendationRoutes = require("../Routes/recommendationRoutes");
 
 // Register Routes
 app.use("/api/menus", menuRoutes);
@@ -60,22 +60,22 @@ app.use("/api/food-recommendations", recommendationRoutes);
 app.use("/api/table-recommendations", tableRoutes);
 
 // Health check route
-app.get('/api/health', (req, res) => {
+app.get("/api/health", (req, res) => {
   res.status(200).json({
-    status: 'ok',
+    status: "ok",
     timestamp: new Date().toISOString(),
-    message: 'Serverless function is running'
+    message: "Serverless function is running",
   });
 });
 
 // API status endpoint
-app.get('/api/status', (req, res) => {
+app.get("/api/status", (req, res) => {
   res.status(200).json({
-    status: 'ok',
-    message: 'Hotel Management System API - Serverless',
-    version: '1.0.0',
+    status: "ok",
+    message: "Hotel Management System API - Serverless",
+    version: "1.0.0",
     timestamp: new Date().toISOString(),
-    environment: 'production'
+    environment: "production",
   });
 });
 

@@ -199,6 +199,61 @@ const hotelSettingsSchema = new mongoose.Schema({
     }
   }],
 
+  // Branding and Visual Identity
+  branding: {
+    logo: {
+      primary: {
+        type: String,
+        default: '/images/logo-primary.png',
+        trim: true
+      },
+      secondary: {
+        type: String,
+        default: '/images/logo-secondary.png',
+        trim: true
+      },
+      loginLogo: {
+        type: String,
+        default: '/images/logo-login.png',
+        trim: true
+      },
+      favicon: {
+        type: String,
+        default: '/images/favicon.ico',
+        trim: true
+      }
+    },
+    colors: {
+      primary: {
+        type: String,
+        default: '#64ffda',
+        trim: true
+      },
+      secondary: {
+        type: String,
+        default: '#0A192F',
+        trim: true
+      },
+      accent: {
+        type: String,
+        default: '#ffffff',
+        trim: true
+      }
+    },
+    fonts: {
+      primary: {
+        type: String,
+        default: 'Inter',
+        trim: true
+      },
+      secondary: {
+        type: String,
+        default: 'Roboto',
+        trim: true
+      }
+    }
+  },
+
   // SEO and Meta Information
   seo: {
     metaTitle: {

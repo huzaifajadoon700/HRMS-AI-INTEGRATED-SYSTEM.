@@ -1,12 +1,12 @@
 /* BookRoom.css */
 :root {
-  --primary-bg: #0a192f;
-  --card-bg: rgba(10, 25, 47, 0.7);
-  --accent-blue: #00a3ff;
-  --space-purple: #6c63ff;
-  --text-light: #f0f4fc;
-  --gradient-blue: linear-gradient(45deg, #00a3ff, #6c63ff);
-  --neon-glow: 0 0 10px rgba(0, 163, 255, 0.3);
+  --primary-bg: #ffffff;
+  --card-bg: #ffffff;
+  --accent-blue: #000000;
+  --space-purple: #000000;
+  --text-light: #000000;
+  --gradient-blue: #ffffff;
+  --neon-glow: none;
   --transition: all 0.3s ease;
 }
 

@@ -182,13 +182,17 @@ const AdminManageReservations = () => {
                 <td>
                   <div>
                     <div style={{ fontWeight: "bold" }}>
-                      {reservation.customerName ||
+                      {reservation.fullName ||
+                        reservation.customerName ||
                         reservation.customer?.name ||
+                        reservation.userId?.name ||
                         "N/A"}
                     </div>
                     <div style={{ fontSize: "12px", color: "#666" }}>
-                      {reservation.customerEmail ||
+                      {reservation.email ||
+                        reservation.customerEmail ||
                         reservation.customer?.email ||
+                        reservation.userId?.email ||
                         ""}
                     </div>
                   </div>

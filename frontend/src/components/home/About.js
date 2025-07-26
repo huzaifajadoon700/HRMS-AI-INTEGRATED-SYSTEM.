@@ -15,13 +15,13 @@ export default function About() {
   useEffect(() => {
     const handleSettingsChange = () => {
       // Force component re-render by updating state
-      setForceUpdate((prev) => prev + 1);
+      setForceUpdate(prev => prev + 1);
     };
 
-    window.addEventListener("hotelSettingsChanged", handleSettingsChange);
+    window.addEventListener('hotelSettingsChanged', handleSettingsChange);
 
     return () => {
-      window.removeEventListener("hotelSettingsChanged", handleSettingsChange);
+      window.removeEventListener('hotelSettingsChanged', handleSettingsChange);
     };
   }, []);
 
@@ -33,427 +33,219 @@ export default function About() {
   // Show loading state while data is being fetched
   if (hotelInfo.loading) {
     return (
-      <div
-        className="about-section-mobile"
-        style={{
-          width: "100vw",
-          background:
-            "linear-gradient(135deg, #0A192F 0%, #112240 50%, #0A192F 100%)",
-          position: "relative",
-          marginLeft: "calc(50% - 50vw)",
-          marginRight: "calc(50% - 50vw)",
-          padding: "4rem 0",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          color: "#64ffda",
-        }}
-      >
+      <div className="about-section-mobile" style={{
+        width: '100vw',
+        background: '#ffffff',
+        position: 'relative',
+        marginLeft: 'calc(50% - 50vw)',
+        marginRight: 'calc(50% - 50vw)',
+        padding: '4rem 0',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        color: '#000000'
+      }}>
         <div>Loading hotel information...</div>
       </div>
     );
   }
 
   return (
-    <div
-      key={hotelInfo.hotelName}
-      className="about-section-mobile"
-      style={{
-        width: "100vw",
-        background:
-          "linear-gradient(135deg, #0A192F 0%, #112240 50%, #0A192F 100%)",
-        position: "relative",
-        marginLeft: "calc(50% - 50vw)",
-        marginRight: "calc(50% - 50vw)",
-        padding: "2rem 0",
-        boxSizing: "border-box",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        className="about-section-mobile"
-        style={{
-          width: "100%",
-          padding: "0 2rem",
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1.2fr",
-            gap: "4rem",
-            alignItems: "center",
-            width: "100%",
-            maxWidth: "1400px",
-            margin: "0 auto",
-          }}
-        >
+    <div key={hotelInfo.hotelName} className="about-section-mobile" style={{
+      width: '100vw',
+      background: '#ffffff',
+      position: 'relative',
+      marginLeft: 'calc(50% - 50vw)',
+      marginRight: 'calc(50% - 50vw)',
+      padding: '4rem 0',
+      boxSizing: 'border-box'
+    }}>
+      <div className="about-section-mobile" style={{
+        width: '100%',
+        padding: '0 2rem',
+        position: 'relative',
+        zIndex: 1
+      }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1.2fr',
+          gap: '4rem',
+          alignItems: 'center',
+          width: '100%',
+          maxWidth: '1400px',
+          margin: '0 auto'
+        }}>
           {/* Text Content */}
-          <div style={{ position: "relative", zIndex: 2 }}>
+          <div style={{ position: 'relative', zIndex: 2 }}>
             {/* Section Header */}
-            <div style={{ marginBottom: "2rem" }}>
-              <div
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  background: "rgba(100, 255, 218, 0.1)",
-                  padding: "0.4rem 0.8rem",
-                  borderRadius: "1.5rem",
-                  border: "1px solid rgba(100, 255, 218, 0.2)",
-                  marginBottom: "1rem",
-                  color: "#64ffda",
-                  fontSize: "0.75rem",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                }}
-              >
-                <FiStar size={14} />
+            <div style={{ marginBottom: '2rem' }}>
+              <div style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: '#f8fafc',
+                padding: '0.5rem 1rem',
+                borderRadius: '24px',
+                border: '1px solid #e5e7eb',
+                marginBottom: '1rem',
+                color: '#374151',
+                fontSize: '0.875rem',
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: '500'
+              }}>
+                <FiStar size={16} />
                 <span>About {hotelInfo.hotelName}</span>
               </div>
 
-              <h2
-                style={{
-                  fontSize: "2rem",
-                  fontWeight: "700",
-                  lineHeight: "1.2",
-                  marginBottom: "1rem",
-                  color: "#f0f4fc",
-                }}
-              >
-                {hotelInfo.hotelName}{" "}
-                <span style={{ color: "#64ffda" }}>Management</span> System
+              <h2 style={{
+                fontSize: '2.5rem',
+                fontWeight: '700',
+                lineHeight: '1.2',
+                marginBottom: '1rem',
+                color: '#000000',
+                fontFamily: 'Inter, sans-serif'
+              }}>
+                {hotelInfo.hotelName} Management System
               </h2>
 
-              <p
-                style={{
-                  fontSize: "0.9rem",
-                  lineHeight: "1.6",
-                  color: "rgba(240, 244, 252, 0.8)",
-                  marginBottom: "1.5rem",
-                }}
-              >
+              <p style={{
+                fontSize: '1.125rem',
+                lineHeight: '1.6',
+                color: '#374151',
+                marginBottom: '2rem',
+                fontFamily: 'Inter, sans-serif',
+                fontWeight: '400'
+              }}>
                 {hotelInfo.description}
               </p>
             </div>
 
             {/* Features Grid */}
-            <div
-              className="features-grid"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr",
-                gap: "0.75rem",
-                marginBottom: "1.5rem",
-              }}
-            >
+            <div className="features-grid" style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: '1rem',
+              marginBottom: '2rem'
+            }}>
               {[
-                {
-                  icon: "⚡",
-                  title: "Lightning Fast",
-                  desc: "Instant Operations",
-                },
-                {
-                  icon: "🔒",
-                  title: "Secure Platform",
-                  desc: "Enterprise Grade",
-                },
-                {
-                  icon: "💝",
-                  title: "Guest-Centric",
-                  desc: "Exceptional Experience",
-                },
+                { icon: '⚡', title: 'Lightning Fast', desc: 'Instant Operations' },
+                { icon: '🔒', title: 'Secure Platform', desc: 'Enterprise Grade' },
+                { icon: '💝', title: 'Guest-Centric', desc: 'Exceptional Experience' }
               ].map((feature, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.75rem",
-                    padding: "0.75rem",
-                    background: "rgba(255, 255, 255, 0.02)",
-                    borderRadius: "0.5rem",
-                    border: "1px solid rgba(255, 255, 255, 0.05)",
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  <div style={{ fontSize: "1rem" }}>{feature.icon}</div>
+                <div key={index} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '1rem',
+                  padding: '1rem',
+                  background: '#ffffff',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e7eb',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <div style={{ fontSize: '1.5rem' }}>{feature.icon}</div>
                   <div>
-                    <h4
-                      style={{
-                        color: "#f0f4fc",
-                        margin: "0 0 0.2rem 0",
-                        fontSize: "0.8rem",
-                        fontWeight: "600",
-                      }}
-                    >
-                      {feature.title}
-                    </h4>
-                    <p
-                      style={{
-                        color: "rgba(240, 244, 252, 0.6)",
-                        margin: 0,
-                        fontSize: "0.7rem",
-                      }}
-                    >
-                      {feature.desc}
-                    </p>
+                    <h4 style={{ color: '#000000', margin: '0 0 0.25rem 0', fontSize: '1rem', fontWeight: '600', fontFamily: 'Inter, sans-serif' }}>{feature.title}</h4>
+                    <p style={{ color: '#6b7280', margin: 0, fontSize: '0.875rem', fontFamily: 'Inter, sans-serif' }}>{feature.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Stats Grid */}
-            <div
-              className="stats-grid"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, 1fr)",
-                gap: "0.75rem",
-                marginBottom: "1.5rem",
-              }}
-            >
+            <div className="stats-grid" style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '1rem',
+              marginBottom: '2rem'
+            }}>
               {[
-                {
-                  icon: <i className="fa fa-hotel fa-2x text-primary mb-2"></i>,
-                  text: "Rooms",
-                  count: stats.totalRooms,
-                },
-                {
-                  icon: <i className="fa fa-users fa-2x text-primary mb-2"></i>,
-                  text: "Staff",
-                  count: stats.totalStaff,
-                },
-                {
-                  icon: (
-                    <i className="fa fa-users-cog fa-2x text-primary mb-2"></i>
-                  ),
-                  text: "Clients",
-                  count: stats.totalClients,
-                },
+                { icon: <i className="fa fa-hotel" style={{fontSize: '1.5rem', color: '#374151'}}></i>, text: "Rooms", count: stats.loading ? "..." : stats.totalRooms },
+                { icon: <i className="fa fa-utensils" style={{fontSize: '1.5rem', color: '#374151'}}></i>, text: "Menu Items", count: stats.loading ? "..." : stats.totalMenuItems },
+                { icon: <i className="fa fa-users-cog" style={{fontSize: '1.5rem', color: '#374151'}}></i>, text: "Happy Clients", count: stats.loading ? "..." : stats.totalClients }
               ].map((item, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    textAlign: "center",
-                    padding: "0.75rem",
-                    background: "rgba(100, 255, 218, 0.05)",
-                    borderRadius: "0.5rem",
-                    border: "1px solid rgba(100, 255, 218, 0.1)",
-                    transition: "all 0.3s ease",
-                  }}
-                >
-                  <div
-                    style={{
-                      color: "#64ffda",
-                      fontSize: "1rem",
-                      marginBottom: "0.3rem",
-                    }}
-                  >
-                    {item.icon}
-                  </div>
-                  <div
-                    style={{
-                      color: "#f0f4fc",
-                      fontWeight: "700",
-                      fontSize: "1rem",
-                      marginBottom: "0.2rem",
-                    }}
-                  >
-                    {item.count}+
-                  </div>
-                  <p
-                    style={{
-                      color: "rgba(240, 244, 252, 0.7)",
-                      margin: 0,
-                      fontSize: "0.65rem",
-                    }}
-                  >
-                    {item.text}
-                  </p>
+                <div key={index} style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  padding: '1.5rem 1rem',
+                  background: '#ffffff',
+                  borderRadius: '8px',
+                  border: '1px solid #e5e7eb',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.3s ease'
+                }}>
+                  <div style={{ marginBottom: '0.75rem' }}>{item.icon}</div>
+                  <div style={{ color: '#000000', fontWeight: '700', fontSize: '1.5rem', marginBottom: '0.25rem', fontFamily: 'Inter, sans-serif' }}>{item.count}+</div>
+                  <p style={{ color: '#6b7280', margin: 0, fontSize: '0.875rem', fontFamily: 'Inter, sans-serif' }}>{item.text}</p>
                 </div>
               ))}
             </div>
 
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1rem",
-                flexWrap: "wrap",
-              }}
-            >
-              <Link
-                to="/about"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "0.4rem",
-                  padding: "0.6rem 1.2rem",
-                  background:
-                    "linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)",
-                  color: "#0A192F",
-                  textDecoration: "none",
-                  borderRadius: "0.4rem",
-                  fontWeight: "600",
-                  fontSize: "0.8rem",
-                  transition: "all 0.3s ease",
-                }}
-              >
-                <span>Explore Platform</span>
-                <FiArrowUpRight size={14} />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+              <Link to="/about" style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.75rem 1.5rem',
+                background: '#000000',
+                color: '#ffffff !important',
+                textDecoration: 'none',
+                borderRadius: '6px',
+                fontWeight: '500',
+                fontSize: '0.875rem',
+                fontFamily: 'Inter, sans-serif',
+                border: '1px solid #000000',
+                transition: 'all 0.3s ease'
+              }}>
+                <span style={{ color: '#ffffff !important' }}>Learn More</span>
+                <FiArrowUpRight size={16} style={{ color: '#ffffff !important' }} />
               </Link>
-              <div style={{ display: "flex", gap: "1rem" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.4rem",
-                    color: "rgba(240, 244, 252, 0.8)",
-                  }}
-                >
-                  <FiTrendingUp style={{ color: "#64ffda" }} size={12} />
-                  <span style={{ fontSize: "0.7rem" }}>99.9% Uptime</span>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.4rem",
-                    color: "rgba(240, 244, 252, 0.8)",
-                  }}
-                >
-                  <FiUsers style={{ color: "#64ffda" }} size={12} />
-                  <span style={{ fontSize: "0.7rem" }}>500+ Hotels</span>
-                </div>
-              </div>
+
             </div>
           </div>
 
-          {/* Gallery Section */}
-          <div
-            className="gallery-grid"
-            style={{
-              display: "grid",
-              gridTemplateColumns: "2fr 1fr",
-              gridTemplateRows: "1fr 1fr",
-              gap: "0.75rem",
-              height: "400px",
-              width: "100%",
-            }}
-          >
-            <div
-              className="gallery-main"
-              style={{
-                gridRow: "1 / 3",
-                position: "relative",
-                borderRadius: "0.5rem",
-                overflow: "hidden",
-                border: "1px solid rgba(100, 255, 218, 0.1)",
-                background: "rgba(100, 255, 218, 0.02)",
-              }}
-            >
+          {/* Simple Image Section */}
+          <div className="gallery-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr',
+            gap: '1rem',
+            height: '400px',
+            width: '100%'
+          }}>
+            <div className="gallery-main" style={{
+              position: 'relative',
+              borderRadius: '8px',
+              overflow: 'hidden',
+              border: '1px solid #e5e7eb',
+              background: '#ffffff',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+            }}>
               <img
                 src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80"
                 alt="Luxury Hotel Lobby"
                 style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block'
                 }}
               />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "0.75rem",
-                  left: "0.75rem",
-                  background: "rgba(0, 0, 0, 0.8)",
-                  color: "#f0f4fc",
-                  padding: "0.4rem 0.8rem",
-                  borderRadius: "0.3rem",
-                  fontSize: "0.7rem",
-                  fontWeight: "600",
-                }}
-              >
-                Hotel Management
-              </div>
-            </div>
-
-            <div
-              style={{
-                borderRadius: "0.5rem",
-                overflow: "hidden",
-                border: "1px solid rgba(100, 255, 218, 0.1)",
-                position: "relative",
-                background: "rgba(100, 255, 218, 0.02)",
-              }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-                alt="Fine Dining Restaurant"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "0.4rem",
-                  left: "0.4rem",
-                  background: "rgba(0, 0, 0, 0.8)",
-                  color: "#f0f4fc",
-                  padding: "0.2rem 0.4rem",
-                  borderRadius: "0.2rem",
-                  fontSize: "0.6rem",
-                  fontWeight: "600",
-                }}
-              >
-                Restaurant
-              </div>
-            </div>
-
-            <div
-              style={{
-                borderRadius: "0.5rem",
-                overflow: "hidden",
-                border: "1px solid rgba(100, 255, 218, 0.1)",
-                position: "relative",
-                background: "rgba(100, 255, 218, 0.02)",
-              }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1571896349842-33c89424de2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
-                alt="Hotel Room"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  display: "block",
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "0.4rem",
-                  left: "0.4rem",
-                  background: "rgba(0, 0, 0, 0.8)",
-                  color: "#f0f4fc",
-                  padding: "0.2rem 0.4rem",
-                  borderRadius: "0.2rem",
-                  fontSize: "0.6rem",
-                  fontWeight: "600",
-                }}
-              >
-                Rooms
+              <div style={{
+                position: 'absolute',
+                bottom: '1rem',
+                left: '1rem',
+                background: 'rgba(255, 255, 255, 0.95)',
+                color: '#000000',
+                padding: '0.5rem 1rem',
+                borderRadius: '6px',
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                fontFamily: 'Inter, sans-serif',
+                border: '1px solid #e5e7eb'
+              }}>
+                Hotel Management System
               </div>
             </div>
           </div>

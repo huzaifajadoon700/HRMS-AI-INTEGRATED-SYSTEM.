@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { FiCheckCircle, FiUsers, FiZap, FiAlertCircle } from "react-icons/fi";
+import { getTableImageUrl, handleImageError } from "../../utils/imageUtils";
 import "./Tables.css";
 
 const TablesSection = () => {
@@ -59,9 +61,10 @@ const TablesSection = () => {
                   <div className="card-image">
                     {table.image && (
                       <img
-                        src={`${process.env.REACT_APP_API_URL || 'https://hrms-bace.vercel.app'}${table.image}`}
+                        src={getTableImageUrl(table.image)}
                         alt={table.tableName}
                         loading="lazy"
+                        onError={(e) => handleImageError(e, "/images/placeholder-table.jpg")}
                       />
                     )}
                     <div className="status-badge">
@@ -84,9 +87,22 @@ const TablesSection = () => {
                         <span>{table.tableType}</span>
                       </div>
                     </div>
-                    <button className="reserve-button">
+                    <Link
+                      to="/table-reservation"
+                      className="reserve-button"
+                      onClick={() => {
+                        // Store table details for the reservation page
+                        const reservationDetails = {
+                          tableId: table._id,
+                          tableName: table.tableName,
+                          tableCapacity: table.capacity,
+                          tableDescription: table.description,
+                        };
+                        localStorage.setItem('reservationDetails', JSON.stringify(reservationDetails));
+                      }}
+                    >
                       Reserve Table
-                    </button>
+                    </Link>
                   </div>
                 </article>
               ))

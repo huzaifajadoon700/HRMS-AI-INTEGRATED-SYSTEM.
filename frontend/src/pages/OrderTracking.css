@@ -1,3 +1,70 @@
+/* ========== BLACK & WHITE THEME OVERRIDES FOR ORDER TRACKING ========== */
+
+/* Force white background and black text for all tracking elements */
+.tracking-container,
+.tracking-card,
+.tracking-header,
+.status-icon,
+.delivery-info,
+.order-summary,
+.order-items,
+.order-item,
+.action-buttons,
+.delivered-card {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #000000 !important;
+  border-color: #e5e7eb !important;
+}
+
+/* Override all text elements */
+.tracking-container h1,
+.tracking-container h2,
+.tracking-container h3,
+.tracking-container h4,
+.tracking-container p,
+.tracking-container span,
+.tracking-container div,
+.tracking-header h2,
+.estimated-delivery,
+.order-summary h3,
+.order-item,
+.order-total {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* Status icon styling */
+.status-icon {
+  background: #f3f4f6 !important;
+  color: #000000 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+/* Button styling */
+.invoice-button,
+.action-buttons button {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+.invoice-button:hover,
+.action-buttons button:hover {
+  background: #374151 !important;
+}
+
+/* Remove any CSS variables that might cause dark themes */
+.tracking-card {
+  --bg-primary: #ffffff !important;
+  --text-primary: #000000 !important;
+  --text-secondary: #6b7280 !important;
+  --accent-primary: #000000 !important;
+  --accent-primary-transparent: rgba(0, 0, 0, 0.1) !important;
+  --gradient-primary: linear-gradient(90deg, #000000, #374151) !important;
+}
+
 .tracking-container {
   max-width: 90%;
   margin: 1rem auto;
@@ -5,8 +72,8 @@
 }
 
 .tracking-card {
-  background: var(--bg-primary);
-  border-radius: var(--radius-lg);
+  background: #ffffff !important;
+  border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   padding: 2rem;
   display: grid;
@@ -14,16 +81,17 @@
   gap: 3rem;
   position: relative;
   overflow: hidden;
+  border: 1px solid #e5e7eb !important;
 }
 
 .tracking-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 4px;
-  background: var(--gradient-primary);
+  background: #000000 !important;
 }
 
 .tracking-header {
@@ -36,16 +104,17 @@
 .status-icon {
   width: 60px;
   height: 60px;
-  background: var(--accent-primary-transparent);
+  background: #f3f4f6 !important;
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
-  color: var(--accent-primary);
+  color: #000000 !important;
   font-size: 1.5rem;
   transform: rotate(-5deg);
   transition: transform 0.3s ease;
+  border: 1px solid #d1d5db !important;
 }
 
 .status-icon:hover {
@@ -53,7 +122,7 @@
 }
 
 .tracking-header h2 {
-  color: var(--accent-primary);
+  color: #000000 !important;
   margin: 0.25rem 0;
   font-size: 2rem;
   font-weight: 700;
@@ -61,7 +130,7 @@
 }
 
 .estimated-delivery {
-  color: var(--text-secondary);
+  color: #6b7280 !important;
   margin: 0.5rem 0 1rem;
   font-size: 1rem;
   line-height: 1.4;
@@ -122,7 +191,7 @@
 }
 
 .delivered-card::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -273,7 +342,7 @@
 }
 
 .connection-status span::before {
-  content: '';
+  content: "";
   display: inline-block;
   width: 8px;
   height: 8px;
@@ -328,7 +397,7 @@
 }
 
 .timeline-message::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 6px;
@@ -375,7 +444,7 @@
 }
 
 .message-content::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -8px;
@@ -496,11 +565,11 @@
   .delivery-info {
     margin: 0 auto;
   }
-  
+
   .delivered-card {
     padding: 1.5rem;
   }
-  
+
   .action-buttons {
     flex-direction: column;
     gap: 0.75rem;
@@ -528,11 +597,56 @@
     height: 60px;
     font-size: 1.5rem;
   }
-  
+
   .delivered-card {
     border-radius: 0;
     box-shadow: none;
   }
+}
+
+/* ========== COMPREHENSIVE OVERRIDE FOR ALL TRACKING ELEMENTS ========== */
+/* Ensure no dark theme elements remain */
+
+#order-tracking-component,
+#order-tracking-component *,
+.tracking-container *,
+.tracking-card *,
+.delivery-info *,
+.order-summary *,
+.delivered-card * {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #000000 !important;
+  border-color: #e5e7eb !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Preserve button styling */
+.invoice-button,
+.action-buttons button,
+.tracking-container button {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border: 1px solid #000000 !important;
+}
+
+.invoice-button:hover,
+.action-buttons button:hover,
+.tracking-container button:hover {
+  background: #374151 !important;
+  background-color: #374151 !important;
+}
+
+/* Override any remaining CSS variables */
+.tracking-container {
+  --primary-color: #000000 !important;
+  --secondary-color: #6b7280 !important;
+  --background-color: #ffffff !important;
+  --text-color: #000000 !important;
+  --border-color: #e5e7eb !important;
 }
 
 /* Socket Debug Panel Styles */
@@ -748,7 +862,7 @@
 }
 
 .timeline-message.highlight-animation .message-dot::after {
-  content: '';
+  content: "";
   position: absolute;
   top: -4px;
   left: -4px;
@@ -852,4 +966,209 @@
   border-radius: 50%;
   margin-right: 6px;
   animation: pulse 1.5s infinite;
-} 
+}
+
+/* ========== BLACK LINES AND PROGRESS OVERRIDES ========== */
+
+/* Make timeline lines black */
+.timeline-message::before {
+  background-color: #000000 !important;
+}
+
+/* Make timeline dots black when not completed */
+.message-dot {
+  background-color: #000000 !important;
+  border: 2px solid #ffffff !important;
+}
+
+/* Keep completed dots green but with black border */
+.timeline-message.completed .message-dot {
+  background-color: #10b981 !important;
+  border: 2px solid #000000 !important;
+}
+
+/* Make current dot orange but with black border */
+.timeline-message.current .message-dot {
+  background-color: #f59e0b !important;
+  border: 2px solid #000000 !important;
+}
+
+/* Make progress bar black */
+.status-progress {
+  background-color: #f3f4f6 !important;
+  border: 1px solid #000000 !important;
+}
+
+.status-progress-bar {
+  background: #000000 !important;
+  background-color: #000000 !important;
+}
+
+/* Make message content borders black */
+.message-content {
+  border: 1px solid #000000 !important;
+}
+
+.message-content::before {
+  border-right: 8px solid #f5f5f5 !important;
+  border-top: 8px solid transparent !important;
+  border-bottom: 8px solid transparent !important;
+}
+
+.timeline-message.completed .message-content::before {
+  border-right-color: rgba(76, 175, 80, 0.1) !important;
+}
+
+.timeline-message.current .message-content::before {
+  border-right-color: rgba(255, 152, 0, 0.1) !important;
+}
+
+/* Make all borders black */
+.tracking-card,
+.delivery-info,
+.order-summary,
+.delivered-card,
+.connection-status,
+.socket-debug-panel,
+.socket-events,
+.socket-event {
+  border-color: #000000 !important;
+}
+
+/* Override any remaining colored lines */
+.order-item {
+  border-bottom: 1px solid #000000 !important;
+}
+
+/* Make delivered card progress line black */
+.delivered-card::before {
+  background: #000000 !important;
+}
+
+/* Mobile responsive overrides */
+@media (max-width: 768px) {
+  .timeline-message::before {
+    background-color: #000000 !important;
+  }
+
+  .message-dot {
+    background-color: #000000 !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  .timeline-message.completed .message-dot {
+    background-color: #10b981 !important;
+    border: 2px solid #000000 !important;
+  }
+
+  .timeline-message.current .message-dot {
+    background-color: #f59e0b !important;
+    border: 2px solid #000000 !important;
+  }
+
+  .status-progress-bar {
+    background: #000000 !important;
+  }
+}
+
+/* Manual Tracking Section */
+.manual-tracking-section {
+  background: #f8f9fa !important;
+  border: 2px dashed #6c757d !important;
+  border-radius: 8px !important;
+  padding: 20px !important;
+  text-align: center !important;
+  margin: 15px 0 !important;
+}
+
+.start-tracking-btn {
+  background: #28a745 !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 12px 24px !important;
+  border-radius: 6px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  margin-bottom: 10px !important;
+}
+
+.start-tracking-btn:hover {
+  background: #218838 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3) !important;
+}
+
+.start-tracking-btn:disabled {
+  background: #6c757d !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.tracking-info {
+  color: #6c757d !important;
+  font-size: 14px !important;
+  margin: 0 !important;
+}
+
+/* Tracking Active Indicator */
+.tracking-active-indicator {
+  background: #d4edda !important;
+  border: 1px solid #c3e6cb !important;
+  border-radius: 6px !important;
+  padding: 12px !important;
+  text-align: center !important;
+  color: #155724 !important;
+  font-weight: 600 !important;
+  margin: 15px 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+}
+
+/* Pulse Animation for Active Tracking */
+.pulse-dot {
+  width: 8px !important;
+  height: 8px !important;
+  background: #28a745 !important;
+  border-radius: 50% !important;
+  animation: pulse 1.5s infinite !important;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Enhanced Timeline Animation */
+.timeline-item.highlight {
+  animation: statusHighlight 2s ease-in-out !important;
+  border-left: 4px solid #28a745 !important;
+}
+
+@keyframes statusHighlight {
+  0% {
+    background: #ffffff;
+    transform: scale(1);
+  }
+  50% {
+    background: #d4edda;
+    transform: scale(1.02);
+  }
+  100% {
+    background: #ffffff;
+    transform: scale(1);
+  }
+}

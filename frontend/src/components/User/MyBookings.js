@@ -329,8 +329,12 @@ const MyBookings = () => {
             return (
               <div key={booking._id} className="booking-card">
                 <div className="booking-header">
-                  <h3 className="room-name">{booking.roomType}</h3>
-                  <span className="booking-status">Confirmed</span>
+                  <div className="booking-info">
+                    <h3 className="room-name">{booking.roomType}</h3>
+                  </div>
+                  <div className="booking-status-wrapper">
+                    <span className="booking-status confirmed">Confirmed</span>
+                  </div>
                 </div>
                 
                 <div className="booking-details">
@@ -425,8 +429,12 @@ const MyBookings = () => {
             return (
               <div key={booking._id} className="booking-card past-booking">
                 <div className="booking-header">
-                  <h3 className="room-name">{booking.roomType}</h3>
-                  <span className="booking-status past">Past</span>
+                  <div className="booking-info">
+                    <h3 className="room-name">{booking.roomType}</h3>
+                  </div>
+                  <div className="booking-status-wrapper">
+                    <span className="booking-status past">Past</span>
+                  </div>
                 </div>
                 
                 <div className="booking-details">

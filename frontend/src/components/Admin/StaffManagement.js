@@ -17,9 +17,9 @@ const StaffManagement = () => {
     email: "",
     phone: "",
     department: "",
-    position: "",
+    role: "",
     salary: "",
-    status: "Active",
+    status: "active",
     hireDate: "",
   });
 
@@ -76,15 +76,24 @@ const StaffManagement = () => {
         "https://hrms-bace.vercel.app/api";
       const url = editingStaff
         ? `${apiUrl}/staff/${editingStaff._id}`
-        : `${apiUrl}/staff`;
+        : `${apiUrl}/staff/add`;
       const method = editingStaff ? "PUT" : "POST";
 
-      await axios({
+      console.log("Submitting staff data:", formData);
+      console.log("URL:", url);
+      console.log("Method:", method);
+
+      const response = await axios({
         method,
         url,
         data: formData,
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       });
+
+      console.log("Staff submission response:", response.data);
 
       toast.success(
         editingStaff ? "Staff updated successfully" : "Staff added successfully"
@@ -93,13 +102,26 @@ const StaffManagement = () => {
       resetForm();
     } catch (error) {
       console.error("Error saving staff:", error);
-      toast.error("Failed to save staff");
+      console.error("Error details:", error.response?.data);
+
+      const errorMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "Failed to save staff";
+      toast.error(errorMessage);
     }
   };
 
   const handleEdit = (staffMember) => {
     setEditingStaff(staffMember);
-    setFormData(staffMember);
+    // Format the hire date for the date input field
+    const formattedStaffMember = {
+      ...staffMember,
+      hireDate: staffMember.hireDate
+        ? new Date(staffMember.hireDate).toISOString().split("T")[0]
+        : "",
+    };
+    setFormData(formattedStaffMember);
     setShowAddForm(true);
   };
 
@@ -128,9 +150,9 @@ const StaffManagement = () => {
       email: "",
       phone: "",
       department: "",
-      position: "",
+      role: "",
       salary: "",
-      status: "Active",
+      status: "active",
       hireDate: "",
     });
     setEditingStaff(null);
@@ -191,11 +213,10 @@ const StaffManagement = () => {
             }}
           >
             <option value="All Departments">All Departments</option>
-            <option value="Front Desk">Front Desk</option>
-            <option value="Housekeeping">Housekeeping</option>
-            <option value="Kitchen">Kitchen</option>
-            <option value="Maintenance">Maintenance</option>
-            <option value="Management">Management</option>
+            <option value="front-desk">Front Desk</option>
+            <option value="service">Service</option>
+            <option value="kitchen">Kitchen</option>
+            <option value="management">Management</option>
           </select>
         </div>
         <button
@@ -247,22 +268,26 @@ const StaffManagement = () => {
                 required
               >
                 <option value="">Select Department</option>
-                <option value="Front Desk">Front Desk</option>
-                <option value="Housekeeping">Housekeeping</option>
-                <option value="Kitchen">Kitchen</option>
-                <option value="Maintenance">Maintenance</option>
-                <option value="Management">Management</option>
+                <option value="front-desk">Front Desk</option>
+                <option value="service">Service</option>
+                <option value="kitchen">Kitchen</option>
+                <option value="management">Management</option>
               </select>
             </div>
             <div className="simple-form-row">
-              <input
-                type="text"
-                name="position"
-                placeholder="Position/Job Title"
-                value={formData.position}
+              <select
+                name="role"
+                value={formData.role}
                 onChange={handleInputChange}
                 required
-              />
+              >
+                <option value="">Select Role</option>
+                <option value="manager">Manager</option>
+                <option value="chef">Chef</option>
+                <option value="waiter">Waiter</option>
+                <option value="host">Host</option>
+                <option value="admin">Admin</option>
+              </select>
               <input
                 type="number"
                 name="salary"
@@ -285,8 +310,9 @@ const StaffManagement = () => {
                 onChange={handleInputChange}
                 required
               >
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="on-leave">On Leave</option>
               </select>
             </div>
             <div className="simple-form-actions">
@@ -333,7 +359,7 @@ const StaffManagement = () => {
               <th style={{ minWidth: "180px" }}>Email</th>
               <th style={{ minWidth: "120px" }}>Phone</th>
               <th style={{ minWidth: "120px" }}>Department</th>
-              <th style={{ minWidth: "120px" }}>Position</th>
+              <th style={{ minWidth: "120px" }}>Role</th>
               <th style={{ minWidth: "100px" }}>Salary</th>
               <th style={{ minWidth: "120px" }}>Hire Date</th>
               <th style={{ minWidth: "100px" }}>Status</th>
@@ -347,12 +373,20 @@ const StaffManagement = () => {
                 <td style={{ minWidth: "180px" }}>{member.email}</td>
                 <td style={{ minWidth: "120px" }}>{member.phone || "N/A"}</td>
                 <td style={{ minWidth: "120px" }}>{member.department}</td>
-                <td style={{ minWidth: "120px" }}>{member.position}</td>
+                <td style={{ minWidth: "120px" }}>{member.role}</td>
                 <td style={{ minWidth: "100px" }}>
-                  Rs. {member.salary || "N/A"}
+                  {member.salary
+                    ? `Rs. ${member.salary.toLocaleString()}`
+                    : "N/A"}
                 </td>
                 <td style={{ minWidth: "120px" }}>
-                  {member.hireDate || "N/A"}
+                  {member.hireDate
+                    ? new Date(member.hireDate).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "N/A"}
                 </td>
                 <td style={{ minWidth: "100px" }}>
                   <span

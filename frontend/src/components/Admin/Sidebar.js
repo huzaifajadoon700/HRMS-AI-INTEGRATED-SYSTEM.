@@ -81,6 +81,35 @@ const Sidebar = () => {
   const [forceUpdate, setForceUpdate] = useState(0);
   const navigate = useNavigate();
 
+  // Simple function to change module
+  const handleModuleChange = (newModule) => {
+    console.log("=== MODULE CHANGE ===");
+    console.log("From:", selectedModule);
+    console.log("To:", newModule);
+    console.log("Is Mobile:", isMobile);
+    console.log("Mobile Menu Open:", isMobileMenuOpen);
+
+    // Force immediate state update
+    setSelectedModule(newModule);
+    setForceUpdate(prev => prev + 1);
+
+    // Close mobile menu and dropdown immediately
+    setIsMobileMenuOpen(false);
+    setOpenDropdown(null);
+
+    // Additional mobile-specific handling
+    if (isMobile) {
+      // Ensure body scroll is restored
+      document.body.style.overflow = "unset";
+      console.log("Mobile menu closed after navigation");
+
+      // Force a re-render to ensure the component updates
+      setTimeout(() => {
+        setForceUpdate(prev => prev + 1);
+      }, 50);
+    }
+  };
+
   useEffect(() => {
     const name = localStorage.getItem("name");
     if (name) {
@@ -101,7 +130,41 @@ const Sidebar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Monitor selectedModule changes
+  useEffect(() => {
+    console.log("selectedModule state changed to:", selectedModule);
+    console.log("Force update counter:", forceUpdate);
+    console.log("Is mobile:", isMobile);
+    console.log("Mobile menu open:", isMobileMenuOpen);
+  }, [selectedModule, forceUpdate, isMobile, isMobileMenuOpen]);
+
+  // Monitor openDropdown changes
+  useEffect(() => {
+    console.log("openDropdown state changed to:", openDropdown);
+  }, [openDropdown]);
+
+  // Listen for admin module change events from child components
+  useEffect(() => {
+    const handleAdminModuleChange = (event) => {
+      console.log("=== ADMIN MODULE CHANGE EVENT RECEIVED ===");
+      console.log("Event detail:", event.detail);
+      console.log("Target module:", event.detail.module);
+
+      if (event.detail && event.detail.module) {
+        handleModuleChange(event.detail.module);
+      }
+    };
+
+    window.addEventListener('adminModuleChange', handleAdminModuleChange);
+
+    return () => {
+      window.removeEventListener('adminModuleChange', handleAdminModuleChange);
+    };
+  }, []);
+
   const handleLogout = () => {
+    console.log("=== LOGOUT TRIGGERED ===");
+    console.log("Clearing localStorage and navigating to home");
     localStorage.clear();
     navigate("/", { replace: true });
   };
@@ -117,7 +180,14 @@ const Sidebar = () => {
   };
 
   const toggleDropdown = (module) => {
-    setOpenDropdown(openDropdown === module ? null : module);
+    console.log("=== TOGGLE DROPDOWN ===");
+    console.log("Module:", module);
+    console.log("Current openDropdown:", openDropdown);
+    console.log("Is Mobile:", isMobile);
+
+    const newState = openDropdown === module ? null : module;
+    console.log("Setting openDropdown to:", newState);
+    setOpenDropdown(newState);
   };
 
   const toggleNotification = () => {
@@ -297,32 +367,35 @@ const Sidebar = () => {
   ];
 
   const renderContent = () => {
-    console.log("Current selectedModule:", selectedModule);
+    console.log("=== RENDER CONTENT ===");
+    console.log("selectedModule:", selectedModule);
+    console.log("Type:", typeof selectedModule);
+
     switch (selectedModule) {
       case "Dashboard":
-        return <Dashboardmodule />;
+        return <Dashboardmodule key="dashboard" />;
       case "User Profile":
-        return <UserProfileManagement />;
+        return <UserProfileManagement key="user-profile" />;
       case "AdminAddRoom":
-        return <AdminAddRoom />;
+        return <AdminAddRoom key="add-room" />;
       case "AdminViewRooms":
-        return <AdminViewRooms />;
+        return <AdminViewRooms key="view-rooms" />;
       case "AdminRoomUpdate":
-        return <AdminRoomUpdate />;
+        return <AdminRoomUpdate key="update-room" />;
       case "AdminDeleteRoom":
-        return <AdminDeleteRoom />;
+        return <AdminDeleteRoom key="delete-room" />;
       case "AdminAddTable":
-        return <AdminAddTable />;
+        return <AdminAddTable key="add-table" />;
       case "AdminViewTables":
-        return <AdminViewTables />;
+        return <AdminViewTables key="view-tables" />;
       case "AdminUpdateTable":
-        return <AdminUpdateTable />;
+        return <AdminUpdateTable key="update-table" />;
       case "AdminDeleteTable":
-        return <AdminDeleteTable />;
+        return <AdminDeleteTable key="delete-table" />;
       case "AdminManageBookings":
-        return <AdminManageBookings />;
+        return <AdminManageBookings key="manage-bookings" />;
       case "AdminManageReservations":
-        return <AdminManageReservations />;
+        return <AdminManageReservations key="manage-reservations" />;
       case "AdminCustomerManagement":
         return <AdminCustomerManagement />;
       case "Online Orders":
@@ -338,6 +411,7 @@ const Sidebar = () => {
       case "Recommendation System":
         return <RecommendationSystem />;
       case "Reporting":
+      case "ReportingAnalytics":
         return <ReportingAnalytics />;
       case "Settings":
       case "AdminSettings":
@@ -363,6 +437,11 @@ const Sidebar = () => {
       case "MenuRecommendationAnalytics":
         return <RecommendationEvaluation />;
       default:
+        console.warn("=== DEFAULT CASE TRIGGERED ===");
+        console.warn("No component matched for selectedModule:", selectedModule);
+        console.warn("Type of selectedModule:", typeof selectedModule);
+        console.warn("Available cases: Dashboard, User Profile, AdminAddRoom, AdminViewRooms, AdminRoomUpdate, AdminDeleteRoom, AdminAddTable, AdminViewTables, AdminUpdateTable, AdminDeleteTable, AdminManageBookings, AdminManageReservations, AdminCustomerManagement, StaffManagement, ShiftManagement, SentimentAnalysis, ReportingAnalytics, AdminSettings, HotelBrandingSettings, AdminOrders, AdminViewMenus, AdminAddMenu, AdminUpdateMenu, AdminDeleteMenu, TableRecommendationAnalytics, RecommendationEvaluation, RoomRecommendationAnalytics");
+        console.warn("Falling back to Dashboard");
         return <Dashboardmodule />;
     }
   };
@@ -372,8 +451,27 @@ const Sidebar = () => {
       {/* Mobile Menu Overlay */}
       <div
         className={`mobile-overlay ${isMobileMenuOpen ? "active" : ""}`}
-        onClick={() => setIsMobileMenuOpen(false)}
-        style={{ display: isMobileMenuOpen ? "block" : "none" }}
+        onClick={(e) => {
+          // Only close if clicking the overlay itself, not child elements
+          if (e.target === e.currentTarget) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("Mobile overlay clicked - closing menu");
+            setIsMobileMenuOpen(false);
+            document.body.style.overflow = "unset";
+          }
+        }}
+        style={{
+          display: isMobileMenuOpen ? "block" : "none",
+          position: "fixed",
+          top: 0,
+          left: 280, // Start after the sidebar width
+          width: "calc(100% - 280px)",
+          height: "100%",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          zIndex: 999,
+          pointerEvents: isMobileMenuOpen ? "auto" : "none"
+        }}
       />
 
       {/* Clean Sidebar */}
@@ -434,12 +532,13 @@ const Sidebar = () => {
                 return (
                   <React.Fragment key={item.name}>
                     <li className="nav-item">
-                      <a
-                        href="#"
+                      <div
                         className={`nav-link ${isActive ? "active" : ""}`}
                         style={{
                           color: "#000000 !important",
                           textDecoration: "none",
+                          cursor: "pointer",
+                          userSelect: "none"
                         }}
                         onMouseEnter={(e) => {
                           e.target.style.color = "#000000";
@@ -447,22 +546,65 @@ const Sidebar = () => {
                         onMouseLeave={(e) => {
                           e.target.style.color = "#000000";
                         }}
+                        onTouchStart={(e) => {
+                          console.log("=== TOUCH START EVENT ===");
+                          console.log("Touch start detected on:", item.name);
+                        }}
+                        onTouchEnd={(e) => {
+                          console.log("=== TOUCH END EVENT ===");
+                          console.log("Touch end detected on:", item.name);
+
+                          // Prevent click event from firing after touch
+                          e.preventDefault();
+                          e.stopPropagation();
+
+                          // Trigger appropriate action for mobile
+                          if (isMobile) {
+                            const hasSubmenu = item.submenu && item.submenu.length > 0;
+                            console.log("Has submenu:", hasSubmenu);
+
+                            if (hasSubmenu) {
+                              console.log("Mobile touch - opening dropdown for:", item.name);
+                              toggleDropdown(item.name);
+                            } else {
+                              console.log("Mobile touch - triggering navigation");
+                              const newModule = item.component || item.name;
+                              console.log("Calling handleModuleChange with:", newModule);
+                              console.log("Current selectedModule before change:", selectedModule);
+                              handleModuleChange(newModule);
+                              console.log("handleModuleChange called successfully");
+                            }
+                          }
+                        }}
+
                         onClick={(e) => {
                           e.preventDefault();
-                          console.log(
-                            "Menu clicked:",
-                            item.name,
-                            "Component:",
-                            item.component || item.name
-                          );
+                          e.stopPropagation();
+
+                          // Skip click handling on mobile (use touch events instead)
+                          if (isMobile) {
+                            console.log("=== CLICK EVENT SKIPPED ON MOBILE ===");
+                            return;
+                          }
+
+                          console.log("=== MENU ITEM CLICKED ===");
+                          console.log("Item:", item.name);
+                          console.log("Component:", item.component);
+                          console.log("Has submenu:", hasSubmenu);
+                          console.log("Is Mobile:", isMobile);
+                          console.log("Mobile Menu Open:", isMobileMenuOpen);
+                          console.log("Event target:", e.target);
+                          console.log("Current target:", e.currentTarget);
+
                           if (hasSubmenu) {
+                            console.log("Opening dropdown for:", item.name);
                             toggleDropdown(item.name);
                           } else {
-                            setSelectedModule(item.component || item.name);
-                            setForceUpdate((prev) => prev + 1); // Force re-render
-                            if (isMobile) {
-                              setIsMobileMenuOpen(false);
-                            }
+                            const newModule = item.component || item.name;
+                            console.log("Calling handleModuleChange with:", newModule);
+                            console.log("Current selectedModule before change:", selectedModule);
+                            handleModuleChange(newModule);
+                            console.log("handleModuleChange called successfully");
                           }
                         }}
                       >
@@ -500,7 +642,7 @@ const Sidebar = () => {
                             )}
                           </>
                         )}
-                      </a>
+                      </div>
 
                       {isSidebarCollapsed && (
                         <div className="menu-tooltip">
@@ -518,7 +660,7 @@ const Sidebar = () => {
                       )}
                     </li>
 
-                    {hasSubmenu && isDropdownOpen && !isSidebarCollapsed && (
+                    {hasSubmenu && isDropdownOpen && (!isSidebarCollapsed || isMobile) && (
                       <ul className="nav-submenu">
                         {item.submenu.map((subItem) => {
                           const SubIconComponent = subItem.icon || FiGrid;
@@ -527,14 +669,15 @@ const Sidebar = () => {
 
                           return (
                             <li key={subItem.name} className="nav-item">
-                              <a
-                                href="#"
+                              <div
                                 className={`nav-link submenu-link ${
                                   isSubActive ? "active" : ""
                                 }`}
                                 style={{
                                   color: "#000000 !important",
                                   textDecoration: "none",
+                                  cursor: "pointer",
+                                  userSelect: "none"
                                 }}
                                 onMouseEnter={(e) => {
                                   e.target.style.color = "#000000";
@@ -542,19 +685,51 @@ const Sidebar = () => {
                                 onMouseLeave={(e) => {
                                   e.target.style.color = "#000000";
                                 }}
+                                onTouchStart={(e) => {
+                                  console.log("=== SUBMENU TOUCH START ===");
+                                  console.log("Touch start on submenu:", subItem.name);
+                                }}
+                                onTouchEnd={(e) => {
+                                  console.log("=== SUBMENU TOUCH END ===");
+                                  console.log("Touch end on submenu:", subItem.name);
+
+                                  // Prevent click event from firing after touch
+                                  e.preventDefault();
+                                  e.stopPropagation();
+
+                                  // Trigger navigation for mobile
+                                  if (isMobile) {
+                                    console.log("Mobile submenu touch - triggering navigation");
+                                    const newModule = subItem.component;
+                                    console.log("Calling handleModuleChange with:", newModule);
+                                    console.log("Current selectedModule before change:", selectedModule);
+                                    handleModuleChange(newModule);
+                                    console.log("handleModuleChange called successfully");
+                                  }
+                                }}
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  console.log(
-                                    "Submenu clicked:",
-                                    subItem.name,
-                                    "Component:",
-                                    subItem.component
-                                  );
-                                  setSelectedModule(subItem.component);
-                                  setForceUpdate((prev) => prev + 1); // Force re-render
+                                  e.stopPropagation();
+
+                                  // Skip click handling on mobile (use touch events instead)
                                   if (isMobile) {
-                                    setIsMobileMenuOpen(false);
+                                    console.log("=== SUBMENU CLICK EVENT SKIPPED ON MOBILE ===");
+                                    return;
                                   }
+
+                                  console.log("=== SUBMENU ITEM CLICKED ===");
+                                  console.log("Submenu item:", subItem.name);
+                                  console.log("Component:", subItem.component);
+                                  console.log("Is Mobile:", isMobile);
+                                  console.log("Mobile Menu Open:", isMobileMenuOpen);
+                                  console.log("Event target:", e.target);
+                                  console.log("Current target:", e.currentTarget);
+
+                                  const newModule = subItem.component;
+                                  console.log("Calling handleModuleChange with:", newModule);
+                                  console.log("Current selectedModule before change:", selectedModule);
+                                  handleModuleChange(newModule);
+                                  console.log("handleModuleChange called successfully");
                                 }}
                               >
                                 <SubIconComponent
@@ -570,7 +745,7 @@ const Sidebar = () => {
                                 <span style={{ color: "#000000 !important" }}>
                                   {subItem.name}
                                 </span>
-                              </a>
+                              </div>
                             </li>
                           );
                         })}
@@ -611,8 +786,28 @@ const Sidebar = () => {
                 onMouseLeave={(e) => {
                   e.target.style.color = "#000000";
                 }}
+                onTouchStart={(e) => {
+                  console.log("=== LOGOUT TOUCH START ===");
+                }}
+                onTouchEnd={(e) => {
+                  console.log("=== LOGOUT TOUCH END ===");
+                  if (isMobile) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log("Mobile logout touch - triggering logout");
+                    handleLogout();
+                  }
+                }}
                 onClick={(e) => {
                   e.preventDefault();
+
+                  // Skip click handling on mobile (use touch events instead)
+                  if (isMobile) {
+                    console.log("=== LOGOUT CLICK EVENT SKIPPED ON MOBILE ===");
+                    return;
+                  }
+
+                  console.log("=== LOGOUT CLICKED ===");
                   handleLogout();
                 }}
               >
@@ -654,6 +849,7 @@ const Sidebar = () => {
             <div>
               <h1 className="header-title">Hi, Admin!</h1>
               <p className="header-subtitle">Welcome to your dashboard</p>
+             
             </div>
           </div>
 
@@ -661,11 +857,11 @@ const Sidebar = () => {
             {/* Hide search and notifications on mobile for cleaner look */}
             {!isMobile && (
               <>
-                <div className="header-search">
-                  <FiSearch className="search-icon" />
+                <div className="header-search" >
+                  <FiSearch className="search-icon"  />
                   <input
                     type="text"
-                    placeholder="Global search..."
+                      placeholder="Global search..."
                     className="search-input"
                   />
                 </div>
@@ -684,7 +880,11 @@ const Sidebar = () => {
         </header>
 
         {/* Dashboard Content */}
-        <div className="admin-content" key={`${selectedModule}-${forceUpdate}`}>
+        <div
+          className="admin-content"
+          key={`${selectedModule}-${forceUpdate}`}
+
+        >
           {renderContent()}
         </div>
       </main>

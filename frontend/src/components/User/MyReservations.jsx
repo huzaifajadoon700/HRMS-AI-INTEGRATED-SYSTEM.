@@ -405,7 +405,7 @@ const MyReservations = () => {
         <div className="container-fluid">
           <div className="controls-grid">
             <div className="tab-section">
-              <button
+              <button style={{marginRight: '1rem'}}
                 className={`tab-btn ${activeTab === 'upcoming' ? 'active' : ''}`}
                 onClick={() => setActiveTab('upcoming')}
               >
@@ -425,9 +425,9 @@ const MyReservations = () => {
                 className="refresh-btn"
                 onClick={fetchReservations}
                 disabled={loading}
+                title="Refresh reservations"
               >
                 <FiRefreshCw className={loading ? 'spinning' : ''} />
-                Refresh
               </button>
             </div>
           </div>

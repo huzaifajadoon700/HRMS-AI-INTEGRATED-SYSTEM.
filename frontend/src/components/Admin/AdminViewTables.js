@@ -2,10 +2,23 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getTableImageUrl, handleImageError } from "../../utils/imageUtils";
 import "./simple-admin.css";
 
 const AdminViewTables = () => {
   const navigate = useNavigate();
+
+  // Function to handle navigation within admin dashboard
+  const handleAdminNavigation = (module) => {
+    console.log("=== ADMIN NAVIGATION TRIGGERED ===");
+    console.log("Navigating to module:", module);
+
+    // Dispatch custom event to trigger sidebar module change
+    const event = new CustomEvent('adminModuleChange', {
+      detail: { module: module }
+    });
+    window.dispatchEvent(event);
+  };
   const [loading, setLoading] = useState(true);
   const [tables, setTables] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -99,7 +112,7 @@ const AdminViewTables = () => {
           className="simple-search-input"
         />
         <button
-          onClick={() => navigate("/admin/add-table")}
+          onClick={() => handleAdminNavigation("AdminAddTable")}
           className="simple-btn simple-btn-primary"
         >
           Add New Table
@@ -146,14 +159,7 @@ const AdminViewTables = () => {
                 <td style={{ minWidth: "100px" }}>
                   {table.image ? (
                     <img
-                      src={
-                        table.image.startsWith("http")
-                          ? table.image
-                          : `${
-                              process.env.REACT_APP_API_URL ||
-                              "https://hrms-bace.vercel.app"
-                            }${table.image}`
-                      }
+                      src={getTableImageUrl(table.image)}
                       alt={table.tableName}
                       className="simple-room-image"
                       style={{
@@ -162,11 +168,7 @@ const AdminViewTables = () => {
                         objectFit: "cover",
                         borderRadius: "4px",
                       }}
-                      onError={(e) => {
-                        e.target.src =
-                          "https://via.placeholder.com/60x40/e5e7eb/9ca3af?text=No+Image";
-                        e.target.onerror = null;
-                      }}
+                      onError={(e) => handleImageError(e, "/images/placeholder-table.jpg")}
                     />
                   ) : (
                     <div
@@ -218,7 +220,7 @@ const AdminViewTables = () => {
         <div style={{ textAlign: "center", marginTop: "40px" }}>
           <p>No tables found.</p>
           <button
-            onClick={() => navigate("/admin/add-table")}
+            onClick={() => handleAdminNavigation("AdminAddTable")}
             className="simple-btn simple-btn-primary"
           >
             Add First Table

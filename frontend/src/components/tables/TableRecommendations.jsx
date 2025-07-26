@@ -500,24 +500,26 @@ const TableRecommendations = () => {
       }}>
         {/* Filters Section - Compact Design */}
         <div className="table-recommendations-filters" style={{
-          background: 'rgba(255, 255, 255, 0.05)',
+          background: 'rgba(100, 255, 218, 0.05)',
           borderRadius: '1rem',
           padding: '1.2rem',
-          marginBottom: '1.5rem'
+          marginBottom: '1.5rem',
+          border: '1px solid rgba(100, 255, 218, 0.1)'
         }}>
         <h3 style={{
-          color: '#fff',
+          color: '#000000',
           fontSize: '1rem',
           fontWeight: '600',
           marginBottom: '1rem',
-          textAlign: 'center'
+          textAlign: 'center',
+          fontFamily: 'Inter, sans-serif'
         }}>
           🎯 Customize Your Recommendations
         </h3>
 
         <div className="table-recommendations-filters-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.8rem', marginBottom: '0.8rem' }}>
           <div>
-            <label style={{ display: 'block', color: '#fff', fontSize: '0.75rem', fontWeight: '500', marginBottom: '0.4rem' }}>
+            <label style={{ display: 'block', color: '#374151', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem', fontFamily: 'Inter, sans-serif' }}>
               🎉 Occasion
             </label>
             <select
@@ -525,12 +527,13 @@ const TableRecommendations = () => {
               onChange={(e) => handleContextChange('occasion', e.target.value)}
               style={{
                 width: '100%',
-                padding: '0.5rem',
-                background: '#0A192F',
-                border: '1px solid rgba(100, 255, 218, 0.3)',
+                padding: '0.75rem',
+                background: '#ffffff',
+                border: '1px solid #d1d5db',
                 borderRadius: '0.5rem',
-                color: '#fff',
-                fontSize: '0.75rem'
+                color: '#000000',
+                fontSize: '0.875rem',
+                fontFamily: 'Inter, sans-serif'
               }}
             >
               <option value="">Any Occasion</option>
@@ -543,7 +546,7 @@ const TableRecommendations = () => {
           </div>
 
           <div>
-            <label style={{ display: 'block', color: '#fff', fontSize: '0.75rem', fontWeight: '500', marginBottom: '0.4rem' }}>
+            <label style={{ display: 'block', color: '#374151', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem', fontFamily: 'Inter, sans-serif' }}>
               👥 Party Size
             </label>
             <input
@@ -554,18 +557,19 @@ const TableRecommendations = () => {
               onChange={(e) => handleContextChange('partySize', parseInt(e.target.value))}
               style={{
                 width: '100%',
-                padding: '0.5rem',
-                background: '#0A192F',
-                border: '1px solid rgba(100, 255, 218, 0.3)',
+                padding: '0.75rem',
+                background: '#ffffff',
+                border: '1px solid #d1d5db',
                 borderRadius: '0.5rem',
-                color: '#fff',
-                fontSize: '0.75rem'
+                color: '#000000',
+                fontSize: '0.875rem',
+                fontFamily: 'Inter, sans-serif'
               }}
             />
           </div>
 
           <div>
-            <label style={{ display: 'block', color: '#fff', fontSize: '0.75rem', fontWeight: '500', marginBottom: '0.4rem' }}>
+            <label style={{ display: 'block', color: '#374151', fontSize: '0.875rem', fontWeight: '500', marginBottom: '0.5rem', fontFamily: 'Inter, sans-serif' }}>
               🕐 Time Preference
             </label>
             <select
@@ -573,12 +577,13 @@ const TableRecommendations = () => {
               onChange={(e) => handleContextChange('timeSlot', e.target.value)}
               style={{
                 width: '100%',
-                padding: '0.5rem',
-                background: '#0A192F',
-                border: '1px solid rgba(100, 255, 218, 0.3)',
+                padding: '0.75rem',
+                background: '#ffffff',
+                border: '1px solid #d1d5db',
                 borderRadius: '0.5rem',
-                color: '#fff',
-                fontSize: '0.75rem'
+                color: '#000000',
+                fontSize: '0.875rem',
+                fontFamily: 'Inter, sans-serif'
               }}
             >
               <option value="">Any Time</option>
@@ -596,15 +601,17 @@ const TableRecommendations = () => {
               disabled={loading}
               style={{
                 width: '100%',
-                padding: '0.5rem 0.8rem',
-                background: loading ? 'rgba(100, 255, 218, 0.5)' : 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)',
-                color: '#0a192f',
+                padding: '0.75rem 1rem',
+                background: loading ? '#9ca3af' : '#000000',
+                color: '#ffffff',
                 border: 'none',
                 borderRadius: '0.5rem',
-                fontSize: '0.75rem',
-                fontWeight: '600',
+                fontSize: '0.875rem',
+                fontWeight: '500',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                fontFamily: 'Inter, sans-serif'
               }}
             >
               {loading ? 'Loading...' : 'Get Recommendations'}
@@ -618,14 +625,15 @@ const TableRecommendations = () => {
       {/* Error Alert */}
       {error && (
         <div style={{
-          background: 'rgba(255, 87, 87, 0.1)',
-          border: '1px solid rgba(255, 87, 87, 0.3)',
-          borderRadius: '0.5rem',
-          padding: '0.8rem',
-          marginBottom: '1rem',
-          color: '#fff',
+          background: 'rgba(239, 68, 68, 0.1)',
+          border: '1px solid rgba(239, 68, 68, 0.2)',
+          borderRadius: '0.75rem',
+          padding: '1rem',
+          marginBottom: '1.5rem',
+          color: '#dc2626',
           textAlign: 'center',
-          fontSize: '0.8rem'
+          fontSize: '0.875rem',
+          fontFamily: 'Inter, sans-serif'
         }}>
           {error}
         </div>
@@ -643,12 +651,11 @@ const TableRecommendations = () => {
             <div
               key={index}
               style={{
-                background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
-                backdropFilter: 'blur(20px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                borderRadius: '1.5rem',
+                background: '#f3f4f6',
+                border: '1px solid #e5e7eb',
+                borderRadius: '1rem',
                 overflow: 'hidden',
-                height: '500px',
+                height: '400px',
                 animation: 'pulse 2s ease-in-out infinite'
               }}
             />
@@ -657,19 +664,20 @@ const TableRecommendations = () => {
           <div style={{
             gridColumn: '1 / -1',
             textAlign: 'center',
-            padding: '3rem 2rem',
-            color: 'rgba(255, 255, 255, 0.8)'
+            padding: '4rem 2rem',
+            color: '#6b7280'
           }}>
-            <FiCalendar size={48} style={{ color: 'rgba(255, 255, 255, 0.4)', marginBottom: '1rem' }} />
+            <FiCalendar size={64} style={{ color: '#9ca3af', marginBottom: '1.5rem' }} />
             <h3 style={{
-              fontSize: '1.2rem',
+              fontSize: '1.5rem',
               fontWeight: '600',
-              color: '#fff',
-              marginBottom: '0.5rem'
+              color: '#111827',
+              marginBottom: '0.5rem',
+              fontFamily: 'Inter, sans-serif'
             }}>
               No recommendations found
             </h3>
-            <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.6)' }}>
+            <p style={{ fontSize: '1rem', color: '#6b7280', fontFamily: 'Inter, sans-serif' }}>
               Try adjusting your preferences or check back later
             </p>
           </div>
@@ -681,16 +689,24 @@ const TableRecommendations = () => {
                 key={table._id || index}
                 className="table-recommendation-card"
                 style={{
-                  background: 'linear-gradient(145deg, rgba(17, 34, 64, 0.6) 0%, rgba(26, 35, 50, 0.4) 100%)',
-                  backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '1.5rem',
+                  background: '#ffffff',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '12px',
                   overflow: 'hidden',
                   transition: 'all 0.3s ease',
                   cursor: 'pointer',
-                  position: 'relative'
+                  position: 'relative',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
                 }}
-                onMouseEnter={() => handleTableView(table)}
+                onMouseEnter={(e) => {
+                  handleTableView(table);
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+                }}
               >
                 {/* Table Image */}
                 <div style={{ position: 'relative', paddingTop: '60%', overflow: 'hidden' }}>
@@ -717,16 +733,17 @@ const TableRecommendations = () => {
                     position: 'absolute',
                     top: '1rem',
                     left: '1rem',
-                    background: 'linear-gradient(135deg, #ff6b9d 0%, #c44569 100%)',
-                    color: '#fff',
-                    padding: '0.4rem 0.6rem',
-                    borderRadius: '1.5rem',
-                    fontSize: '0.7rem',
+                    background: '#ef4444',
+                    color: '#ffffff',
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
                     fontWeight: '600',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.2rem',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+                    gap: '0.25rem',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    fontFamily: 'Inter, sans-serif'
                   }}>
                     #{recommendation.rank || index + 1}
                   </div>
@@ -736,18 +753,19 @@ const TableRecommendations = () => {
                     position: 'absolute',
                     top: '1rem',
                     right: '1rem',
-                    background: 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)',
-                    color: '#0a192f',
-                    padding: '0.4rem 0.6rem',
-                    borderRadius: '1.5rem',
-                    fontSize: '0.7rem',
+                    background: '#000000',
+                    color: '#ffffff',
+                    padding: '0.5rem 0.75rem',
+                    borderRadius: '0.5rem',
+                    fontSize: '0.875rem',
                     fontWeight: '600',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.2rem',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+                    gap: '0.25rem',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    fontFamily: 'Inter, sans-serif'
                   }}>
-                    <FiUsers size={12} />
+                    <FiUsers size={14} />
                     {table.capacity} seats
                   </div>
 
@@ -755,35 +773,37 @@ const TableRecommendations = () => {
                   {table.avgRating && (
                     <div className="table-recommendation-badge" style={{
                       position: 'absolute',
-                      bottom: '1rem',
+                      top: '1rem',
                       left: '1rem',
-                      background: 'rgba(255, 193, 7, 0.9)',
-                      color: '#fff',
-                      padding: '0.4rem 0.6rem',
-                      borderRadius: '1.5rem',
-                      fontSize: '0.7rem',
+                      background: '#fbbf24',
+                      color: '#ffffff',
+                      padding: '0.5rem 0.75rem',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.875rem',
                       fontWeight: '600',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.2rem',
-                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
+                      gap: '0.25rem',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      fontFamily: 'Inter, sans-serif'
                     }}>
-                      <FiStar size={12} />
+                      <FiStar size={14} />
                       {table.avgRating.toFixed(1)}
                     </div>
                   )}
                 </div>
 
                 {/* Card Content */}
-                <div className="table-recommendation-content" style={{ padding: '1.2rem' }}>
+                <div className="table-recommendation-content" style={{ padding: '1.5rem' }}>
                   {/* Header with Title and Favorite */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.8rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                     <h3 className="table-recommendation-title" style={{
-                      color: '#64ffda',
-                      fontSize: '1rem',
+                      color: '#000000',
+                      fontSize: '1.25rem',
                       fontWeight: '600',
                       margin: 0,
-                      lineHeight: '1.2'
+                      lineHeight: '1.2',
+                      fontFamily: 'Inter, sans-serif'
                     }}>
                       {table.tableName}
                     </h3>
@@ -791,9 +811,9 @@ const TableRecommendations = () => {
                       onClick={() => handleTableFavorite(table)}
                       style={{
                         background: 'transparent',
-                        border: '1px solid rgba(255, 107, 157, 0.5)',
+                        border: 'none',
                         color: 'rgba(255, 107, 157, 0.8)',
-                        padding: '0.3rem',
+                        padding: '0.5rem',
                         borderRadius: '50%',
                         cursor: 'pointer',
                         transition: 'all 0.3s ease',
@@ -802,22 +822,23 @@ const TableRecommendations = () => {
                         justifyContent: 'center'
                       }}
                     >
-                      <FiHeart size={12} />
+                      <FiHeart size={16} />
                     </button>
                   </div>
 
                   {/* Recommendation Explanation */}
                   {recommendation.explanation && (
                     <p className="table-recommendation-description" style={{
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      fontSize: '0.75rem',
-                      lineHeight: '1.3',
-                      marginBottom: '0.8rem',
+                      color: '#6b7280',
+                      fontSize: '0.9rem',
+                      lineHeight: '1.4',
+                      marginBottom: '1rem',
                       fontStyle: 'italic',
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      fontFamily: 'Inter, sans-serif'
                     }}>
                       💡 {recommendation.explanation}
                     </p>
@@ -826,43 +847,43 @@ const TableRecommendations = () => {
                   {/* Location */}
                   {table.location && (
                     <div style={{
-                      color: 'rgba(255, 255, 255, 0.6)',
-                      fontSize: '0.7rem',
-                      marginBottom: '0.8rem',
+                      color: '#9ca3af',
+                      fontSize: '0.8rem',
+                      marginBottom: '1rem',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.2rem'
+                      gap: '0.25rem'
                     }}>
                       📍 {table.location}
                     </div>
                   )}
 
                   {/* Features */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', marginBottom: '1rem' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.3rem',
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      fontSize: '0.7rem',
-                      padding: '0.3rem',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      borderRadius: '0.3rem'
+                      gap: '0.5rem',
+                      color: '#374151',
+                      fontSize: '0.85rem',
+                      padding: '0.5rem',
+                      background: '#f9fafb',
+                      borderRadius: '0.5rem'
                     }}>
-                      <FiClock size={12} style={{ color: '#64ffda' }} />
+                      <FiClock size={16} style={{ color: '#374151' }} />
                       <span>Available for booking</span>
                     </div>
                     <div style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '0.3rem',
-                      color: 'rgba(255, 255, 255, 0.8)',
-                      fontSize: '0.7rem',
-                      padding: '0.3rem',
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      borderRadius: '0.3rem'
+                      gap: '0.5rem',
+                      color: '#6b7280',
+                      fontSize: '0.875rem',
+                      padding: '0.5rem',
+                      background: '#f3f4f6',
+                      borderRadius: '0.5rem'
                     }}>
-                      <FiUsers size={12} style={{ color: '#64ffda' }} />
+                      <FiUsers size={16} style={{ color: '#374151' }} />
                       <span>Max {table.capacity} guests</span>
                     </div>
                   </div>
@@ -873,16 +894,17 @@ const TableRecommendations = () => {
                     onClick={() => handleTableInquiry(table)}
                     style={{
                       width: '100%',
-                      padding: '0.6rem 0.8rem',
-                      background: 'linear-gradient(135deg, #64ffda 0%, #4fd1c7 100%)',
-                      color: '#0a192f',
+                      padding: '0.75rem 1rem',
+                      background: '#000000',
+                      color: '#ffffff',
                       border: 'none',
-                      borderRadius: '0.6rem',
-                      fontSize: '0.75rem',
-                      fontWeight: '600',
+                      borderRadius: '0.5rem',
+                      fontSize: '0.875rem',
+                      fontWeight: '500',
                       cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      boxShadow: '0 4px 12px rgba(100, 255, 218, 0.3)'
+                      transition: 'all 0.2s ease',
+                      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                      fontFamily: 'Inter, sans-serif'
                     }}
                   >
                     Reserve Now

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card } from 'react-bootstrap';
 import { FiStar, FiMapPin, FiClock, FiUsers, FiWifi, FiCoffee, FiTv, FiCar } from 'react-icons/fi';
-import { apiConfig } from '../../config/api';
+import { getMenuImageUrl, getRoomImageUrl, getTableImageUrl, handleImageError } from '../../utils/imageUtils';
 import './ModernCard.css';
 
 const ModernCard = ({ 
@@ -15,16 +15,16 @@ const ModernCard = ({
   size = 'medium' // small, medium, large
 }) => {
   const getImageUrl = (imagePath) => {
-    if (!imagePath) {
-      const placeholders = {
-        food: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400',
-        room: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=400',
-        table: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400'
-      };
-      return placeholders[type] || placeholders.food;
+    switch (type) {
+      case 'room':
+        return getRoomImageUrl(imagePath);
+      case 'table':
+        return getTableImageUrl(imagePath);
+      case 'food':
+      case 'menu':
+      default:
+        return getMenuImageUrl(imagePath);
     }
-    if (imagePath.startsWith('http')) return imagePath;
-    return `${apiConfig.serverURL}${imagePath.startsWith('/') ? imagePath : '/' + imagePath}`;
   };
 
   const getAmenityIcon = (amenity) => {
@@ -71,8 +71,13 @@ const ModernCard = ({
           alt={item.name || item.roomType || item.tableName}
           className="modern-card-image"
           onError={(e) => {
-            e.target.src = getImageUrl(null);
-            e.target.onerror = null;
+            const fallbacks = {
+              room: '/images/placeholder-room.jpg',
+              table: '/images/placeholder-table.jpg',
+              food: '/images/placeholder-menu.jpg',
+              menu: '/images/placeholder-menu.jpg'
+            };
+            handleImageError(e, fallbacks[type] || fallbacks.food);
           }}
         />
         

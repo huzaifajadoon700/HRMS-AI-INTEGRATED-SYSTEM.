@@ -152,6 +152,7 @@ const additionalRoutes = [
   ["./Routes/AdminRoutes", "/api/admin", "Admin Panel"],
   ["./Routes/feedbackRoutes", "/api/feedback", "Feedback System"],
   ["./Routes/staffRoutes", "/api/staff", "Staff Management"],
+  ["./Routes/shiftroutes", "/api/shift", "Shift Management"],
   ["./Routes/paymentRoutes", "/api/payment", "Payment Processing"],
   ["./Routes/recommendationRoutes", "/api/food-recommendations", "Food Recommendations"],
   ["./Routes/GoogleRoutes", "/auth", "Google Authentication"],
