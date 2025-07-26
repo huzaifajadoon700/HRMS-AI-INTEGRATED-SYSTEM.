@@ -1,3 +1,4 @@
+/* Footer component styling with consistent theme variables */
 .footer {
   background-color: var(--secondary-bg);
   padding: var(--spacing-xl) 0;
