@@ -8,8 +8,13 @@ const app = express();
 
 // CORS Setup for Vercel
 const corsOptions = {
-  origin: ["https://your-frontend-domain.vercel.app", "http://localhost:3000"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: [
+    process.env.FRONTEND_URL,
+    "http://localhost:3000",
+    "http://localhost:3001",
+    /\.vercel\.app$/,
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 };

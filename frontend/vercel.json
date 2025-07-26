@@ -21,8 +21,8 @@
     }
   ],
   "env": {
-    "REACT_APP_API_URL": "https://hrms-bace.vercel.app",
-    "REACT_APP_API_BASE_URL": "https://hrms-bace.vercel.app/api",
+    "REACT_APP_API_URL": "https://hrms-ai-integrated-system-backend.vercel.app",
+    "REACT_APP_API_BASE_URL": "https://hrms-ai-integrated-system-backend.vercel.app/api",
     "REACT_APP_STRIPE_PUBLIC_KEY": "pk_test_51RQDO0QHBrXA72xgYssbECOe9bubZ2bWHA4m0T6EY6AvvmAfCzIDmKUCkRjpwVVIJ4IMaOiQBUawECn5GD8ADHbn00GRVmjExI",
     "REACT_APP_GOOGLE_CLIENT_ID": "940737064009-sf2stfd9kf6dq9e6s188l2pe1hh6q75o.apps.googleusercontent.com"
   }

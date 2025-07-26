@@ -63,7 +63,7 @@ const OrderTracking = () => {
   const [progressPercentage, setProgressPercentage] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
-  const [trackingStarted, setTrackingStarted] = useState(false);
+  // const [trackingStarted, setTrackingStarted] = useState(false);
   const [manualTrackingActive, setManualTrackingActive] = useState(false);
 
   // Calculate progress percentage based on current status

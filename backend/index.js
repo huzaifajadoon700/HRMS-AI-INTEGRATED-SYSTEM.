@@ -277,10 +277,10 @@ const io = socketModule.init(server);
 // 🔹 CORS Setup for Express
 const corsOptions = {
   origin: [
-    "https://hrms-frontend-swart.vercel.app", // Production frontend
+    process.env.FRONTEND_URL, // Production frontend from environment
     "http://localhost:3000", // Local development
     "http://localhost:3001", // Alternative local port
-    "*", // Allow all origins for development
+    /\.vercel\.app$/, // Allow all Vercel apps for development
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
