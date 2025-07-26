@@ -438,7 +438,7 @@ const OrderTracking = () => {
     if (!orderId || manualTrackingActive) return;
 
     setManualTrackingActive(true);
-    setTrackingStarted(true);
+    // setTrackingStarted(true);
 
     toast.success(
       "Order tracking started! Status will update every 5 seconds.",
