@@ -21,7 +21,7 @@ const AdminDeleteMenu = () => {
     }
 
     fetchMenuItems();
-  }, [navigate]);
+  }, [navigate, fetchMenuItems]);
 
   const fetchMenuItems = async () => {
     try {

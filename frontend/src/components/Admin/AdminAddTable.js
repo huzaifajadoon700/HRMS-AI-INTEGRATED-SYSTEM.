@@ -39,29 +39,34 @@ const AdminAddTable = () => {
     }));
   };
 
-  const handleFeatureChange = (feature) => {
-    setFormData((prev) => ({
-      ...prev,
-      features: prev.features.includes(feature)
-        ? prev.features.filter((f) => f !== feature)
-        : [...prev.features, feature],
-    }));
-  };
+  // const handleFeatureChange = (feature) => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     features: prev.features.includes(feature)
+  //       ? prev.features.filter((f) => f !== feature)
+  //       : [...prev.features, feature],
+  //   }));
+  // };
 
   // Handle file selection
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
       // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      const allowedTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/gif",
+      ];
       if (!allowedTypes.includes(file.type)) {
-        toast.error('Please select a valid image file (JPEG, PNG, or GIF)');
+        toast.error("Please select a valid image file (JPEG, PNG, or GIF)");
         return;
       }
 
       // Validate file size (5MB limit)
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('File size must be less than 5MB');
+        toast.error("File size must be less than 5MB");
         return;
       }
 
@@ -79,7 +84,7 @@ const AdminAddTable = () => {
   // Handle image upload
   const handleImageUpload = async () => {
     if (!selectedFile) {
-      toast.error('Please select an image first');
+      toast.error("Please select an image first");
       return;
     }
 
@@ -89,18 +94,17 @@ const AdminAddTable = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const base64Image = e.target.result;
-        setFormData(prev => ({
+        setFormData((prev) => ({
           ...prev,
-          imageUrl: base64Image
+          imageUrl: base64Image,
         }));
-        toast.success('Image uploaded successfully!');
+        toast.success("Image uploaded successfully!");
         setImageUploading(false);
       };
       reader.readAsDataURL(selectedFile);
-
     } catch (error) {
-      console.error('Image upload error:', error);
-      toast.error('Failed to upload image. Please try again.');
+      console.error("Image upload error:", error);
+      toast.error("Failed to upload image. Please try again.");
       setImageUploading(false);
     }
   };
@@ -109,9 +113,9 @@ const AdminAddTable = () => {
   const clearImage = () => {
     setSelectedFile(null);
     setImagePreview(null);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      imageUrl: ''
+      imageUrl: "",
     }));
   };
 
@@ -131,7 +135,7 @@ const AdminAddTable = () => {
       const apiUrl =
         process.env.REACT_APP_API_BASE_URL ||
         "https://hrms-bace.vercel.app/api";
-      const response = await axios.post(`${apiUrl}/tables`, formData, {
+      await axios.post(`${apiUrl}/tables`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -225,252 +229,289 @@ const AdminAddTable = () => {
           <p>Add a new table to the system</p>
         </div>
 
-      <div className="simple-table-container">
-        <form onSubmit={handleSubmit} className="simple-form">
-          <div className="simple-form-row">
-            <input
-              type="text"
-              name="tableName"
-              placeholder="Table Name"
-              value={formData.tableName}
+        <div className="simple-table-container">
+          <form onSubmit={handleSubmit} className="simple-form">
+            <div className="simple-form-row">
+              <input
+                type="text"
+                name="tableName"
+                placeholder="Table Name"
+                value={formData.tableName}
+                onChange={handleInputChange}
+                required
+              />
+              <select
+                name="tableType"
+                value={formData.tableType}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="">Select Table Type</option>
+                <option value="indoor">Indoor</option>
+                <option value="outdoor">Outdoor</option>
+                <option value="private">Private</option>
+                <option value="Standard">Standard</option>
+                <option value="Premium">Premium</option>
+                <option value="VIP">VIP</option>
+                <option value="Booth">Booth</option>
+                <option value="Counter">Counter</option>
+              </select>
+            </div>
+
+            <div className="simple-form-row">
+              <input
+                type="number"
+                name="capacity"
+                placeholder="Capacity (number of people)"
+                value={formData.capacity}
+                onChange={handleInputChange}
+                required
+              />
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="Available">Available</option>
+                <option value="Booked">Booked</option>
+                <option value="Reserved">Reserved</option>
+              </select>
+            </div>
+
+            <div className="simple-form-row">
+              <input
+                type="text"
+                name="location"
+                placeholder="Location (e.g., Main Hall, Terrace, etc.)"
+                value={formData.location}
+                onChange={handleInputChange}
+              />
+              <div></div>
+            </div>
+
+            <textarea
+              name="description"
+              placeholder="Table Description (optional)"
+              value={formData.description}
               onChange={handleInputChange}
-              required
+              rows="4"
             />
-            <select
-              name="tableType"
-              value={formData.tableType}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="">Select Table Type</option>
-              <option value="indoor">Indoor</option>
-              <option value="outdoor">Outdoor</option>
-              <option value="private">Private</option>
-              <option value="Standard">Standard</option>
-              <option value="Premium">Premium</option>
-              <option value="VIP">VIP</option>
-              <option value="Booth">Booth</option>
-              <option value="Counter">Counter</option>
-            </select>
-          </div>
 
-          <div className="simple-form-row">
-            <input
-              type="number"
-              name="capacity"
-              placeholder="Capacity (number of people)"
-              value={formData.capacity}
-              onChange={handleInputChange}
-              required
-            />
-            <select
-              name="status"
-              value={formData.status}
-              onChange={handleInputChange}
-              required
-            >
-              <option value="Available">Available</option>
-              <option value="Booked">Booked</option>
-              <option value="Reserved">Reserved</option>
-            </select>
-          </div>
+            {/* Image Upload Section */}
+            <div className="simple-form-section">
+              <h3
+                style={{
+                  margin: "0 0 1rem 0",
+                  fontSize: "1.1rem",
+                  color: "#374151",
+                }}
+              >
+                Table Image
+              </h3>
 
-          <div className="simple-form-row">
-            <input
-              type="text"
-              name="location"
-              placeholder="Location (e.g., Main Hall, Terrace, etc.)"
-              value={formData.location}
-              onChange={handleInputChange}
-            />
-            <div></div>
-          </div>
-
-          <textarea
-            name="description"
-            placeholder="Table Description (optional)"
-            value={formData.description}
-            onChange={handleInputChange}
-            rows="4"
-          />
-
-          {/* Image Upload Section */}
-          <div className="simple-form-section">
-            <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', color: '#374151' }}>
-              Table Image
-            </h3>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <div className="admin-image-upload-container" style={{
-                display: 'flex',
-                gap: '1rem',
-                marginBottom: '1rem',
-                flexWrap: 'wrap'
-              }}>
-                {/* File Upload */}
-                <div className="admin-image-upload-section" style={{ flex: '1', minWidth: '250px' }}>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontSize: '0.9rem',
-                    fontWeight: '500',
-                    color: '#374151'
-                  }}>
-                    Upload Image File
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileSelect}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '2px dashed #d1d5db',
-                      borderRadius: '0.5rem',
-                      backgroundColor: '#f9fafb',
-                      cursor: 'pointer'
-                    }}
-                  />
-                  {selectedFile && (
-                    <div className="admin-image-upload-buttons" style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem' }}>
-                      <button
-                        type="button"
-                        onClick={handleImageUpload}
-                        disabled={imageUploading}
+              <div style={{ marginBottom: "1rem" }}>
+                <div
+                  className="admin-image-upload-container"
+                  style={{
+                    display: "flex",
+                    gap: "1rem",
+                    marginBottom: "1rem",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {/* File Upload */}
+                  <div
+                    className="admin-image-upload-section"
+                    style={{ flex: "1", minWidth: "250px" }}
+                  >
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "0.5rem",
+                        fontSize: "0.9rem",
+                        fontWeight: "500",
+                        color: "#374151",
+                      }}
+                    >
+                      Upload Image File
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      style={{
+                        width: "100%",
+                        padding: "0.75rem",
+                        border: "2px dashed #d1d5db",
+                        borderRadius: "0.5rem",
+                        backgroundColor: "#f9fafb",
+                        cursor: "pointer",
+                      }}
+                    />
+                    {selectedFile && (
+                      <div
+                        className="admin-image-upload-buttons"
                         style={{
-                          padding: '0.5rem 1rem',
-                          backgroundColor: imageUploading ? '#9ca3af' : '#059669',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '0.375rem',
-                          cursor: imageUploading ? 'not-allowed' : 'pointer',
-                          fontSize: '0.875rem'
+                          marginTop: "0.5rem",
+                          display: "flex",
+                          gap: "0.5rem",
                         }}
                       >
-                        {imageUploading ? 'Uploading...' : 'Upload Image'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={clearImage}
-                        style={{
-                          padding: '0.5rem 1rem',
-                          backgroundColor: '#ef4444',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '0.375rem',
-                          cursor: 'pointer',
-                          fontSize: '0.875rem'
-                        }}
-                      >
-                        Clear
-                      </button>
-                    </div>
-                  )}
-                </div>
+                        <button
+                          type="button"
+                          onClick={handleImageUpload}
+                          disabled={imageUploading}
+                          style={{
+                            padding: "0.5rem 1rem",
+                            backgroundColor: imageUploading
+                              ? "#9ca3af"
+                              : "#059669",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "0.375rem",
+                            cursor: imageUploading ? "not-allowed" : "pointer",
+                            fontSize: "0.875rem",
+                          }}
+                        >
+                          {imageUploading ? "Uploading..." : "Upload Image"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={clearImage}
+                          style={{
+                            padding: "0.5rem 1rem",
+                            backgroundColor: "#ef4444",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "0.375rem",
+                            cursor: "pointer",
+                            fontSize: "0.875rem",
+                          }}
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
-                {/* OR Divider */}
-                <div style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  padding: '0 1rem',
-                  color: '#6b7280',
-                  fontSize: '0.875rem',
-                  fontWeight: '500'
-                }}>
-                  OR
-                </div>
-
-                {/* URL Input */}
-                <div className="admin-image-upload-section" style={{ flex: '1', minWidth: '250px' }}>
-                  <label style={{
-                    display: 'block',
-                    marginBottom: '0.5rem',
-                    fontSize: '0.9rem',
-                    fontWeight: '500',
-                    color: '#374151'
-                  }}>
-                    Image URL
-                  </label>
-                  <input
-                    type="url"
-                    name="imageUrl"
-                    placeholder="https://example.com/table.jpg"
-                    value={formData.imageUrl}
-                    onChange={handleInputChange}
+                  {/* OR Divider */}
+                  <div
                     style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1px solid #d1d5db',
-                      borderRadius: '0.375rem',
-                      fontSize: '0.875rem'
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "0 1rem",
+                      color: "#6b7280",
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
                     }}
-                  />
-                </div>
-              </div>
+                  >
+                    OR
+                  </div>
 
-              {/* Image Preview */}
-              {(imagePreview || formData.imageUrl) && (
-                <div className="admin-image-preview" style={{
-                  marginTop: '1rem',
-                  padding: '1rem',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '0.5rem',
-                  backgroundColor: '#f9fafb'
-                }}>
-                  <h4 style={{
-                    margin: '0 0 0.5rem 0',
-                    fontSize: '0.9rem',
-                    color: '#374151'
-                  }}>
-                    Image Preview
-                  </h4>
-                  <img
-                    src={imagePreview || formData.imageUrl}
-                    alt="Table preview"
-                    style={{
-                      maxWidth: '200px',
-                      maxHeight: '150px',
-                      objectFit: 'cover',
-                      borderRadius: '0.375rem',
-                      border: '1px solid #d1d5db'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'block';
-                    }}
-                  />
-                  <div style={{
-                    display: 'none',
-                    color: '#ef4444',
-                    fontSize: '0.875rem',
-                    marginTop: '0.5rem'
-                  }}>
-                    Failed to load image
+                  {/* URL Input */}
+                  <div
+                    className="admin-image-upload-section"
+                    style={{ flex: "1", minWidth: "250px" }}
+                  >
+                    <label
+                      style={{
+                        display: "block",
+                        marginBottom: "0.5rem",
+                        fontSize: "0.9rem",
+                        fontWeight: "500",
+                        color: "#374151",
+                      }}
+                    >
+                      Image URL
+                    </label>
+                    <input
+                      type="url"
+                      name="imageUrl"
+                      placeholder="https://example.com/table.jpg"
+                      value={formData.imageUrl}
+                      onChange={handleInputChange}
+                      style={{
+                        width: "100%",
+                        padding: "0.75rem",
+                        border: "1px solid #d1d5db",
+                        borderRadius: "0.375rem",
+                        fontSize: "0.875rem",
+                      }}
+                    />
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
 
-          <div className="simple-form-actions">
-            <button
-              type="submit"
-              className="simple-btn simple-btn-primary"
-              disabled={loading}
-            >
-              {loading ? "Adding..." : "Add Table"}
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate("/admin/view-tables")}
-              className="simple-btn simple-btn-secondary"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+                {/* Image Preview */}
+                {(imagePreview || formData.imageUrl) && (
+                  <div
+                    className="admin-image-preview"
+                    style={{
+                      marginTop: "1rem",
+                      padding: "1rem",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "0.5rem",
+                      backgroundColor: "#f9fafb",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        margin: "0 0 0.5rem 0",
+                        fontSize: "0.9rem",
+                        color: "#374151",
+                      }}
+                    >
+                      Image Preview
+                    </h4>
+                    <img
+                      src={imagePreview || formData.imageUrl}
+                      alt="Table preview"
+                      style={{
+                        maxWidth: "200px",
+                        maxHeight: "150px",
+                        objectFit: "cover",
+                        borderRadius: "0.375rem",
+                        border: "1px solid #d1d5db",
+                      }}
+                      onError={(e) => {
+                        e.target.style.display = "none";
+                        e.target.nextSibling.style.display = "block";
+                      }}
+                    />
+                    <div
+                      style={{
+                        display: "none",
+                        color: "#ef4444",
+                        fontSize: "0.875rem",
+                        marginTop: "0.5rem",
+                      }}
+                    >
+                      Failed to load image
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="simple-form-actions">
+              <button
+                type="submit"
+                className="simple-btn simple-btn-primary"
+                disabled={loading}
+              >
+                {loading ? "Adding..." : "Add Table"}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/admin/view-tables")}
+                className="simple-btn simple-btn-secondary"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
     </>
   );
 };

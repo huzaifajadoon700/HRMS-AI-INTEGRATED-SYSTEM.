@@ -21,7 +21,7 @@ const AdminDeleteRoom = () => {
     }
 
     fetchRooms();
-  }, [navigate]);
+  }, [navigate, fetchRooms]);
 
   const fetchRooms = async () => {
     try {

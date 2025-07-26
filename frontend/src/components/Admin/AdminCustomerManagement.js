@@ -34,7 +34,7 @@ const AdminCustomerManagement = () => {
     }
 
     fetchCustomers();
-  }, [navigate]);
+  }, [navigate, fetchCustomers]);
 
   const fetchCustomers = async () => {
     try {
