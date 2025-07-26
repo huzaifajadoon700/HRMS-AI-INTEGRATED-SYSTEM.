@@ -1,49 +1,58 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
+
+// Feedback model for storing user reviews and sentiment analysis
 
 const feedbackSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'users',
-    required: true
+    ref: "users",
+    required: true,
   },
   rating: {
     type: Number,
     required: true,
     min: 1,
-    max: 5
+    max: 5,
   },
   comment: {
     type: String,
-    required: true
+    required: true,
   },
   sentiment: {
     type: String,
-    enum: ['positive', 'slightly_positive', 'neutral', 'slightly_negative', 'negative'],
-    required: true
+    enum: [
+      "positive",
+      "slightly_positive",
+      "neutral",
+      "slightly_negative",
+      "negative",
+    ],
+    required: true,
   },
   sentimentScore: {
     type: Number,
     required: true,
     min: -1,
-    max: 1
+    max: 1,
   },
   sentimentConfidence: {
     type: Number,
     required: true,
     min: 0,
-    max: 1
+    max: 1,
   },
   processedTokens: {
     type: Number,
-    required: true
+    required: true,
   },
   createdAt: {
     type: Date,
-    default: Date.now
-  }
+    default: Date.now,
+  },
 });
 
 // Check if the model already exists before defining it
-const FeedbackModel = mongoose.models.Feedback || mongoose.model('Feedback', feedbackSchema);
+const FeedbackModel =
+  mongoose.models.Feedback || mongoose.model("Feedback", feedbackSchema);
 
-module.exports = FeedbackModel; 
+module.exports = FeedbackModel;
