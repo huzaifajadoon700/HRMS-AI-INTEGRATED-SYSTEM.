@@ -8,7 +8,7 @@ const {
 } = require("../Controllers/feedbackController");
 const { ensureAuthenticated, ensureAdmin } = require("../Middlewares/Auth");
 
-// User routes
+// User routes - Customer feedback operations
 router.post("/", ensureAuthenticated, submitFeedback);
 router.get("/my-feedback", ensureAuthenticated, getUserFeedback);
 
