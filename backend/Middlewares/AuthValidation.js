@@ -1,6 +1,7 @@
 // Authentication Validation Middleware - Validates user input for signup and login
 const Joi = require("joi");
 
+// Validates user registration data
 const signupValidation = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(100).required(),
