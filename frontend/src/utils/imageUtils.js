@@ -3,46 +3,75 @@
  * Supports both external URLs (Unsplash, etc.) and local uploads
  */
 
-import { apiConfig } from '../config/api';
+import { apiConfig } from "../config/api";
 
-export const getImageUrl = (imagePath, fallback = "/images/placeholder-food.jpg") => {
+export const getImageUrl = (
+  imagePath,
+  fallback = "/images/placeholder-food.jpg"
+) => {
   // Return fallback if no image path provided
   if (!imagePath) {
-    console.log('getImageUrl: No image path provided, using fallback:', fallback);
+    console.log(
+      "getImageUrl: No image path provided, using fallback:",
+      fallback
+    );
     return fallback;
   }
 
   // Handle invalid image paths (common issue with failed uploads)
-  if (imagePath.includes('undefined') || imagePath === '/uploads/undefined' || imagePath === 'undefined') {
-    console.log('getImageUrl: Invalid image path detected:', imagePath, 'using fallback:', fallback);
+  if (
+    imagePath.includes("undefined") ||
+    imagePath === "/uploads/undefined" ||
+    imagePath === "undefined"
+  ) {
+    console.log(
+      "getImageUrl: Invalid image path detected:",
+      imagePath,
+      "using fallback:",
+      fallback
+    );
     return fallback;
   }
 
   try {
     // If it's already a full URL (Unsplash, external sources), return as is
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      console.log('getImageUrl: External URL detected:', imagePath);
+    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+      console.log("getImageUrl: External URL detected:", imagePath);
       return imagePath;
     }
 
     // If it's a local upload path
-    const cleanPath = imagePath.replace(/^\/+/, '');
-    console.log('getImageUrl: Processing local path:', imagePath, '-> cleaned:', cleanPath);
+    const cleanPath = imagePath.replace(/^\/+/, "");
+    console.log(
+      "getImageUrl: Processing local path:",
+      imagePath,
+      "-> cleaned:",
+      cleanPath
+    );
 
     let finalUrl;
     // Check if it already includes uploads in the path
-    if (cleanPath.includes('uploads/') || cleanPath.startsWith('uploads')) {
+    if (cleanPath.includes("uploads/") || cleanPath.startsWith("uploads")) {
       finalUrl = `${apiConfig.serverURL}/${cleanPath}`;
     } else {
       // Default to uploads folder
       finalUrl = `${apiConfig.serverURL}/uploads/${cleanPath}`;
     }
 
-    console.log('getImageUrl: Final URL:', finalUrl, 'Server URL:', apiConfig.serverURL);
+    console.log(
+      "getImageUrl: Final URL:",
+      finalUrl,
+      "Server URL:",
+      apiConfig.serverURL
+    );
     return finalUrl;
-
   } catch (error) {
-    console.error('getImageUrl: Error formatting image URL:', error, 'for path:', imagePath);
+    console.error(
+      "getImageUrl: Error formatting image URL:",
+      error,
+      "for path:",
+      imagePath
+    );
     return fallback;
   }
 };
@@ -70,8 +99,12 @@ export const getTableImageUrl = (imagePath) => {
 
 /**
  * Handle image error by setting fallback
+ * Prevents broken image display in UI
  */
-export const handleImageError = (e, fallback = "/images/placeholder-food.jpg") => {
+export const handleImageError = (
+  e,
+  fallback = "/images/placeholder-food.jpg"
+) => {
   e.target.src = fallback;
   e.target.onerror = null; // Prevent infinite loop
 };
